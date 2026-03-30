@@ -1,9 +1,22 @@
 /**
- * main.js — Electron main process for IRFlow Timeline
+ * main.js — Electron main process for IRFlow Timeline (Windows build)
  *
- * Coordinates between the renderer (React UI) and the backend
- * (SQLite DB + streaming parser). All data operations happen here
- * in the main process, with results sent to renderer via IPC.
+ * Windows-specific changes from macOS original:
+ *  - BrowserWindow: removed titleBarStyle/trafficLightPosition/vibrancy (macOS only);
+ *    replaced with frame:true, standard Windows chrome.
+ *  - app.on("open-file") removed — macOS-only; Windows file association is handled
+ *    via process.argv / second-instance instead.
+ *  - second-instance handler added for single-instance enforcement + argv file opens.
+ *  - app.requestSingleInstanceLock() called before createWindow.
+ *  - macOS-only menu items removed: "services", "hide", "hideOthers", "unhide",
+ *    "front", "zoom" (Window submenu), "about" (moved to Help).
+ *  - Window submenu simplified for Windows (minimize, separator, close).
+ *  - "App" top-level menu removed; Quit/About moved into File/Help menus.
+ *  - updater "not-configured" message updated to reference latest-win.yml.
+ *  - Log path uses app.getPath("userData") instead of os.homedir() to stay
+ *    inside the user's AppData\Roaming folder on Windows.
+ *  - All path.join() calls already use Node's cross-platform path module — no changes needed.
+ *  - PDF export: loadURL with data: URI works on Windows; no change needed.
  */
 
 const { app, BrowserWindow, Menu, dialog, ipcMain, shell } = require("electron");
@@ -16,9 +29,7 @@ const TimelineDB = require("./db");
 const { parseFile, getXLSXSheets, extractResidentData } = require("./parser");
 const { createUpdateController } = require("./updater");
 
-// Raise V8 heap limit to 16GB — needed for importing large forensic images (20GB+)
-// app.commandLine.appendSwitch only affects renderer processes; for the main process
-// (where parsing runs), we must set the flag via v8 directly.
+// Raise V8 heap limit to 16 GB for large forensic files.
 const v8 = require("v8");
 v8.setFlagsFromString("--max-old-space-size=16384");
 app.commandLine.appendSwitch("js-flags", "--max-old-space-size=16384");
@@ -28,13 +39,14 @@ const db = new TimelineDB();
 let tabCounter = 0;
 const _tabMeta = new Map(); // tabId -> { filePath, sourceFormat }
 
-// ── Recent files persistence ──────────────────────────────────────
+// ── Recent files persistence ──────────────────────────────────────────────────
 const RECENT_FILES_MAX = 10;
 const _recentFilesPath = path.join(app.getPath("userData"), "recent-files.json");
 
 function _loadRecentFiles() {
   try {
-    if (fs.existsSync(_recentFilesPath)) return JSON.parse(fs.readFileSync(_recentFilesPath, "utf8")).slice(0, RECENT_FILES_MAX);
+    if (fs.existsSync(_recentFilesPath))
+      return JSON.parse(fs.readFileSync(_recentFilesPath, "utf8")).slice(0, RECENT_FILES_MAX);
   } catch {}
   return [];
 }
@@ -49,17 +61,16 @@ function addRecentFile(filePath) {
   files.unshift(filePath);
   if (files.length > RECENT_FILES_MAX) files.length = RECENT_FILES_MAX;
   _saveRecentFiles(files);
-  // Debounce menu rebuild — batch imports can call addRecentFile rapidly
   if (_menuRebuildTimer) clearTimeout(_menuRebuildTimer);
   _menuRebuildTimer = setTimeout(() => { _menuRebuildTimer = null; _rebuildMenu(); }, 500);
   safeSend("recent-files-updated", files);
 }
 
-// ── Debug trace logger (shared singleton — see logger.js) ─────
+// ── Debug trace logger ────────────────────────────────────────────────────────
 const { dbg, debugLogPath } = require("./logger");
-dbg("INIT", `IRFlow Timeline starting, debug log: ${debugLogPath}`);
+dbg("INIT", `IRFlow Timeline starting (Windows), debug log: ${debugLogPath}`);
 
-// ── Global crash guards ──────────────────────────────────────────
+// ── Global crash guards ───────────────────────────────────────────────────────
 process.on("uncaughtException", (err) => {
   dbg("CRASH", "Uncaught exception", { message: err?.message, stack: err?.stack });
   try {
@@ -74,10 +85,12 @@ process.on("unhandledRejection", (reason) => {
   dbg("CRASH", "Unhandled rejection", { message: reason?.message || String(reason), stack: reason?.stack });
 });
 
-// ── Safe IPC helpers ─────────────────────────────────────────────
+// ── Safe IPC helpers ──────────────────────────────────────────────────────────
 function safeHandle(channel, handler) {
   ipcMain.handle(channel, async (event, ...args) => {
-    dbg("IPC", `→ ${channel}`, args?.length > 0 ? { argKeys: typeof args[0] === "object" && args[0] ? Object.keys(args[0]) : undefined } : undefined);
+    dbg("IPC", `→ ${channel}`, args?.length > 0
+      ? { argKeys: typeof args[0] === "object" && args[0] ? Object.keys(args[0]) : undefined }
+      : undefined);
     try {
       const result = await handler(event, ...args);
       dbg("IPC", `← ${channel} OK`);
@@ -89,8 +102,6 @@ function safeHandle(channel, handler) {
   });
 }
 
-// Return mainWindow if it's still alive, otherwise null.
-// Electron dialog APIs accept null/undefined — they show a parentless dialog.
 function _activeWindow() {
   return (mainWindow && !mainWindow.isDestroyed()) ? mainWindow : null;
 }
@@ -108,10 +119,10 @@ const updateController = createUpdateController({
   sendStatus: (payload) => safeSend("updater-state", payload),
 });
 
-// ── Import queue — serialize file imports to prevent concurrent memory exhaustion ──
+// ── Import queue ──────────────────────────────────────────────────────────────
 const _importQueue = [];
 let _importRunning = false;
-const _pendingIndexTabs = []; // tabs waiting for index/FTS build (deferred until queue drains)
+const _pendingIndexTabs = [];
 
 function enqueueImport(filePath, opts) {
   let fileName; try { fileName = decodeURIComponent(path.basename(filePath)); } catch { fileName = path.basename(filePath); }
@@ -135,15 +146,17 @@ async function _processQueue() {
     const item = _importQueue.shift();
     _broadcastQueue();
 
-    // Log memory before import
     const memBefore = process.memoryUsage();
-    dbg("QUEUE", `Starting import: ${item.fileName}`, { heapMB: Math.round(memBefore.heapUsed / 1048576), rssMB: Math.round(memBefore.rss / 1048576), queueRemaining: _importQueue.length });
+    dbg("QUEUE", `Starting import: ${item.fileName}`, {
+      heapMB: Math.round(memBefore.heapUsed / 1048576),
+      rssMB: Math.round(memBefore.rss / 1048576),
+      queueRemaining: _importQueue.length,
+    });
 
     try {
       await importFile(item.filePath, item.tabId, item.sheetName);
     } catch (err) {
       dbg("QUEUE", `importFile failed for ${item.fileName}`, { error: err?.message });
-      // Notify renderer so it can dismiss the loading state for this file
       safeSend("import-error", {
         tabId: item.tabId || null,
         fileName: item.fileName,
@@ -153,7 +166,6 @@ async function _processQueue() {
     _broadcastQueue();
 
     if (_importQueue.length > 0) {
-      // GC-friendly pause: yield to event loop + request GC before next import
       await new Promise((r) => setTimeout(r, 100));
       if (global.gc) { try { global.gc(); } catch {} }
     }
@@ -161,7 +173,6 @@ async function _processQueue() {
 
   _importRunning = false;
   _broadcastQueue();
-  // Queue fully drained — now build deferred indexes/FTS
   _buildDeferredIndexes();
 }
 
@@ -170,8 +181,6 @@ function _buildDeferredIndexes() {
   const tabs = _pendingIndexTabs.splice(0);
   dbg("QUEUE", `Building deferred indexes for ${tabs.length} tabs`);
 
-  // Limit concurrency to 2 to prevent memory exhaustion — each index build
-  // allocates 256MB-1GB cache, so 10 concurrent builds could OOM.
   const MAX_CONCURRENT = 2;
   let active = 0;
   let idx = 0;
@@ -183,7 +192,6 @@ function _buildDeferredIndexes() {
       db.buildIndexesAsync(tabId, (progress) => {
         safeSend("index-progress", { tabId, ...progress });
       }).then(() => {
-        // After MFT indexes finish, re-resolve any USN Journal tabs
         const tabInfo = _tabMeta.get(tabId);
         if (tabInfo?.sourceFormat === "raw-mft") {
           for (const [tid, tmeta] of _tabMeta) {
@@ -210,43 +218,68 @@ function _buildDeferredIndexes() {
   buildNext();
 }
 
-// ── macOS lifecycle ────────────────────────────────────────────────
+// ── Windows lifecycle ─────────────────────────────────────────────────────────
+// On Windows (and Linux) all windows closing should quit the app.
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    db.closeAll();
-    app.quit();
-  }
+  db.closeAll();
+  app.quit();
 });
 
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
-});
+// No macOS "activate" / re-open behaviour needed on Windows.
 
 app.on("before-quit", () => {
   db.closeAll();
-  // Close VT cache DB if it was opened
   try { if (_vtCacheDb) { _vtCacheDb.close(); _vtCacheDb = null; } } catch {}
 });
 
-app.on("open-file", (event, filePath) => {
-  event.preventDefault();
-  if (mainWindow && mainWindow.webContents) {
-    enqueueImport(filePath);
-  } else {
-    app.pendingFilePath = filePath;
-  }
-});
+// ── Single-instance lock + Windows file-open via argv ─────────────────────────
+// On Windows, opening a file association passes the path as argv[1] (packaged)
+// or argv[2] (dev, because argv[1] is the entry script).
+// The second-instance event fires when a user double-clicks a file while the
+// app is already running — we grab the path from the new instance's argv.
 
-// ── Window ─────────────────────────────────────────────────────────
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+} else {
+  app.on("second-instance", (_event, argv, _workingDir) => {
+    // Bring existing window to front
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+    // Extract the file path from the second instance's command line.
+    const filePath = _extractFileArgFromArgv(argv);
+    if (filePath && fs.existsSync(filePath)) {
+      enqueueImport(filePath);
+    }
+  });
+}
+
+/**
+ * Return the first non-flag argument from argv that looks like a file path,
+ * skipping Electron internals (--switches, the app path, "." etc.).
+ */
+function _extractFileArgFromArgv(argv) {
+  // argv[0] = electron / exe, argv[1] = app path in dev / first real arg in packaged
+  const candidates = argv.slice(app.isPackaged ? 1 : 2);
+  for (const arg of candidates) {
+    if (!arg.startsWith("-") && arg !== "." && path.isAbsolute(arg)) {
+      return arg;
+    }
+  }
+  return null;
+}
+
+// ── Window ────────────────────────────────────────────────────────────────────
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1500,
     height: 950,
     minWidth: 900,
     minHeight: 600,
-    titleBarStyle: "hiddenInset",
-    trafficLightPosition: { x: 16, y: 16 },
-    vibrancy: "under-window",
+    // Windows: use standard frame (no macOS traffic lights / vibrancy).
+    frame: true,
     backgroundColor: "#0f1114",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -265,40 +298,48 @@ function createWindow() {
 
   mainWindow.once("ready-to-show", () => {
     mainWindow.show();
-    if (app.pendingFilePath) {
-      enqueueImport(app.pendingFilePath);
-      delete app.pendingFilePath;
+
+    // Check if a file path was passed via argv on first launch
+    const fileArg = _extractFileArgFromArgv(process.argv);
+    if (fileArg && fs.existsSync(fileArg)) {
+      enqueueImport(fileArg);
     }
+
     updateController.scheduleStartupCheck();
   });
 
   mainWindow.on("closed", () => { mainWindow = null; });
 
   // Forward right-click coordinates to renderer via IPC.
-  // On macOS with external trackpads, DOM contextmenu events may not reach the renderer,
-  // so we forward from the main process where the event always fires.
   mainWindow.webContents.on("context-menu", (event, params) => {
     event.preventDefault();
     safeSend("native-context-menu", { x: params.x, y: params.y });
   });
 
+  // Route window.open(_blank) calls to the system browser via shell.openExternal.
+  // Required on Windows with contextIsolation:true — without this, window.open(_blank)
+  // is silently blocked and VT links, MITRE links, website links etc. never open.
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith("https://") || url.startsWith("http://")) {
+      shell.openExternal(url).catch(() => {});
+    }
+    return { action: "deny" };
+  });
+
   buildMenu();
 }
 
-// ── File import ────────────────────────────────────────────────────
+// ── File import ───────────────────────────────────────────────────────────────
 async function importFile(filePath, preTabId, preSheetName) {
   const tabId = preTabId || `tab_${++tabCounter}_${Date.now()}`;
   let fileName; try { fileName = decodeURIComponent(path.basename(filePath)); } catch { fileName = path.basename(filePath); }
   const ext = path.extname(filePath).toLowerCase();
   dbg("IMPORT", `importFile called`, { filePath, tabId, ext, preSheetName });
 
-  // Pre-flight check for very large files
   let fileSize = 0;
   try { fileSize = fs.statSync(filePath).size; } catch {}
-  const LARGE_FILE_THRESHOLD = 10 * 1024 * 1024 * 1024; // 10GB
+  const LARGE_FILE_THRESHOLD = 10 * 1024 * 1024 * 1024;
 
-  // XLSX/XLSM this large is not a practical import target for the current parser.
-  // Fail fast instead of attempting decompression/parsing and crashing later.
   if ((ext === ".xlsx" || ext === ".xlsm") && fileSize > LARGE_FILE_THRESHOLD) {
     const sizeGB = (fileSize / (1024 ** 3)).toFixed(1);
     const limitGB = (LARGE_FILE_THRESHOLD / (1024 ** 3)).toFixed(0);
@@ -340,7 +381,6 @@ async function importFile(filePath, preTabId, preSheetName) {
     dbg("IMPORT", `User chose to proceed with large file`, { filePath, sizeGB, ramGB });
   }
 
-  // If sheetName is pre-assigned (from select-sheet or session restore), skip sheet detection
   let sheetName = preSheetName;
   if (sheetName && (ext === ".xlsx" || ext === ".xlsm") && !Number.isFinite(Number(sheetName))) {
     try {
@@ -355,20 +395,13 @@ async function importFile(filePath, preTabId, preSheetName) {
     try {
       dbg("IMPORT", `getXLSXSheets calling...`, { filePath });
       const sheets = await getXLSXSheets(filePath);
-      dbg("IMPORT", `getXLSXSheets returned`, { sheetCount: sheets.length, sheets: sheets.map(s => s.name) });
+      dbg("IMPORT", `getXLSXSheets returned`, { sheetCount: sheets.length, sheets: sheets.map((s) => s.name) });
       if (sheets.length > 1) {
-        // Ask user which sheet — import will be re-enqueued by select-sheet handler
-        safeSend("sheet-selection", {
-          tabId,
-          fileName,
-          filePath,
-          sheets,
-        });
+        safeSend("sheet-selection", { tabId, fileName, filePath, sheets });
         return;
       }
     } catch (e) {
       dbg("IMPORT", `getXLSXSheets failed`, { error: e.message, stack: e.stack });
-      // Continue with default sheet
     }
   }
 
@@ -380,15 +413,8 @@ async function startImport(filePath, tabId, fileName, sheetName, preFileSize) {
   dbg("IMPORT", `startImport begin`, { filePath, tabId, fileName, sheetName });
   let fileSize = preFileSize || 0;
   if (!fileSize) { try { fileSize = fs.statSync(filePath).size; } catch {} }
-  dbg("IMPORT", `fileSize`, { fileSize });
 
-  // Notify renderer that import has started
-  safeSend("import-start", {
-    tabId,
-    fileName,
-    filePath,
-    fileSize,
-  });
+  safeSend("import-start", { tabId, fileName, filePath, fileSize });
 
   try {
     dbg("IMPORT", `calling parseFile...`);
@@ -402,7 +428,6 @@ async function startImport(filePath, tabId, fileName, sheetName, preFileSize) {
         percent: totalBytes > 0 ? Math.round((bytesRead / totalBytes) * 100) : 0,
       });
 
-      // Periodic memory check — every 30s during import
       const now = Date.now();
       if (now - _lastMemCheck > 30000) {
         _lastMemCheck = now;
@@ -413,21 +438,16 @@ async function startImport(filePath, tabId, fileName, sheetName, preFileSize) {
           heapGB: heapGB.toFixed(2), rssGB: rssGB.toFixed(2),
           rowsImported: rows, percent: totalBytes > 0 ? Math.round((bytesRead / totalBytes) * 100) : 0,
         });
-        // Warn if heap > 12GB (75% of 16GB limit)
         if (heapGB > 12) {
           dbg("IMPORT", `WARNING: heap usage ${heapGB.toFixed(1)}GB approaching 16GB limit`);
-          safeSend("import-memory-warning", {
-            tabId, heapGB: heapGB.toFixed(1), rssGB: rssGB.toFixed(1),
-          });
+          safeSend("import-memory-warning", { tabId, heapGB: heapGB.toFixed(1), rssGB: rssGB.toFixed(1) });
         }
       }
     }, sheetName, fileSize);
     dbg("IMPORT", `parseFile complete`, { headers: result.headers?.length, rowCount: result.rowCount, tsColumns: result.tsColumns?.length });
 
-    // Track original file path + format for features like resident data extraction
     _tabMeta.set(tabId, { filePath, sourceFormat: result.sourceFormat || null });
 
-    // ── USN Journal Rewind: resolve parent paths from the journal's own directory records ──
     let resolveStats = null;
     if (result.sourceFormat === "raw-usnjrnl") {
       let mftTabId = null;
@@ -439,7 +459,6 @@ async function startImport(filePath, tabId, fileName, sheetName, preFileSize) {
       dbg("IMPORT", `USN path resolution complete`, resolveStats);
     }
 
-    // ── MFT imported: re-resolve any existing USN Journal tabs ──
     if (result.sourceFormat === "raw-mft") {
       for (const [tid, tmeta] of _tabMeta) {
         if (tmeta.sourceFormat === "raw-usnjrnl") {
@@ -451,14 +470,8 @@ async function startImport(filePath, tabId, fileName, sheetName, preFileSize) {
       }
     }
 
-    // Fetch initial window of data (windowed — not all rows)
     dbg("IMPORT", `querying initial rows...`);
-    const initialData = db.queryRows(tabId, {
-      offset: 0,
-      limit: 5000,
-      sortCol: null,
-      sortDir: "asc",
-    });
+    const initialData = db.queryRows(tabId, { offset: 0, limit: 5000, sortCol: null, sortDir: "asc" });
     dbg("IMPORT", `initial rows fetched`, { rowCount: initialData.rows?.length, totalFiltered: initialData.totalFiltered });
 
     const emptyColumns = db.getEmptyColumns(tabId);
@@ -478,17 +491,13 @@ async function startImport(filePath, tabId, fileName, sheetName, preFileSize) {
       resolveStats,
     });
 
-    // Defer index/FTS builds when more imports are queued to avoid memory spikes
     if (_importQueue.length > 0) {
       dbg("IMPORT", `Deferring index/FTS build for ${tabId} (${_importQueue.length} imports queued)`);
       _pendingIndexTabs.push(tabId);
     } else {
-      // No more imports queued — build immediately
       db.buildIndexesAsync(tabId, (progress) => {
         safeSend("index-progress", { tabId, ...progress });
       }).then(() => {
-        // After MFT indexes finish, re-resolve any USN Journal tabs that
-        // missed MFT augmentation because the db was busy during their import
         const tabInfo = _tabMeta.get(tabId);
         if (tabInfo?.sourceFormat === "raw-mft") {
           for (const [tid, tmeta] of _tabMeta) {
@@ -512,19 +521,13 @@ async function startImport(filePath, tabId, fileName, sheetName, preFileSize) {
     }
   } catch (err) {
     dbg("IMPORT", `startImport FAILED`, { error: err.message, stack: err.stack });
-    // Clean up partially-imported tab on failure
     try { db.closeTab(tabId); } catch (_) {}
-    safeSend("import-error", {
-      tabId,
-      fileName,
-      error: err.message,
-    });
+    safeSend("import-error", { tabId, fileName, error: err.message });
   }
 }
 
-// ── IPC Handlers ───────────────────────────────────────────────────
+// ── IPC Handlers ──────────────────────────────────────────────────────────────
 
-// Open file dialog
 safeHandle("open-file-dialog", async () => {
   const result = await dialog.showOpenDialog(_activeWindow(), {
     properties: ["openFile", "multiSelections"],
@@ -545,7 +548,6 @@ safeHandle("open-file-dialog", async () => {
 safeHandle("check-for-updates", async () => updateController.checkForUpdatesFromRenderer());
 safeHandle("install-update", async () => updateController.installUpdate());
 
-// Recent files
 safeHandle("get-recent-files", () => _loadRecentFiles());
 
 safeHandle("open-recent-file", (event, { filePath }) => {
@@ -553,7 +555,6 @@ safeHandle("open-recent-file", (event, { filePath }) => {
     enqueueImport(filePath);
     return true;
   }
-  // Remove stale entry
   const files = _loadRecentFiles().filter((f) => f !== filePath);
   _saveRecentFiles(files);
   _rebuildMenu();
@@ -566,60 +567,18 @@ safeHandle("clear-recent-files", () => {
   return true;
 });
 
-// Query rows (the main data fetch for virtual scrolling)
-safeHandle("query-rows", (event, { tabId, options }) => {
-  return db.queryRows(tabId, options);
-});
+safeHandle("query-rows", (event, { tabId, options }) => db.queryRows(tabId, options));
+safeHandle("toggle-bookmark", (event, { tabId, rowId }) => db.toggleBookmark(tabId, rowId));
+safeHandle("set-bookmarks", (event, { tabId, rowIds, add }) => { db.setBookmarks(tabId, rowIds, add); return true; });
+safeHandle("get-bookmark-count", (event, { tabId }) => db.getBookmarkCount(tabId));
+safeHandle("add-tag", (event, { tabId, rowId, tag }) => { db.addTag(tabId, rowId, tag); return true; });
+safeHandle("remove-tag", (event, { tabId, rowId, tag }) => { db.removeTag(tabId, rowId, tag); return true; });
+safeHandle("get-all-tags", (event, { tabId }) => db.getAllTags(tabId));
+safeHandle("get-all-tag-data", (event, { tabId }) => db.getAllTagData(tabId));
+safeHandle("get-rows-by-ids", (event, { tabId, rowIds }) => db.getRowsByIds(tabId, rowIds));
+safeHandle("get-bookmarked-ids", (event, { tabId }) => db.getBookmarkedIds(tabId));
+safeHandle("bulk-add-tags", (event, { tabId, tagMap }) => { db.bulkAddTags(tabId, tagMap); return true; });
 
-// Toggle bookmark
-safeHandle("toggle-bookmark", (event, { tabId, rowId }) => {
-  return db.toggleBookmark(tabId, rowId);
-});
-
-// Bulk set bookmarks
-safeHandle("set-bookmarks", (event, { tabId, rowIds, add }) => {
-  db.setBookmarks(tabId, rowIds, add);
-  return true;
-});
-
-// Get bookmark count
-safeHandle("get-bookmark-count", (event, { tabId }) => {
-  return db.getBookmarkCount(tabId);
-});
-
-// Tag operations
-safeHandle("add-tag", (event, { tabId, rowId, tag }) => {
-  db.addTag(tabId, rowId, tag);
-  return true;
-});
-
-safeHandle("remove-tag", (event, { tabId, rowId, tag }) => {
-  db.removeTag(tabId, rowId, tag);
-  return true;
-});
-
-safeHandle("get-all-tags", (event, { tabId }) => {
-  return db.getAllTags(tabId);
-});
-
-safeHandle("get-all-tag-data", (event, { tabId }) => {
-  return db.getAllTagData(tabId);
-});
-
-safeHandle("get-rows-by-ids", (event, { tabId, rowIds }) => {
-  return db.getRowsByIds(tabId, rowIds);
-});
-
-safeHandle("get-bookmarked-ids", (event, { tabId }) => {
-  return db.getBookmarkedIds(tabId);
-});
-
-safeHandle("bulk-add-tags", (event, { tabId, tagMap }) => {
-  db.bulkAddTags(tabId, tagMap);
-  return true;
-});
-
-// IOC matching
 safeHandle("load-ioc-file", async () => {
   const result = await dialog.showOpenDialog(_activeWindow(), {
     properties: ["openFile"],
@@ -633,13 +592,12 @@ safeHandle("load-ioc-file", async () => {
   const filePath = result.filePaths[0];
   const fileName = path.basename(filePath);
   const ext = path.extname(filePath).toLowerCase();
-  // Common IOC value column names (lowercase for matching)
+
   const IOC_VALUE_HEADERS = new Set([
     "ioc_value", "ioc", "indicator", "value", "observable", "artifact",
     "indicator_value", "observable_value", "ioc_data", "data", "pattern",
   ]);
 
-  // Detect IOC value column index from a header row
   function findIocColumn(headerRow) {
     if (!headerRow || headerRow.length === 0) return -1;
     for (let i = 0; i < headerRow.length; i++) {
@@ -649,7 +607,6 @@ safeHandle("load-ioc-file", async () => {
     return -1;
   }
 
-  // Check if a row looks like a header (all cells are short non-IOC-like strings)
   function looksLikeHeader(row) {
     return row.length > 1 && row.every((c) => {
       const s = String(c).trim();
@@ -666,16 +623,13 @@ safeHandle("load-ioc-file", async () => {
         const sheet = wb.Sheets[sheetName];
         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
         if (rows.length === 0) continue;
-        // Try to detect structured data with a header row
         const iocCol = looksLikeHeader(rows[0]) ? findIocColumn(rows[0]) : -1;
         if (iocCol >= 0) {
-          // Structured: extract only the IOC value column, skip header
           for (let r = 1; r < rows.length; r++) {
             const v = String(rows[r][iocCol] || "").trim();
             if (v) values.push(v);
           }
         } else {
-          // Flat list or unknown structure: extract all cells
           for (const row of rows) {
             for (const cell of row) {
               const v = String(cell).trim();
@@ -686,7 +640,6 @@ safeHandle("load-ioc-file", async () => {
       }
       return { content: values.join("\n"), fileName };
     }
-    // Plain text formats: .txt, .csv, .ioc, .tsv
     let raw = fs.readFileSync(filePath, "utf-8");
     if (ext === ".csv" || ext === ".tsv") {
       const delim = ext === ".tsv" ? "\t" : ",";
@@ -695,7 +648,6 @@ safeHandle("load-ioc-file", async () => {
         const headerCells = lines[0].split(delim).map((c) => c.trim().replace(/^"|"$/g, ""));
         const iocCol = looksLikeHeader(headerCells) ? findIocColumn(headerCells) : -1;
         if (iocCol >= 0) {
-          // Structured CSV/TSV: extract only IOC value column, skip header
           const values = [];
           for (let i = 1; i < lines.length; i++) {
             const cells = lines[i].split(delim).map((c) => c.trim().replace(/^"|"$/g, ""));
@@ -704,7 +656,6 @@ safeHandle("load-ioc-file", async () => {
           }
           raw = values.join("\n");
         } else {
-          // No recognized header: split all cells onto separate lines
           raw = lines.map((l) => l.split(delim).map((c) => c.trim().replace(/^"|"$/g, "")).join("\n")).join("\n");
         }
       }
@@ -715,48 +666,27 @@ safeHandle("load-ioc-file", async () => {
   }
 });
 
-safeHandle("match-iocs", (event, { tabId, iocPatterns, batchSize }) => {
-  return db.matchIocs(tabId, iocPatterns, batchSize || 200);
-});
+safeHandle("match-iocs", (event, { tabId, iocPatterns, batchSize }) => db.matchIocs(tabId, iocPatterns, batchSize || 200));
 
-// Close tab
 safeHandle("close-tab", (event, { tabId }) => {
-  // Remove from pending index queue so deferred build doesn't fire on a closed DB
   const pendingIdx = _pendingIndexTabs.indexOf(tabId);
   if (pendingIdx !== -1) _pendingIndexTabs.splice(pendingIdx, 1);
   try {
     db.closeTab(tabId);
   } finally {
-    // Always clean up metadata even if db.closeTab throws
     _tabMeta.delete(tabId);
   }
   return true;
 });
 
-// Get column stats
-safeHandle("get-column-stats", (event, { tabId, colName, options }) => {
-  return db.getColumnStats(tabId, colName, options);
-});
+safeHandle("get-column-stats", (event, { tabId, colName, options }) => db.getColumnStats(tabId, colName, options));
+safeHandle("get-column-unique-values", (event, { tabId, colName, options }) => db.getColumnUniqueValues(tabId, colName, options));
+safeHandle("get-empty-columns", (event, { tabId }) => db.getEmptyColumns(tabId));
+safeHandle("get-group-values", (event, { tabId, groupCol, options }) => db.getGroupValues(tabId, groupCol, options));
 
-// Get unique values for a column (checkbox filter dropdown)
-safeHandle("get-column-unique-values", (event, { tabId, colName, options }) => {
-  return db.getColumnUniqueValues(tabId, colName, options);
-});
-
-// Get columns that are entirely empty
-safeHandle("get-empty-columns", (event, { tabId }) => {
-  return db.getEmptyColumns(tabId);
-});
-
-// Get group values with counts (column grouping)
-safeHandle("get-group-values", (event, { tabId, groupCol, options }) => {
-  return db.getGroupValues(tabId, groupCol, options);
-});
-
-// Export filtered data (CSV, TSV, XLSX, XLS)
 safeHandle("export-filtered", async (event, { tabId, options }) => {
   const result = await dialog.showSaveDialog(_activeWindow(), {
-    defaultPath: `filtered_export.csv`,
+    defaultPath: "filtered_export.csv",
     filters: [
       { name: "CSV (Comma-separated)", extensions: ["csv"] },
       { name: "TSV (Tab-separated)", extensions: ["tsv"] },
@@ -770,15 +700,12 @@ safeHandle("export-filtered", async (event, { tabId, options }) => {
 
   const ext = path.extname(result.filePath).toLowerCase();
 
-  // Excel export (XLSX)
   if (ext === ".xlsx") {
     const ExcelJS = require("exceljs");
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("Export");
 
-    // Add header row
     sheet.addRow(exportData.headers);
-    // Style header
     const headerRow = sheet.getRow(1);
     headerRow.font = { bold: true };
     headerRow.eachCell((cell) => {
@@ -786,12 +713,10 @@ safeHandle("export-filtered", async (event, { tabId, options }) => {
       cell.font = { bold: true, color: { argb: "FF58A6FF" } };
     });
 
-    // Track max column widths during row iteration (single-pass, no second iteration)
     const colCount = exportData.headers.length;
     const maxLens = new Array(colCount);
     for (let i = 0; i < colCount; i++) maxLens[i] = (exportData.headers[i] || "").length;
 
-    // Stream rows — guard against tab close during iteration
     let count = 0;
     try {
       for (const rawRow of exportData.iterator) {
@@ -803,16 +728,12 @@ safeHandle("export-filtered", async (event, { tabId, options }) => {
         });
         sheet.addRow(values);
         count++;
-        if (count % 100000 === 0) {
-          safeSend("export-progress", { count });
-        }
+        if (count % 100000 === 0) safeSend("export-progress", { count });
       }
     } catch (e) {
-      // Tab closed or DB error during export — save what we have
       dbg("MAIN", `XLSX export interrupted after ${count} rows`, { error: e.message });
     }
 
-    // Apply column widths from tracked maximums
     sheet.columns.forEach((col, i) => {
       col.width = Math.min(Math.max((maxLens[i] || 8) + 2, 8), 60);
     });
@@ -821,40 +742,28 @@ safeHandle("export-filtered", async (event, { tabId, options }) => {
     return { count, filePath: result.filePath };
   }
 
-  // Delimited text export (CSV or TSV)
   const delimiter = ext === ".tsv" ? "\t" : ",";
   const writeStream = fs.createWriteStream(result.filePath, { encoding: "utf-8" });
-
-  // Write header
   writeStream.write(exportData.headers.join(delimiter) + "\n");
 
-  // Stream rows with backpressure handling — guard against tab close during iteration
   let count = 0;
   try {
     for (const rawRow of exportData.iterator) {
       const values = exportData.safeCols.map((sc) => {
         const val = rawRow[sc] ?? "";
         if (delimiter === "\t") {
-          // TSV: escape tabs and newlines within values
           return val.includes("\t") || val.includes("\n") ? val.replace(/\t/g, " ").replace(/\n/g, " ") : val;
         }
-        // CSV: quote fields containing comma, quote, or newline
         return val.includes(",") || val.includes('"') || val.includes("\n")
           ? `"${val.replace(/"/g, '""')}"`
           : val;
       });
       const ok = writeStream.write(values.join(delimiter) + "\n");
-      if (!ok) {
-        // Internal buffer full — wait for drain before continuing
-        await new Promise((r) => writeStream.once("drain", r));
-      }
+      if (!ok) await new Promise((r) => writeStream.once("drain", r));
       count++;
-      if (count % 100000 === 0) {
-        safeSend("export-progress", { count });
-      }
+      if (count % 100000 === 0) safeSend("export-progress", { count });
     }
   } catch (e) {
-    // Tab closed or DB error during export — flush what we have
     dbg("MAIN", `CSV/TSV export interrupted after ${count} rows`, { error: e.message });
   }
 
@@ -866,15 +775,10 @@ safeHandle("export-filtered", async (event, { tabId, options }) => {
   return { count, filePath: result.filePath };
 });
 
-// Extract resident $DATA from raw MFT file
 safeHandle("extract-resident-data", async (event, { tabId }) => {
   const meta = _tabMeta.get(tabId);
-  if (!meta || meta.sourceFormat !== "raw-mft") {
-    return { error: "This tab is not a raw MFT file" };
-  }
-  if (!fs.existsSync(meta.filePath)) {
-    return { error: `Original MFT file no longer exists: ${meta.filePath}` };
-  }
+  if (!meta || meta.sourceFormat !== "raw-mft") return { error: "This tab is not a raw MFT file" };
+  if (!fs.existsSync(meta.filePath)) return { error: `Original MFT file no longer exists: ${meta.filePath}` };
 
   const result = await dialog.showOpenDialog(_activeWindow(), {
     title: "Choose output folder for resident data extraction",
@@ -892,12 +796,9 @@ safeHandle("extract-resident-data", async (event, { tabId }) => {
   return extractResult;
 });
 
-// Ransomware MFT Analysis
 safeHandle("analyze-ransomware", (event, { tabId, encryptedExt, ransomNotePattern, noteMatchMode, usnTabId }) => {
   const meta = _tabMeta.get(tabId);
-  if (!meta || meta.sourceFormat !== "raw-mft") {
-    return { error: "This feature requires a raw MFT tab." };
-  }
+  if (!meta || meta.sourceFormat !== "raw-mft") return { error: "This feature requires a raw MFT tab." };
   let resolvedUsnTabId = null;
   if (usnTabId) {
     const usnMeta = _tabMeta.get(usnTabId);
@@ -905,10 +806,7 @@ safeHandle("analyze-ransomware", (event, { tabId, encryptedExt, ransomNotePatter
   }
   if (!resolvedUsnTabId) {
     for (const [tid, tmeta] of _tabMeta) {
-      if (tid !== tabId && tmeta.sourceFormat === "raw-usnjrnl") {
-        resolvedUsnTabId = tid;
-        break;
-      }
+      if (tid !== tabId && tmeta.sourceFormat === "raw-usnjrnl") { resolvedUsnTabId = tid; break; }
     }
   }
   return db.analyzeRansomware(tabId, { encryptedExt, ransomNotePattern, noteMatchMode, usnTabId: resolvedUsnTabId, progressCb: (p) => safeSend("rw-progress", p) });
@@ -916,37 +814,21 @@ safeHandle("analyze-ransomware", (event, { tabId, encryptedExt, ransomNotePatter
 
 safeHandle("scan-ransomware-extensions", (event, { tabId }) => {
   const meta = _tabMeta.get(tabId);
-  if (!meta || meta.sourceFormat !== "raw-mft") {
-    return { error: "This feature requires a raw MFT tab." };
-  }
+  if (!meta || meta.sourceFormat !== "raw-mft") return { error: "This feature requires a raw MFT tab." };
   return db.scanRansomwareExtensions(tabId, (p) => safeSend("rw-progress", p));
 });
 
-// Timestomping Detector
-safeHandle("detect-timestomping", (event, { tabId }) => {
-  return db.detectTimestomping(tabId);
-});
+safeHandle("detect-timestomping", (event, { tabId }) => db.detectTimestomping(tabId));
 
-// File Activity Heatmap
 safeHandle("get-file-activity-heatmap", (event, { tabId }) => {
   const meta = _tabMeta.get(tabId);
-  if (!meta || meta.sourceFormat !== "raw-mft") {
-    return { error: "This feature requires a raw MFT tab." };
-  }
+  if (!meta || meta.sourceFormat !== "raw-mft") return { error: "This feature requires a raw MFT tab." };
   return db.getFileActivityHeatmap(tabId, (p) => safeSend("hm-progress", p));
 });
 
-// ADS Analyzer
-safeHandle("analyze-ads", (event, { tabId }) => {
-  return db.analyzeADS(tabId);
-});
+safeHandle("analyze-ads", (event, { tabId }) => db.analyzeADS(tabId));
+safeHandle("analyze-usn-journal", (event, { tabId, startTime, endTime, analyses, pathFilter, mftTabId }) => db.analyzeUsnJournal(tabId, { startTime, endTime, analyses, pathFilter, mftTabId }));
 
-// USN Journal Analysis
-safeHandle("analyze-usn-journal", (event, { tabId, startTime, endTime, analyses, pathFilter, mftTabId }) => {
-  return db.analyzeUsnJournal(tabId, { startTime, endTime, analyses, pathFilter, mftTabId });
-});
-
-// Save text content to file with save dialog
 safeHandle("save-text-file", async (event, { content, defaultPath, filters }) => {
   const result = await dialog.showSaveDialog(_activeWindow(), { defaultPath, filters });
   if (result.canceled) return null;
@@ -954,7 +836,6 @@ safeHandle("save-text-file", async (event, { content, defaultPath, filters }) =>
   return { filePath: result.filePath };
 });
 
-// Export ransomware report as PDF
 safeHandle("export-ransomware-pdf", async (event, { html, defaultName }) => {
   const result = await dialog.showSaveDialog(_activeWindow(), {
     defaultPath: defaultName || "ransomware_report.pdf",
@@ -964,7 +845,6 @@ safeHandle("export-ransomware-pdf", async (event, { html, defaultName }) => {
   const win = new BrowserWindow({ show: false, width: 900, height: 1200, webPreferences: { offscreen: true } });
   try {
     await win.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(html));
-    // Wait a moment for rendering
     await new Promise((r) => setTimeout(r, 500));
     const pdfBuf = await win.webContents.printToPDF({ printBackground: true, preferCSSPageSize: true, margins: { top: 0, bottom: 0, left: 0, right: 0 } });
     await fsp.writeFile(result.filePath, pdfBuf);
@@ -974,7 +854,6 @@ safeHandle("export-ransomware-pdf", async (event, { html, defaultName }) => {
   }
 });
 
-// Generate HTML report from bookmarked/tagged events
 safeHandle("generate-report", async (event, { tabId, fileName, tagColors, vtEnrichment }) => {
   const reportData = db.getReportData(tabId);
   if (!reportData) return { error: "No data available" };
@@ -990,95 +869,32 @@ safeHandle("generate-report", async (event, { tabId, fileName, tagColors, vtEnri
   return { filePath: result.filePath };
 });
 
-// Sheet selection response (for multi-sheet XLSX) — route through queue
 safeHandle("select-sheet", (event, { filePath, tabId, fileName, sheetName }) => {
   enqueueImport(filePath, { tabId, sheetName, skipRecent: true });
 });
 
-// Get tab info
-safeHandle("get-tab-info", (event, { tabId }) => {
-  return db.getTabInfo(tabId);
-});
+safeHandle("get-tab-info", (event, { tabId }) => db.getTabInfo(tabId));
+safeHandle("get-fts-status", (event, { tabId }) => db.getFtsStatus(tabId));
+safeHandle("search-count", (event, { tabId, searchTerm, searchMode, searchCondition }) => db.searchCount(tabId, searchTerm, searchMode, searchCondition));
+safeHandle("get-histogram-data", (event, { tabId, colName, options }) => db.getHistogramData(tabId, colName, options));
+safeHandle("get-stacking-data", (event, { tabId, colName, options }) => db.getStackingData(tabId, colName, options));
+safeHandle("get-gap-analysis", (event, { tabId, colName, gapThresholdMinutes, options }) => db.getGapAnalysis(tabId, colName, gapThresholdMinutes, options));
+safeHandle("get-log-source-coverage", (event, { tabId, sourceCol, tsCol, options }) => db.getLogSourceCoverage(tabId, sourceCol, tsCol, options));
+safeHandle("get-burst-analysis", (event, { tabId, colName, windowMinutes, thresholdMultiplier, options }) => db.getBurstAnalysis(tabId, colName, windowMinutes, thresholdMultiplier, options));
+safeHandle("get-process-tree", (event, { tabId, options }) => db.getProcessTree(tabId, options));
+safeHandle("preview-process-tree", (event, { tabId, options }) => db.previewProcessTree(tabId, options));
+safeHandle("get-process-inspector-context", (event, { tabId, options }) => db.getProcessInspectorContext(tabId, options));
+safeHandle("preview-lateral-movement", (event, { tabId, options }) => db.previewLateralMovement(tabId, options));
+safeHandle("get-lateral-movement", (event, { tabId, options }) => db.getLateralMovement(tabId, options));
+safeHandle("preview-persistence-analysis", (event, { tabId, options }) => db.previewPersistenceAnalysis(tabId, options));
+safeHandle("get-persistence-analysis", (event, { tabId, options }) => db.getPersistenceAnalysis(tabId, options));
+safeHandle("bulk-tag-by-time-range", (event, { tabId, colName, ranges }) => db.bulkTagByTimeRange(tabId, colName, ranges));
+safeHandle("bulk-tag-filtered", (event, { tabId, tag, options }) => db.bulkTagFiltered(tabId, tag, options));
+safeHandle("bulk-bookmark-filtered", (event, { tabId, add, options }) => db.bulkBookmarkFiltered(tabId, add, options));
 
-// FTS build status check
-safeHandle("get-fts-status", (event, { tabId }) => {
-  return db.getFtsStatus(tabId);
-});
-
-// Search count across a tab (for cross-tab find)
-safeHandle("search-count", (event, { tabId, searchTerm, searchMode, searchCondition }) => {
-  return db.searchCount(tabId, searchTerm, searchMode, searchCondition);
-});
-
-// Histogram data for timeline visualization
-safeHandle("get-histogram-data", (event, { tabId, colName, options }) => {
-  return db.getHistogramData(tabId, colName, options);
-});
-
-safeHandle("get-stacking-data", (event, { tabId, colName, options }) => {
-  return db.getStackingData(tabId, colName, options);
-});
-
-safeHandle("get-gap-analysis", (event, { tabId, colName, gapThresholdMinutes, options }) => {
-  return db.getGapAnalysis(tabId, colName, gapThresholdMinutes, options);
-});
-
-safeHandle("get-log-source-coverage", (event, { tabId, sourceCol, tsCol, options }) => {
-  return db.getLogSourceCoverage(tabId, sourceCol, tsCol, options);
-});
-
-safeHandle("get-burst-analysis", (event, { tabId, colName, windowMinutes, thresholdMultiplier, options }) => {
-  return db.getBurstAnalysis(tabId, colName, windowMinutes, thresholdMultiplier, options);
-});
-
-safeHandle("get-process-tree", (event, { tabId, options }) => {
-  return db.getProcessTree(tabId, options);
-});
-
-safeHandle("preview-process-tree", (event, { tabId, options }) => {
-  return db.previewProcessTree(tabId, options);
-});
-
-safeHandle("get-process-inspector-context", (event, { tabId, options }) => {
-  return db.getProcessInspectorContext(tabId, options);
-});
-
-safeHandle("preview-lateral-movement", (event, { tabId, options }) => {
-  return db.previewLateralMovement(tabId, options);
-});
-
-safeHandle("get-lateral-movement", (event, { tabId, options }) => {
-  return db.getLateralMovement(tabId, options);
-});
-
-safeHandle("preview-persistence-analysis", (event, { tabId, options }) => {
-  return db.previewPersistenceAnalysis(tabId, options);
-});
-
-safeHandle("get-persistence-analysis", (event, { tabId, options }) => {
-  return db.getPersistenceAnalysis(tabId, options);
-});
-
-safeHandle("bulk-tag-by-time-range", (event, { tabId, colName, ranges }) => {
-  return db.bulkTagByTimeRange(tabId, colName, ranges);
-});
-
-safeHandle("bulk-tag-filtered", (event, { tabId, tag, options }) => {
-  return db.bulkTagFiltered(tabId, tag, options);
-});
-
-safeHandle("bulk-bookmark-filtered", (event, { tabId, add, options }) => {
-  return db.bulkBookmarkFiltered(tabId, add, options);
-});
-
-// Merge multiple tabs into a single chronological timeline
 safeHandle("merge-tabs", async (event, { mergedTabId, sources }) => {
   try {
-    safeSend("import-start", {
-      tabId: mergedTabId,
-      fileName: "Merged Timeline",
-      filePath: "(merged)",
-    });
+    safeSend("import-start", { tabId: mergedTabId, fileName: "Merged Timeline", filePath: "(merged)" });
 
     const result = db.mergeTabs(mergedTabId, sources, (progress) => {
       safeSend("import-progress", {
@@ -1090,14 +906,7 @@ safeHandle("merge-tabs", async (event, { mergedTabId, sources }) => {
       });
     });
 
-    // Fetch initial window sorted by unified datetime
-    const initialData = db.queryRows(mergedTabId, {
-      offset: 0,
-      limit: 5000,
-      sortCol: "datetime",
-      sortDir: "asc",
-    });
-
+    const initialData = db.queryRows(mergedTabId, { offset: 0, limit: 5000, sortCol: "datetime", sortDir: "asc" });
     const emptyColumns = db.getEmptyColumns(mergedTabId);
 
     safeSend("import-complete", {
@@ -1112,7 +921,6 @@ safeHandle("merge-tabs", async (event, { mergedTabId, sources }) => {
       emptyColumns,
     });
 
-    // Build indexes + FTS (same as normal import flow)
     db.buildIndexesAsync(mergedTabId, (progress) => {
       safeSend("index-progress", { tabId: mergedTabId, ...progress });
     }).then(() => {
@@ -1127,16 +935,11 @@ safeHandle("merge-tabs", async (event, { mergedTabId, sources }) => {
     return { success: true, rowCount: result.rowCount };
   } catch (err) {
     try { db.closeTab(mergedTabId); } catch (_) {}
-    safeSend("import-error", {
-      tabId: mergedTabId,
-      fileName: "Merged Timeline",
-      error: err.message,
-    });
+    safeSend("import-error", { tabId: mergedTabId, fileName: "Merged Timeline", error: err.message });
     return { success: false, error: err.message };
   }
 });
 
-// Session save
 safeHandle("save-session", async (event, { sessionData }) => {
   const result = await dialog.showSaveDialog(_activeWindow(), {
     defaultPath: "session.tle",
@@ -1147,7 +950,6 @@ safeHandle("save-session", async (event, { sessionData }) => {
   return result.filePath;
 });
 
-// Session load
 safeHandle("load-session", async () => {
   const result = await dialog.showOpenDialog(_activeWindow(), {
     properties: ["openFile"],
@@ -1162,8 +964,6 @@ safeHandle("load-session", async () => {
   }
 });
 
-// Import file for session restore (no dialog)
-// Import files by path (used for drag-and-drop)
 safeHandle("import-files", async (event, { filePaths }) => {
   for (const fp of filePaths) { if (fs.existsSync(fp)) enqueueImport(fp); }
   return true;
@@ -1177,7 +977,7 @@ safeHandle("import-file-for-restore", async (event, { filePath, sheetName }) => 
   return { tabId, fileName };
 });
 
-// ── Filter Presets (persistent storage) ─────────────────────────────
+// ── Filter Presets ────────────────────────────────────────────────────────────
 const presetsPath = path.join(app.getPath("userData"), "filter-presets.json");
 const piAnalystProfilePath = path.join(app.getPath("userData"), "process-inspector-profile.json");
 
@@ -1216,7 +1016,7 @@ safeHandle("save-pi-analyst-profile", async (event, { profile }) => {
   return next;
 });
 
-// ── VirusTotal API Integration ──────────────────────────────────────
+// ── VirusTotal API Integration ────────────────────────────────────────────────
 const _vtSettingsPath = path.join(app.getPath("userData"), "vt-settings.json");
 
 function _loadVtSettings() {
@@ -1253,7 +1053,6 @@ safeHandle("vt-clear-api-key", async () => {
   return true;
 });
 
-// VT cache — persistent SQLite DB
 let _vtCacheDb = null;
 function _openVtCache() {
   if (_vtCacheDb) return _vtCacheDb;
@@ -1271,7 +1070,6 @@ function _openVtCache() {
   return _vtCacheDb;
 }
 
-// Normalize IOC for cache key — avoid duplicate entries for equivalent IOCs
 function _vtCacheKey(ioc, category) {
   if (/^(SHA256|SHA1|MD5)_Hash$/.test(category)) return ioc.toLowerCase();
   if (category === "Domain_Name") return ioc.toLowerCase();
@@ -1285,8 +1083,7 @@ function _vtCacheLookup(ioc, category, ttlHours) {
   const key = _vtCacheKey(ioc, category);
   const row = cache.prepare("SELECT * FROM vt_cache WHERE ioc = ?").get(key);
   if (!row) return null;
-  const ageMs = Date.now() - row.fetched_at;
-  if (ageMs > ttlHours * 3600 * 1000) return null;
+  if (Date.now() - row.fetched_at > ttlHours * 3600 * 1000) return null;
   try { return JSON.parse(row.vt_response); } catch { return null; }
 }
 
@@ -1297,7 +1094,6 @@ function _vtCacheStore(ioc, category, result) {
     .run(key, category, JSON.stringify(result), Date.now(), result.score || "");
 }
 
-// Private IP detection
 function _isPrivateIp(ip) {
   const clean = ip.replace(/:\d+$/, "").replace(/^\[|\]$/g, "");
   if (/^10\./.test(clean)) return true;
@@ -1308,7 +1104,6 @@ function _isPrivateIp(ip) {
   return false;
 }
 
-// VT API request
 function _vtApiRequest(endpoint, apiKey) {
   return new Promise((resolve, reject) => {
     const options = {
@@ -1320,9 +1115,7 @@ function _vtApiRequest(endpoint, apiKey) {
     const req = https.request(options, (res) => {
       let data = "";
       res.on("data", (chunk) => { data += chunk; });
-      res.on("end", () => {
-        resolve({ statusCode: res.statusCode, headers: res.headers, body: data });
-      });
+      res.on("end", () => { resolve({ statusCode: res.statusCode, headers: res.headers, body: data }); });
     });
     req.on("error", (err) => reject(err));
     req.setTimeout(30000, () => { req.destroy(); reject(new Error("Request timeout")); });
@@ -1330,7 +1123,6 @@ function _vtApiRequest(endpoint, apiKey) {
   });
 }
 
-// Map IOC category to VT endpoint
 function _vtEndpoint(ioc, category) {
   if (/^(SHA256|SHA1|MD5)_Hash$/.test(category)) return `files/${ioc}`;
   if (category === "Domain_Name") return `domains/${ioc}`;
@@ -1345,7 +1137,6 @@ function _vtEndpoint(ioc, category) {
   return null;
 }
 
-// VT URL for browser
 function _vtUrl(ioc, category) {
   if (/^(SHA256|SHA1|MD5)_Hash$/.test(category)) return `https://www.virustotal.com/gui/file/${ioc}`;
   if (category === "Domain_Name") return `https://www.virustotal.com/gui/domain/${ioc}`;
@@ -1364,18 +1155,10 @@ function _vtUrl(ioc, category) {
 function _parseVtResponse(ioc, category, statusCode, body) {
   const vtUrl = _vtUrl(ioc, category);
   const queriedAt = Date.now();
-  if (statusCode === 404) {
-    return { ioc, found: false, malicious: 0, suspicious: 0, harmless: 0, undetected: 0, total: 0, score: "Not Found", verdict: "not_found", vtUrl, error: null, queriedAt };
-  }
-  if (statusCode === 401) {
-    return { ioc, found: false, score: "", verdict: "error", vtUrl, error: "Invalid API key", queriedAt };
-  }
-  if (statusCode === 429) {
-    return { ioc, found: false, score: "", verdict: "error", vtUrl, error: "Rate limited (429)", queriedAt };
-  }
-  if (statusCode < 200 || statusCode >= 300) {
-    return { ioc, found: false, score: "", verdict: "error", vtUrl, error: `HTTP ${statusCode}`, queriedAt };
-  }
+  if (statusCode === 404) return { ioc, found: false, malicious: 0, suspicious: 0, harmless: 0, undetected: 0, total: 0, score: "Not Found", verdict: "not_found", vtUrl, error: null, queriedAt };
+  if (statusCode === 401) return { ioc, found: false, score: "", verdict: "error", vtUrl, error: "Invalid API key", queriedAt };
+  if (statusCode === 429) return { ioc, found: false, score: "", verdict: "error", vtUrl, error: "Rate limited (429)", queriedAt };
+  if (statusCode < 200 || statusCode >= 300) return { ioc, found: false, score: "", verdict: "error", vtUrl, error: `HTTP ${statusCode}`, queriedAt };
   try {
     const json = JSON.parse(body);
     const attrs = json?.data?.attributes || {};
@@ -1395,42 +1178,27 @@ function _parseVtResponse(ioc, category, statusCode, body) {
   }
 }
 
-// Rate limiter — token bucket
+// Rolling rate-limiter (requests per second window)
 const _vtRequestTimes = [];
-
 async function _vtRateLimitWait(rateLimit) {
-  const windowMs = 60000;
-  while (true) {
-    const now = Date.now();
-    // Remove timestamps older than window
-    while (_vtRequestTimes.length > 0 && now - _vtRequestTimes[0] > windowMs) _vtRequestTimes.shift();
-    if (_vtRequestTimes.length < rateLimit) {
-      _vtRequestTimes.push(now);
-      return;
-    }
-    const waitUntil = _vtRequestTimes[0] + windowMs;
-    const waitMs = waitUntil - now + 50;
-    await new Promise((r) => setTimeout(r, waitMs));
-  }
+  const windowMs = 1000;
+  _vtRequestTimes.push(Date.now());
+  if (_vtRequestTimes.length > rateLimit) _vtRequestTimes.shift();
+  const now = Date.now();
+  if (_vtRequestTimes.length < rateLimit) return;
+  const waitUntil = _vtRequestTimes[0] + windowMs;
+  const waitMs = waitUntil - now + 50;
+  if (waitMs > 0) await new Promise((r) => setTimeout(r, waitMs));
 }
 
-// Single IOC lookup
 safeHandle("vt-lookup-single", async (event, { ioc, category }) => {
   const settings = _loadVtSettings();
   if (!settings.apiKey) return { ioc, error: "No API key configured" };
-
   const endpoint = _vtEndpoint(ioc, category);
   if (!endpoint) return { ioc, score: "N/A", verdict: "unsupported", error: null };
-
-  if (/^IPv[46]_Address(:Port)?$/.test(category) && _isPrivateIp(ioc)) {
-    return { ioc, found: false, score: "Private IP", verdict: "private", vtUrl: null, error: null };
-  }
-
-  // Check cache
+  if (/^IPv[46]_Address(:Port)?$/.test(category) && _isPrivateIp(ioc)) return { ioc, found: false, score: "Private IP", verdict: "private", vtUrl: null, error: null };
   const cached = _vtCacheLookup(ioc, category, settings.cacheTtlHours || 24);
   if (cached) return cached;
-
-  // API call
   await _vtRateLimitWait(settings.rateLimit || 4);
   try {
     const res = await _vtApiRequest(endpoint, settings.apiKey);
@@ -1450,7 +1218,6 @@ safeHandle("vt-lookup-single", async (event, { ioc, category }) => {
   }
 });
 
-// Bulk lookup — runs in background with progress events
 const _vtBulkJobs = new Map();
 let _vtBulkIdCounter = 0;
 
@@ -1462,21 +1229,15 @@ safeHandle("vt-bulk-lookup", async (event, { iocs, requestId: clientId }) => {
   const job = { cancelled: false };
   _vtBulkJobs.set(requestId, job);
 
-  // Run in background
   (async () => {
     const total = iocs.length;
     let completed = 0;
-    // Track normalized keys already looked up in this batch to avoid duplicate API calls
-    // (e.g., 1.2.3.4:80 and 1.2.3.4:443 resolve to the same VT object)
-    const seenKeys = new Map(); // normalized key → result
+    const seenKeys = new Map();
 
     for (const { raw, category } of iocs) {
       if (job.cancelled || (mainWindow && mainWindow.isDestroyed())) break;
-
       const endpoint = _vtEndpoint(raw, category);
       let result;
-
-      // Deduplicate: if a normalized-equivalent IOC was already looked up in this batch, reuse its result
       const normKey = _vtCacheKey(raw, category);
       if (seenKeys.has(normKey)) {
         result = { ...seenKeys.get(normKey), ioc: raw };
@@ -1484,18 +1245,15 @@ safeHandle("vt-bulk-lookup", async (event, { iocs, requestId: clientId }) => {
         safeSend("vt-progress", { requestId, completed, total, result });
         continue;
       }
-
       if (!endpoint) {
         result = { ioc: raw, score: "N/A", verdict: "unsupported", error: null };
       } else if (/^IPv[46]_Address(:Port)?$/.test(category) && _isPrivateIp(raw)) {
         result = { ioc: raw, found: false, score: "Private IP", verdict: "private", vtUrl: null, error: null };
       } else {
-        // Check cache
         const cached = _vtCacheLookup(raw, category, settings.cacheTtlHours || 24);
         if (cached) {
           result = cached;
         } else {
-          // API call
           try {
             await _vtRateLimitWait(settings.rateLimit || 4);
             if (job.cancelled) break;
@@ -1508,7 +1266,6 @@ safeHandle("vt-bulk-lookup", async (event, { iocs, requestId: clientId }) => {
             }
             if (res.statusCode === 429) {
               const retryAfter = parseInt(res.headers["retry-after"] || "60", 10);
-              // Cancellable sleep — check every 2s instead of blocking for full duration
               const sleepEnd = Date.now() + retryAfter * 1000;
               while (Date.now() < sleepEnd && !job.cancelled) {
                 await new Promise((r) => setTimeout(r, Math.min(2000, sleepEnd - Date.now())));
@@ -1526,12 +1283,10 @@ safeHandle("vt-bulk-lookup", async (event, { iocs, requestId: clientId }) => {
           }
         }
       }
-
       if (!result.error) seenKeys.set(normKey, result);
       completed++;
       safeSend("vt-progress", { requestId, completed, total, result });
     }
-
     safeSend("vt-complete", { requestId, completed, total, cancelled: job.cancelled });
     _vtBulkJobs.delete(requestId);
   })().catch((err) => {
@@ -1555,12 +1310,10 @@ safeHandle("vt-clear-cache", async () => {
   return { cleared: info.changes };
 });
 
-// VT relationships — pivot from one IOC to related artifacts
 safeHandle("vt-get-related", async (event, { ioc, category }) => {
   const settings = _loadVtSettings();
   if (!settings.apiKey) return { error: "No API key configured" };
 
-  // Build relationship endpoints per IOC type
   const rels = [];
   if (/^(SHA256|SHA1|MD5)_Hash$/.test(category)) {
     rels.push({ type: "Contacted Domains", endpoint: `files/${ioc}/contacted_domains` });
@@ -1587,15 +1340,12 @@ safeHandle("vt-get-related", async (event, { ioc, category }) => {
     try {
       await _vtRateLimitWait(settings.rateLimit || 4);
       let res = await _vtApiRequest(`${rel.endpoint}?limit=10`, settings.apiKey);
-      // Retry once on 429
       if (res.statusCode === 429) {
         const retryAfter = parseInt(res.headers["retry-after"] || "60", 10);
         await new Promise((r) => setTimeout(r, retryAfter * 1000));
         res = await _vtApiRequest(`${rel.endpoint}?limit=10`, settings.apiKey);
       }
-      if (res.statusCode === 401) {
-        return { ioc, relationships: [], error: "Invalid API key" };
-      }
+      if (res.statusCode === 401) return { ioc, relationships: [], error: "Invalid API key" };
       if (res.statusCode === 200) {
         const json = JSON.parse(res.body);
         const items = (json.data || []).map((item) => {
@@ -1625,11 +1375,17 @@ safeHandle("vt-get-related", async (event, { ioc, category }) => {
   return { ioc, relationships: results, error: errors.length > 0 ? errors.join("; ") : undefined };
 });
 
-// ── Native macOS Menu ──────────────────────────────────────────────
+// ── Windows Application Menu ──────────────────────────────────────────────────
+// Differences from the macOS menu:
+//  - No top-level "IRFlow Timeline" app menu (macOS convention).
+//  - "About" moved into Help.
+//  - Quit moved into File.
+//  - macOS-only roles removed: services, hide, hideOthers, unhide, front, zoom.
+//  - Window submenu simplified (minimize + close only).
+//  - "role: close" closes window (not quit) — keep it in File for closing the current file view.
 function _rebuildMenu() { buildMenu(); }
 
 function buildMenu() {
-  // Build recent files submenu
   const recentFiles = _loadRecentFiles();
   const recentSubmenu = recentFiles.length > 0
     ? [
@@ -1644,7 +1400,7 @@ function buildMenu() {
               _saveRecentFiles(files);
               _rebuildMenu();
               safeSend("recent-files-updated", files);
-              dialog.showMessageBox(_activeWindow(), { type: "warning", title: "File Not Found", message: `The file no longer exists at this location.`, detail: fp, buttons: ["OK"] }).catch(() => {});
+              dialog.showMessageBox(_activeWindow(), { type: "warning", title: "File Not Found", message: "The file no longer exists at this location.", detail: fp, buttons: ["OK"] }).catch(() => {});
             }
           },
         })),
@@ -1654,20 +1410,6 @@ function buildMenu() {
     : [{ label: "No Recent Files", enabled: false }];
 
   const template = [
-    {
-      label: "IRFlow Timeline",
-      submenu: [
-        { role: "about" },
-        { type: "separator" },
-        { role: "services" },
-        { type: "separator" },
-        { role: "hide" },
-        { role: "hideOthers" },
-        { role: "unhide" },
-        { type: "separator" },
-        { role: "quit" },
-      ],
-    },
     {
       label: "File",
       submenu: [
@@ -1714,7 +1456,8 @@ function buildMenu() {
           click: () => mainWindow?.webContents.send("trigger-close-all-tabs"),
         },
         { type: "separator" },
-        { role: "close" },
+        // Windows convention: Quit is in File menu
+        { role: "quit" },
       ],
     },
     {
@@ -1830,8 +1573,12 @@ function buildMenu() {
       ],
     },
     {
+      // Windows: simplified Window menu — no macOS front/zoom/front roles
       label: "Window",
-      submenu: [{ role: "minimize" }, { role: "zoom" }, { type: "separator" }, { role: "front" }],
+      submenu: [
+        { role: "minimize" },
+        { role: "close" },
+      ],
     },
     {
       label: "Help",
@@ -1853,18 +1600,21 @@ function buildMenu() {
           label: "EZ Tools Website",
           click: () => shell.openExternal("https://ericzimmerman.github.io/"),
         },
+        { type: "separator" },
+        // About belongs in Help on Windows (no dedicated app menu)
+        { role: "about" },
       ],
     },
   ];
+
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
 
-// ── HTML Report Builder ──────────────────────────────────────────
+// ── HTML Report Builder ───────────────────────────────────────────────────────
 function buildReportHtml(data, fileName, tagColors = {}, vtEnrichment = null) {
   const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   const now = new Date().toISOString().replace("T", " ").slice(0, 19) + " UTC";
 
-  // Filter out columns that are entirely empty across bookmarked+tagged rows
   const allReportRows = [...data.bookmarkedRows];
   for (const rows of Object.values(data.taggedGroups)) {
     for (const r of rows) allReportRows.push(r);
@@ -1889,7 +1639,6 @@ function buildReportHtml(data, fileName, tagColors = {}, vtEnrichment = null) {
 
   let body = "";
 
-  // Header
   body += `<div class="report-header">
     <h1>IRFlow Timeline Report</h1>
     <div class="meta">
@@ -1898,7 +1647,6 @@ function buildReportHtml(data, fileName, tagColors = {}, vtEnrichment = null) {
     </div>
   </div>`;
 
-  // Summary cards
   body += `<div class="cards">
     <div class="card"><div class="card-val">${data.totalRows.toLocaleString()}</div><div class="card-label">Total Rows</div></div>
     <div class="card"><div class="card-val">${data.bookmarkCount.toLocaleString()}</div><div class="card-label">Bookmarked</div></div>
@@ -1906,7 +1654,6 @@ function buildReportHtml(data, fileName, tagColors = {}, vtEnrichment = null) {
     <div class="card"><div class="card-val">${data.tagCount}</div><div class="card-label">Unique Tags</div></div>
   </div>`;
 
-  // Timestamp range
   if (data.tsRange) {
     body += `<div class="ts-range">
       <strong>Timeline Span (${esc(data.tsRange.column)}):</strong>
@@ -1914,7 +1661,6 @@ function buildReportHtml(data, fileName, tagColors = {}, vtEnrichment = null) {
     </div>`;
   }
 
-  // Tag breakdown chips
   if (data.tagSummary.length > 0) {
     body += '<div class="section"><h2>Tag Breakdown</h2><div class="tag-chips">';
     for (const { tag, cnt } of data.tagSummary) {
@@ -1924,12 +1670,10 @@ function buildReportHtml(data, fileName, tagColors = {}, vtEnrichment = null) {
     body += "</div></div>";
   }
 
-  // VirusTotal IOC Enrichment summary
   if (vtEnrichment && vtEnrichment.perIocResults && vtEnrichment.results) {
     const vtr = vtEnrichment.results;
     const perIoc = vtEnrichment.perIocResults;
     const vtIocs = perIoc.filter((ioc) => vtr[ioc.raw]);
-    // Split into timeline-matched vs feed-only IOCs
     const vtMatched = vtIocs.filter((ioc) => ioc.hits > 0);
     const vtFeedOnly = vtIocs.filter((ioc) => ioc.hits === 0);
     const malicious = vtMatched.filter((ioc) => vtr[ioc.raw]?.verdict === "malicious");
@@ -1941,8 +1685,6 @@ function buildReportHtml(data, fileName, tagColors = {}, vtEnrichment = null) {
     const feedClean = vtFeedOnly.filter((ioc) => vtr[ioc.raw]?.verdict === "clean").length;
 
     body += '<div class="section"><h2>VirusTotal IOC Enrichment</h2>';
-
-    // Verdict summary cards (scoped to timeline-matched IOCs)
     body += '<div class="cards">';
     body += `<div class="card" style="border-color:#f85149"><div class="card-val" style="color:#f85149">${malicious.length}</div><div class="card-label">Malicious</div></div>`;
     body += `<div class="card" style="border-color:#d29922"><div class="card-val" style="color:#d29922">${suspicious.length}</div><div class="card-label">Suspicious</div></div>`;
@@ -1956,13 +1698,9 @@ function buildReportHtml(data, fileName, tagColors = {}, vtEnrichment = null) {
       if (feedClean > 0) parts.push(`<span style="color:#3fb950">${feedClean} clean</span>`);
       body += `<div style="text-align:center;font-size:11px;color:#8b949e;margin-top:4px">Feed only: ${parts.join(" · ")} <span style="opacity:0.7">(no timeline hits)</span></div>`;
     }
-
-    // IOC details table (only VT-enriched IOCs)
     if (vtIocs.length > 0) {
-      // Sort: malicious first, then suspicious, then clean, then not found
       const verdictOrder = { malicious: 0, suspicious: 1, clean: 2, not_found: 3, private: 3 };
       const sorted = [...vtIocs].sort((a, b) => (verdictOrder[vtr[a.raw]?.verdict] ?? 4) - (verdictOrder[vtr[b.raw]?.verdict] ?? 4));
-
       body += '<div class="table-wrap"><table><thead><tr>';
       body += '<th>IOC</th><th>Category</th><th>VT Score</th><th>Verdict</th><th>Threat</th><th>Queried At</th><th>Timeline Hits</th>';
       body += '</tr></thead><tbody>';
@@ -1985,14 +1723,12 @@ function buildReportHtml(data, fileName, tagColors = {}, vtEnrichment = null) {
     body += '</div>';
   }
 
-  // Bookmarked events table
   if (data.bookmarkedRows.length > 0) {
     body += `<div class="section"><h2>Bookmarked Events (${data.bookmarkCount})</h2>`;
     body += renderTable(data.bookmarkedRows, usedHeaders);
     body += "</div>";
   }
 
-  // Tagged event tables (one per tag)
   for (const { tag, cnt } of data.tagSummary) {
     const rows = data.taggedGroups[tag] || [];
     if (rows.length === 0) continue;
@@ -2003,7 +1739,6 @@ function buildReportHtml(data, fileName, tagColors = {}, vtEnrichment = null) {
     body += "</div>";
   }
 
-  // Empty report fallback
   if (data.bookmarkedRows.length === 0 && data.tagSummary.length === 0) {
     body += '<div class="section"><p style="color:#9a9590;font-style:italic;text-align:center;padding:40px 0;">No bookmarked or tagged events to include in report.<br>Bookmark events with the star icon or tag them to include in the report.</p></div>';
   }
@@ -2016,7 +1751,7 @@ function buildReportHtml(data, fileName, tagColors = {}, vtEnrichment = null) {
 <title>IRFlow Report — ${esc(fileName)}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0f1114;color:#e0ddd8;font-family:-apple-system,'SF Pro Text','Segoe UI',sans-serif;font-size:13px;padding:30px;max-width:1400px;margin:0 auto}
+body{background:#0f1114;color:#e0ddd8;font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;padding:30px;max-width:1400px;margin:0 auto}
 .report-header{border-bottom:2px solid #E85D2A;padding-bottom:16px;margin-bottom:24px}
 .report-header h1{font-size:22px;font-weight:700;color:#E85D2A}
 .meta{display:flex;gap:24px;color:#9a9590;font-size:12px;margin-top:6px}
@@ -2032,7 +1767,7 @@ body{background:#0f1114;color:#e0ddd8;font-family:-apple-system,'SF Pro Text','S
 .tag-chip strong{margin-left:4px}
 .tag-badge{padding:2px 10px;border-radius:4px;font-size:12px;font-weight:600}
 .table-wrap{overflow-x:auto;border:1px solid #2a2d33;border-radius:8px}
-table{width:100%;border-collapse:collapse;font-size:11px;font-family:'SF Mono','Fira Code',Menlo,monospace}
+table{width:100%;border-collapse:collapse;font-size:11px;font-family:'Cascadia Code','Consolas','Courier New',monospace}
 th{position:sticky;top:0;background:#181b20;color:#E85D2A;padding:8px 10px;text-align:left;border-bottom:2px solid #2a2d33;white-space:nowrap;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
 td{padding:5px 10px;border-bottom:1px solid #1a1d22;color:#e0ddd8;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 tr:nth-child(even){background:#141720}
@@ -2048,4 +1783,5 @@ ${body}
 </html>`;
 }
 
+// ── Boot ──────────────────────────────────────────────────────────────────────
 app.whenReady().then(createWindow);

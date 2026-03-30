@@ -1,3 +1,15 @@
+/**
+ * preload.js — Renderer ↔ main IPC bridge for IRFlow Timeline (Windows build)
+ *
+ * No Windows-specific code changes are required in this file.
+ * All IPC channel names, contextBridge API surface, and webUtils usage are
+ * platform-agnostic.  The file is included here unchanged for completeness.
+ *
+ * Note: webUtils.getPathForFile() (used for drag-and-drop) works correctly on
+ * Windows — it returns an absolute Windows path (e.g. "C:\Users\...\file.csv").
+ * The main process already handles these paths correctly via Node's path module.
+ */
+
 const { contextBridge, ipcRenderer, webUtils } = require("electron");
 
 contextBridge.exposeInMainWorld("tle", {

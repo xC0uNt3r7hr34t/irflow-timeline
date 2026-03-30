@@ -2029,7 +2029,7 @@ export default function App() {
   // Fallback: catch right-clicks via DOM mousedown (covers Cmd+Click / Ctrl+Click on macOS and button=2)
   useEffect(() => {
     const handler = (e) => {
-      if (e.button === 2 || (e.button === 0 && (e.ctrlKey || e.metaKey))) {
+      if (e.button === 2 || (e.button === 0 && (e.ctrlKey || e.ctrlKey))) {
         e.preventDefault();
         rightClickFired.current = true;
         setTimeout(() => { rightClickFired.current = false; }, 50);
@@ -2278,7 +2278,7 @@ export default function App() {
         for (let i = from; i <= to; i++) next.add(i);
         return next;
       });
-    } else if (e.metaKey || e.ctrlKey) {
+    } else if (e.ctrlKey || e.ctrlKey) {
       // Cmd/Ctrl+Click: toggle individual
       setSelectedRows((prev) => {
         const next = new Set(prev);
@@ -2781,7 +2781,7 @@ export default function App() {
 
   // ── Modals ───────────────────────────────────────────────────────
   const Overlay = ({ children }) => (
-    <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+    <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
       <div style={{ background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 12, padding: 24, width: 480, maxWidth: "92vw", maxHeight: "80vh", overflow: "auto", boxShadow: "0 24px 48px rgba(0,0,0,0.5)", WebkitAppRegion: "no-drag" }}>
         {children}
       </div>
@@ -2866,9 +2866,9 @@ export default function App() {
   const ShortModal = () => (
     <Overlay>
       <h3 style={ms.mh}>Shortcuts & Search Syntax</h3>
-      {[["⌘ O", "Open file"], ["⌘ E", "Export filtered view"], ["⌘⇧R", "Generate report"], ["⌘ S", "Save session"], ["⌘⇧O", "Open session"], ["⌘ W", "Close tab"], ["⌘⇧Q", "Close all tabs"], ["⌘ F", "Focus search"], ["⌘⇧F", "Find in all tabs"], ["F3 / ⌘→", "Next search match"], ["⇧F3 / ⌘←", "Previous search match"], ["↑ / ↓", "Navigate rows"], ["⌘ B", "Toggle bookmarked only"], ["⌘⇧C", "Column Manager"], ["⌘⇧L", "Conditional Formatting"], ["⌘ R", "Reset column widths"], ["⌘ + / ⌘ -", "Font size increase / decrease"], ["⌘ C", "Copy selected rows"], ["Shift+Click", "Select range"], ["⌘+Click", "Context menu (Copy / Tags)"], ["⌃+Click", "Context menu (alt)"], ["⇧F10", "Context menu (keyboard)"], ["FL / HL", "Toggle filter/highlight search mode"], ["⏱ icon", "Date range filter (timestamp cols)"], ["Dbl-click", "Cell detail popup"], ["Dbl-click border", "Auto-fit column"], ["Drag header", "Group by column"], ["Esc", "Close panel/modal"]].map(([k, d]) => (
+      {[["Ctrl+ O", "Open file"], ["Ctrl+ E", "Export filtered view"], ["Ctrl+⇧R", "Generate report"], ["Ctrl+ S", "Save session"], ["Ctrl+⇧O", "Open session"], ["Ctrl+ W", "Close tab"], ["Ctrl+⇧Q", "Close all tabs"], ["Ctrl+ F", "Focus search"], ["Ctrl+⇧F", "Find in all tabs"], ["F3 / Ctrl+→", "Next search match"], ["⇧F3 / Ctrl+←", "Previous search match"], ["↑ / ↓", "Navigate rows"], ["Ctrl+ B", "Toggle bookmarked only"], ["Ctrl+⇧C", "Column Manager"], ["Ctrl+⇧L", "Conditional Formatting"], ["Ctrl+ R", "Reset column widths"], ["Ctrl+ + / Ctrl+ -", "Font size increase / decrease"], ["Ctrl+ C", "Copy selected rows"], ["Shift+Click", "Select range"], ["Ctrl++Click", "Context menu (Copy / Tags)"], ["⌃+Click", "Context menu (alt)"], ["⇧F10", "Context menu (keyboard)"], ["FL / HL", "Toggle filter/highlight search mode"], ["⏱ icon", "Date range filter (timestamp cols)"], ["Dbl-click", "Cell detail popup"], ["Dbl-click border", "Auto-fit column"], ["Drag header", "Group by column"], ["Esc", "Close panel/modal"]].map(([k, d]) => (
         <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: `1px solid ${th.bgAlt}` }}>
-          <kbd style={{ background: th.btnBg, color: th.accent, padding: "2px 7px", borderRadius: 4, fontSize: 11, fontFamily: "'SF Mono',Menlo,monospace", border: `1px solid ${th.btnBorder}` }}>{k}</kbd>
+          <kbd style={{ background: th.btnBg, color: th.accent, padding: "2px 7px", borderRadius: 4, fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", border: `1px solid ${th.btnBorder}` }}>{k}</kbd>
           <span style={{ color: th.textDim, fontSize: 12 }}>{d}</span>
         </div>
       ))}
@@ -2919,11 +2919,11 @@ export default function App() {
         <line x1="32" y1="20" x2="32" y2="17.5" stroke={th.accent} strokeWidth="1.2" opacity="0.7" strokeLinecap="round" />
         <line x1="32" y1="20" x2="34.5" y2="20" stroke={th.accent} strokeWidth="1.2" opacity="0.7" strokeLinecap="round" />
       </svg>
-      <div style={{ fontSize: 18, fontWeight: 700, color: th.text, fontFamily: "-apple-system, 'SF Pro Display', sans-serif", marginBottom: 2 }}>IRFlow <span style={{ color: th.accent }}>Timeline</span></div>
-      <p style={{ color: th.textMuted, fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 28, fontFamily: "-apple-system, sans-serif" }}>DFIR Timeline Analysis for macOS</p>
+      <div style={{ fontSize: 18, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 2 }}>IRFlow <span style={{ color: th.accent }}>Timeline</span></div>
+      <p style={{ color: th.textMuted, fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 28, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>DFIR Timeline Analysis for Windows</p>
       {/* Progress */}
       <div style={{ width: 400, maxWidth: "100%" }}>
-        <h3 style={{ color: th.text, fontSize: 16, marginBottom: 8, fontFamily: "-apple-system, sans-serif" }}>
+        <h3 style={{ color: th.text, fontSize: 16, marginBottom: 8, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
           {info.status === "indexing" ? "Finalizing..." : "Importing..."}
         </h3>
         <p style={{ color: th.textDim, fontSize: 13, marginBottom: 16 }}>{info.fileName}</p>
@@ -2935,20 +2935,20 @@ export default function App() {
           <span>{info.percent || 0}%</span>
         </div>
         {info.fileSize > 3 * 1024 * 1024 * 1024 && (
-          <div style={{ marginTop: 16, padding: "10px 14px", background: (th.warning || "#d29922") + "15", border: `1px solid ${(th.warning || "#d29922")}44`, borderRadius: 8, color: th.warning || "#d29922", fontSize: 11, lineHeight: 1.5, fontFamily: "-apple-system, sans-serif" }}>
+          <div style={{ marginTop: 16, padding: "10px 14px", background: (th.warning || "#d29922") + "15", border: `1px solid ${(th.warning || "#d29922")}44`, borderRadius: 8, color: th.warning || "#d29922", fontSize: 11, lineHeight: 1.5, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
             <strong>Large file detected ({(info.fileSize / (1024 * 1024 * 1024)).toFixed(1)} GB)</strong> — This may take several minutes. Do not close this window or import additional files until ingestion is complete.
           </div>
         )}
         {queueLen > 0 && (
           <div style={{ marginTop: 20, padding: "12px 14px", background: `${th.accent}08`, border: `1px solid ${th.border}44`, borderRadius: 8 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8, fontFamily: "-apple-system, sans-serif" }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
               Queued ({queueLen} file{queueLen > 1 ? "s" : ""} waiting)
             </div>
             {importQueue.map((q, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 0", fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>
-                <span style={{ color: th.textMuted, fontSize: 10, fontFamily: "SF Mono, monospace", minWidth: 16 }}>{i + 1}.</span>
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 0", fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+                <span style={{ color: th.textMuted, fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", minWidth: 16 }}>{i + 1}.</span>
                 <span style={{ color: th.text, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{q.fileName}</span>
-                <span style={{ color: th.textDim, fontSize: 10, fontFamily: "SF Mono, monospace", flexShrink: 0 }}>{q.fileSize > 1048576 ? `${(q.fileSize / 1048576).toFixed(1)} MB` : q.fileSize > 1024 ? `${(q.fileSize / 1024).toFixed(0)} KB` : `${q.fileSize} B`}</span>
+                <span style={{ color: th.textDim, fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flexShrink: 0 }}>{q.fileSize > 1048576 ? `${(q.fileSize / 1048576).toFixed(1)} MB` : q.fileSize > 1024 ? `${(q.fileSize / 1024).toFixed(0)} KB` : `${q.fileSize} B`}</span>
               </div>
             ))}
           </div>
@@ -2968,23 +2968,23 @@ export default function App() {
 
   // ── Themed style constants ───────────────────────────────────────
   const Sdiv = () => <span style={{ width: 1, height: 12, background: th.border, display: "inline-block" }} />;
-  const tb = { display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "transparent", color: th.textDim, border: "none", borderRadius: 7, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "-apple-system,sans-serif", whiteSpace: "nowrap" };
+  const tb = { display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "transparent", color: th.textDim, border: "none", borderRadius: 7, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'Segoe UI',system-ui,sans-serif", whiteSpace: "nowrap" };
   const tdv = { width: 1, height: 20, background: th.border, margin: "0 4px", display: "inline-block" };
   const ms = {
-    mh: { margin: "0 0 14px", fontSize: 16, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" },
+    mh: { margin: "0 0 14px", fontSize: 16, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" },
     fg: { marginBottom: 10 },
-    lb: { display: "block", fontSize: 10, color: th.textDim, marginBottom: 3, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system, sans-serif" },
+    lb: { display: "block", fontSize: 10, color: th.textDim, marginBottom: 3, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Segoe UI', system-ui, sans-serif" },
     sl: { width: "100%", padding: "6px 8px", background: th.bgInput, border: `1px solid ${th.btnBorder}`, borderRadius: 6, color: th.text, fontSize: 12, outline: "none", fontFamily: "inherit" },
     ip: { width: "100%", padding: "6px 8px", background: th.bgInput, border: `1px solid ${th.btnBorder}`, borderRadius: 6, color: th.text, fontSize: 12, outline: "none", fontFamily: "inherit", boxSizing: "border-box" },
-    bp: { padding: "6px 16px", background: th.primaryBtn, color: "#fff", border: "none", borderRadius: 6, fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "-apple-system,sans-serif" },
-    bs: { padding: "6px 16px", background: th.btnBg, color: th.text, border: `1px solid ${th.btnBorder}`, borderRadius: 6, fontSize: 12, cursor: "pointer", fontFamily: "-apple-system,sans-serif" },
-    bsm: { padding: "3px 8px", background: th.btnBg, color: th.text, border: `1px solid ${th.btnBorder}`, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "-apple-system,sans-serif" },
+    bp: { padding: "6px 16px", background: th.primaryBtn, color: "#fff", border: "none", borderRadius: 6, fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'Segoe UI',system-ui,sans-serif" },
+    bs: { padding: "6px 16px", background: th.btnBg, color: th.text, border: `1px solid ${th.btnBorder}`, borderRadius: 6, fontSize: 12, cursor: "pointer", fontFamily: "'Segoe UI',system-ui,sans-serif" },
+    bsm: { padding: "3px 8px", background: th.btnBg, color: th.text, border: `1px solid ${th.btnBorder}`, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "'Segoe UI',system-ui,sans-serif" },
   };
 
   // ── Empty state ──────────────────────────────────────────────────
   if (tabs.length === 0) {
     return (
-      <div onContextMenu={(e) => e.preventDefault()} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: th.bg, fontFamily: "'SF Mono',Menlo,monospace", WebkitAppRegion: "drag" }}
+      <div onContextMenu={(e) => e.preventDefault()} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: th.bg, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", WebkitAppRegion: "no-drag" }}
         onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={(e) => { e.preventDefault(); setDragOver(false); const files = [...e.dataTransfer.files]; if (files.length > 0 && tle) { const paths = files.map((f) => tle.getPathForFile(f)).filter(Boolean); if (paths.length > 0) tle.importFiles(paths); } }}>
@@ -3005,12 +3005,12 @@ export default function App() {
             <line x1="32" y1="20" x2="32" y2="17.5" stroke={th.accent} strokeWidth="1.2" opacity="0.7" strokeLinecap="round" />
             <line x1="32" y1="20" x2="34.5" y2="20" stroke={th.accent} strokeWidth="1.2" opacity="0.7" strokeLinecap="round" />
           </svg>
-          <h1 style={{ fontSize: 34, fontWeight: 700, color: th.text, margin: 0, fontFamily: "-apple-system, 'SF Pro Display', sans-serif" }}>IRFlow <span style={{ color: th.accent }}>Timeline</span></h1>
-          <p style={{ color: th.textDim, fontSize: 14, letterSpacing: "0.14em", textTransform: "uppercase", margin: "10px 0 6px", fontWeight: 600 }}>DFIR Timeline Analysis for macOS</p>
+          <h1 style={{ fontSize: 34, fontWeight: 700, color: th.text, margin: 0, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>IRFlow <span style={{ color: th.accent }}>Timeline</span></h1>
+          <p style={{ color: th.textDim, fontSize: 14, letterSpacing: "0.14em", textTransform: "uppercase", margin: "10px 0 6px", fontWeight: 600 }}>DFIR Timeline Analysis for Windows</p>
           <p style={{ color: th.textMuted, fontSize: 12, margin: "0 0 32px" }}>SQLite-backed · Handles large files for timeline analysis · CSV / TSV / XLSX / EVTX / Plaso / Raw $MFT / $J</p>
-          <button onClick={() => tle?.openFileDialog()} style={{ padding: "14px 48px", background: th.primaryBtn, color: "#fff", border: "none", borderRadius: 8, fontSize: 16, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, sans-serif", WebkitAppRegion: "no-drag" }}>Open File</button>
-          <p style={{ color: th.textMuted, fontSize: 12, marginTop: 28 }}>⌘O open · ⌘F search · ⌘B bookmarks · ⌘E export</p>
-          <p style={{ color: th.textMuted, fontSize: 11, marginTop: 28, fontFamily: "-apple-system, sans-serif" }}>Created by <span style={{ color: th.textDim }}>Renzon Cruz</span> | <span style={{ color: th.accent }}>@r3nzsec</span></p>
+          <button onClick={() => tle?.openFileDialog()} style={{ padding: "14px 48px", background: th.primaryBtn, color: "#fff", border: "none", borderRadius: 8, fontSize: 16, fontWeight: 600, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", WebkitAppRegion: "no-drag" }}>Open File</button>
+          <p style={{ color: th.textMuted, fontSize: 12, marginTop: 28 }}>Ctrl+O open · Ctrl+F search · Ctrl+B bookmarks · Ctrl+E export</p>
+          <p style={{ color: th.textMuted, fontSize: 11, marginTop: 28, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Created by <span style={{ color: th.textDim }}>Renzon Cruz</span> | <span style={{ color: th.accent }}>@r3nzsec</span></p>
         </div>
       </div>
     );
@@ -3039,7 +3039,7 @@ export default function App() {
       onDragOver={(e) => { if (!e.dataTransfer.types.includes("Files")) return; e.preventDefault(); e.dataTransfer.dropEffect = "copy"; setDragOver(true); }}
       onDragLeave={(e) => { if (e.currentTarget.contains(e.relatedTarget)) return; setDragOver(false); }}
       onDrop={(e) => { if (!e.dataTransfer.types.includes("Files")) return; e.preventDefault(); setDragOver(false); const files = [...e.dataTransfer.files]; if (files.length > 0 && tle) { const paths = files.map((f) => tle.getPathForFile(f)).filter(Boolean); if (paths.length > 0) tle.importFiles(paths); } }}
-      style={{ display: "flex", flexDirection: "column", height: "100vh", background: th.bg, color: th.text, fontFamily: "'SF Mono','Fira Code',Menlo,monospace", fontSize: fontSize, overflow: "hidden" }}>
+      style={{ display: "flex", flexDirection: "column", height: "100vh", background: th.bg, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: fontSize, overflow: "hidden" }}>
       <style>{`
         @keyframes tle-spin { to { transform: rotate(360deg) } }
         @keyframes tle-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.95); } }
@@ -3059,15 +3059,15 @@ export default function App() {
         <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
           <div style={{ padding: "40px 60px", border: `3px dashed ${th.accent}`, borderRadius: 16, background: `${th.bg}DD`, textAlign: "center" }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>+</div>
-            <div style={{ color: th.accent, fontSize: 16, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>Drop files to import</div>
-            <div style={{ color: th.textMuted, fontSize: 11, marginTop: 4, fontFamily: "-apple-system, sans-serif" }}>CSV · TSV · XLSX · EVTX · Plaso · Raw $MFT · $J</div>
-            <div style={{ color: th.textMuted, fontSize: 10, marginTop: 2, fontFamily: "-apple-system, sans-serif", opacity: 0.7 }}>Extensionless files auto-detected by content</div>
+            <div style={{ color: th.accent, fontSize: 16, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Drop files to import</div>
+            <div style={{ color: th.textMuted, fontSize: 11, marginTop: 4, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>CSV · TSV · XLSX · EVTX · Plaso · Raw $MFT · $J</div>
+            <div style={{ color: th.textMuted, fontSize: 10, marginTop: 2, fontFamily: "'Segoe UI', system-ui, sans-serif", opacity: 0.7 }}>Extensionless files auto-detected by content</div>
           </div>
         </div>
       )}
 
       {/* Toolbar — draggable title bar region */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 12px 6px 84px", background: th.bgAlt, borderBottom: `1px solid ${th.glassBorder}`, gap: 10, flexShrink: 0, position: "relative", zIndex: 100, WebkitAppRegion: "drag" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 12px 6px 12px", background: th.bgAlt, borderBottom: `1px solid ${th.glassBorder}`, gap: 10, flexShrink: 0, position: "relative", zIndex: 100, WebkitAppRegion: "no-drag" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, WebkitAppRegion: "no-drag" }}>
           {/* Menu capsule */}
           <div style={{ display: "flex", alignItems: "center", gap: 1, background: th.glassBg, border: `1px solid ${th.glassBorder}`, borderRadius: 9, padding: 2 }}>
@@ -3077,15 +3077,15 @@ export default function App() {
               <div onClick={() => setFileMenuOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 149 }} />
               <div style={{ position: "absolute", top: "100%", left: 0, marginTop: 4, background: th.modalBg + "EE", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: `1px solid ${th.glassBorder}`, borderRadius: 10, padding: "6px 0", zIndex: 150, boxShadow: `0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px ${th.glassBorder}`, minWidth: 220, whiteSpace: "nowrap" }}>
                 {[
-                  { label: "Open", shortcut: "⌘O", action: () => tle?.openFileDialog() },
-                  { label: "Export", shortcut: "⌘E", action: handleExport, disabled: !ct?.dataReady },
+                  { label: "Open", shortcut: "Ctrl+O", action: () => tle?.openFileDialog() },
+                  { label: "Export", shortcut: "Ctrl+E", action: handleExport, disabled: !ct?.dataReady },
                   { type: "separator" },
-                  { label: "Save Session", shortcut: "⌘S", action: handleSaveSession, disabled: tabs.length === 0 },
-                  { label: "Load Session", shortcut: "⇧⌘O", action: handleLoadSession },
+                  { label: "Save Session", shortcut: "Ctrl+S", action: handleSaveSession, disabled: tabs.length === 0 },
+                  { label: "Load Session", shortcut: "Ctrl+Shift+O", action: handleLoadSession },
                   { type: "separator" },
                   { label: "Open Recent", submenu: true },
                   { type: "separator" },
-                  { label: "Close Tab", shortcut: "⌘W", action: () => { if (ct) closeTab(ct.id); }, disabled: !ct },
+                  { label: "Close Tab", shortcut: "Ctrl+W", action: () => { if (ct) closeTab(ct.id); }, disabled: !ct },
                   { label: "Close All Tabs", action: () => { setTabs((prev) => { prev.forEach((t) => tle.closeTab(t.id)); return []; }); setActiveTab(null); }, disabled: tabs.length === 0 },
                   { type: "separator" },
                   { label: "Exit", action: () => window.close() },
@@ -3096,7 +3096,7 @@ export default function App() {
                       <div key={item.label} style={{ position: "relative" }}
                         onMouseEnter={(e) => { const el = e.currentTarget; el.dataset.hover = "1"; el.querySelector("[data-submenu]")?.style.setProperty("display", "block"); }}
                         onMouseLeave={(e) => { const el = e.currentTarget; el.dataset.hover = ""; el.querySelector("[data-submenu]")?.style.setProperty("display", "none"); }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 16px", cursor: "default", fontSize: 13, fontFamily: "-apple-system, sans-serif", color: th.text }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 16px", cursor: "default", fontSize: 13, fontFamily: "'Segoe UI', system-ui, sans-serif", color: th.text }}>
                           <span>{item.label}</span>
                           <span style={{ fontSize: 10, color: th.textMuted, marginLeft: 12 }}>▶</span>
                         </div>
@@ -3105,22 +3105,22 @@ export default function App() {
                             {recentFiles.map((fp, ri) => (
                               <div key={ri} onClick={() => { setFileMenuOpen(false); tle?.openRecentFile(fp).then((r) => { if (r?.error) alert(`Could not open file: ${r.error}\n\n${fp}`); }); }}
                                 title={fp}
-                                style={{ padding: "6px 16px", cursor: "pointer", fontSize: 12, fontFamily: "-apple-system, sans-serif", color: th.text, overflow: "hidden", textOverflow: "ellipsis" }}
+                                style={{ padding: "6px 16px", cursor: "pointer", fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif", color: th.text, overflow: "hidden", textOverflow: "ellipsis" }}
                                 onMouseEnter={(e) => e.currentTarget.style.background = th.selection}
                                 onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
-                                {fp.split("/").pop()}
+                                {fp.split(/[\\/]/).pop()}
                                 <div style={{ fontSize: 10, color: th.textMuted, marginTop: 1, overflow: "hidden", textOverflow: "ellipsis" }}>{fp}</div>
                               </div>
                             ))}
                             <div style={{ height: 1, background: th.border, margin: "4px 12px" }} />
                             <div onClick={() => { setFileMenuOpen(false); tle?.clearRecentFiles(); setRecentFiles([]); }}
-                              style={{ padding: "6px 16px", cursor: "pointer", fontSize: 12, fontFamily: "-apple-system, sans-serif", color: th.textMuted }}
+                              style={{ padding: "6px 16px", cursor: "pointer", fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif", color: th.textMuted }}
                               onMouseEnter={(e) => e.currentTarget.style.background = th.selection}
                               onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
                               Clear Recent Files
                             </div>
                           </>) : (
-                            <div style={{ padding: "6px 16px", fontSize: 12, fontFamily: "-apple-system, sans-serif", color: th.textMuted, fontStyle: "italic" }}>No recent files</div>
+                            <div style={{ padding: "6px 16px", fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif", color: th.textMuted, fontStyle: "italic" }}>No recent files</div>
                           )}
                         </div>
                       </div>
@@ -3128,7 +3128,7 @@ export default function App() {
                   }
                   return (
                     <div key={item.label} onClick={() => { if (!item.disabled) { setFileMenuOpen(false); item.action?.(); } }}
-                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 16px", cursor: item.disabled ? "default" : "pointer", fontSize: 13, fontFamily: "-apple-system, sans-serif", color: item.disabled ? th.textMuted : th.text, opacity: item.disabled ? 0.5 : 1 }}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 16px", cursor: item.disabled ? "default" : "pointer", fontSize: 13, fontFamily: "'Segoe UI', system-ui, sans-serif", color: item.disabled ? th.textMuted : th.text, opacity: item.disabled ? 0.5 : 1 }}
                       onMouseEnter={(e) => { if (!item.disabled) e.currentTarget.style.background = th.selection; }}
                       onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
                       <span>{item.label}</span>
@@ -3168,7 +3168,7 @@ export default function App() {
                     <button key={item.label} onClick={() => { setViewMenuOpen(false); item.action(); }} disabled={item.disabled}
                       onMouseEnter={(e) => { if (!item.disabled) { e.currentTarget.style.background = `${th.accent}15`; e.currentTarget.style.borderLeft = `2px solid ${th.accent}`; e.currentTarget.style.paddingLeft = "12px"; } }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderLeft = "2px solid transparent"; e.currentTarget.style.paddingLeft = "12px"; }}
-                      style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "7px 14px 7px 12px", background: "none", border: "none", borderLeft: "2px solid transparent", color: item.disabled ? th.textMuted : th.text, fontSize: 13, cursor: item.disabled ? "default" : "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif", opacity: item.disabled ? 0.4 : 1, transition: "all 0.1s" }}>
+                      style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "7px 14px 7px 12px", background: "none", border: "none", borderLeft: "2px solid transparent", color: item.disabled ? th.textMuted : th.text, fontSize: 13, cursor: item.disabled ? "default" : "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", opacity: item.disabled ? 0.4 : 1, transition: "all 0.1s" }}>
                       {item.icon}
                       {item.label}
                     </button>
@@ -3272,14 +3272,14 @@ export default function App() {
                     if (item.type === "separator") return <div key={`sep-${i}`} style={{ height: 1, background: th.border, margin: "4px 12px" }} />;
                     if (item.type === "section") return (
                       <div key={item.label} style={{ padding: "6px 14px 4px", borderTop: `1px solid ${th.border}33`, marginTop: 2 }}>
-                        <span style={{ fontSize: 9, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "-apple-system, sans-serif" }}>{item.label}</span>
+                        <span style={{ fontSize: 9, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{item.label}</span>
                       </div>
                     );
                     return (
                       <button key={item.label} onClick={() => { setActionsMenuOpen(false); item.action(); }} disabled={item.disabled}
                         onMouseEnter={(e) => { if (!item.disabled) { e.currentTarget.style.background = `${th.accent}15`; e.currentTarget.style.borderLeft = `2px solid ${th.accent}`; e.currentTarget.style.paddingLeft = "12px"; } }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderLeft = "2px solid transparent"; e.currentTarget.style.paddingLeft = "12px"; }}
-                        style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "7px 14px 7px 12px", background: "none", border: "none", borderLeft: "2px solid transparent", color: item.disabled ? th.textMuted : th.text, fontSize: 13, cursor: item.disabled ? "default" : "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif", opacity: item.disabled ? 0.4 : 1, transition: "all 0.1s" }}>
+                        style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "7px 14px 7px 12px", background: "none", border: "none", borderLeft: "2px solid transparent", color: item.disabled ? th.textMuted : th.text, fontSize: 13, cursor: item.disabled ? "default" : "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", opacity: item.disabled ? 0.4 : 1, transition: "all 0.1s" }}>
                         {item.icon}
                         {item.label}
                       </button>
@@ -3462,20 +3462,20 @@ export default function App() {
                     <button key={item.label} onClick={() => { setToolsOpen(false); item.action(); }} disabled={item.disabled}
                       onMouseEnter={(e) => { if (!item.disabled) { e.currentTarget.style.background = `${th.accent}15`; e.currentTarget.style.borderLeft = `2px solid ${th.accent}`; e.currentTarget.style.paddingLeft = `${indent}px`; } }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderLeft = "2px solid transparent"; e.currentTarget.style.paddingLeft = `${indent}px`; }}
-                      style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: `7px 14px 7px ${indent}px`, background: "none", border: "none", borderLeft: "2px solid transparent", color: item.disabled ? th.textMuted : th.text, fontSize: 13, cursor: item.disabled ? "default" : "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif", opacity: item.disabled ? 0.4 : 1, transition: "all 0.1s" }}>
+                      style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: `7px 14px 7px ${indent}px`, background: "none", border: "none", borderLeft: "2px solid transparent", color: item.disabled ? th.textMuted : th.text, fontSize: 13, cursor: item.disabled ? "default" : "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", opacity: item.disabled ? 0.4 : 1, transition: "all 0.1s" }}>
                       {item.icon}
                       {item.label}
                     </button>
                   );
                   return items.flatMap((item, i) => item.section ? [(
                     <div key={item.section} style={{ padding: i === 0 ? "2px 14px 4px" : "6px 14px 4px", borderTop: i === 0 ? "none" : `1px solid ${th.border}33`, marginTop: i === 0 ? 0 : 2 }}>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "-apple-system, sans-serif" }}>{item.section}</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{item.section}</span>
                     </div>
                   )] : item.group ? [
                     <button key={item.group} onClick={() => setToolsMenuExpanded((p) => ({ ...p, [item.group]: !p[item.group] }))}
                       onMouseEnter={(e) => { e.currentTarget.style.background = `${th.accent}10`; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                      style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "7px 14px 7px 12px", background: "none", border: "none", borderLeft: "2px solid transparent", color: th.text, fontSize: 13, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif", transition: "all 0.1s" }}>
+                      style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "7px 14px 7px 12px", background: "none", border: "none", borderLeft: "2px solid transparent", color: th.text, fontSize: 13, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", transition: "all 0.1s" }}>
                       {item.icon}
                       <span style={{ flex: 1 }}>{item.group}</span>
                       <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke={th.textMuted} strokeWidth="1.5" strokeLinecap="round" style={{ transform: toolsMenuExpanded[item.group] ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.15s ease", flexShrink: 0 }}>
@@ -3495,7 +3495,7 @@ export default function App() {
               <div style={{ position: "absolute", top: "100%", left: 0, marginTop: 4, background: th.modalBg + "EE", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: `1px solid ${th.glassBorder}`, borderRadius: 10, padding: "6px 0", zIndex: 150, boxShadow: `0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px ${th.glassBorder}`, minWidth: 220, whiteSpace: "nowrap" }}>
                 {[
                   { label: "Quick Help", icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>, action: () => setModal({ type: "quickHelp" }) },
-                  { label: "Keyboard Shortcuts", shortcut: "⌘/", icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M18 12h.01M8 16h8"/></svg>, action: () => setModal({ type: "shortcuts" }) },
+                  { label: "Keyboard Shortcuts", shortcut: "Ctrl+/", icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M18 12h.01M8 16h8"/></svg>, action: () => setModal({ type: "shortcuts" }) },
                   { label: checkingForUpdates ? "Checking for Updates..." : "Check for Updates...", icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>, action: handleCheckForUpdates },
                   { type: "separator" },
                   { label: "Website", icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>, action: () => window.open("https://r3nzsec.github.io/irflow-timeline/", "_blank") },
@@ -3504,7 +3504,7 @@ export default function App() {
                   if (item.type === "separator") return <div key={`sep-${i}`} style={{ height: 1, background: th.border, margin: "4px 12px" }} />;
                   return (
                     <div key={item.label} onClick={() => { setHelpMenuOpen(false); item.action?.(); }}
-                      style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", cursor: "pointer", fontSize: 13, fontFamily: "-apple-system, sans-serif", color: th.text }}
+                      style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", cursor: "pointer", fontSize: 13, fontFamily: "'Segoe UI', system-ui, sans-serif", color: th.text }}
                       onMouseEnter={(e) => e.currentTarget.style.background = th.selection}
                       onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
                       {item.icon}
@@ -3539,7 +3539,7 @@ export default function App() {
           </button>
           </div>{/* end settings capsule */}
           {proximityFilter && ct?.dateRangeFilters?.[proximityFilter.tsCol] && (
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 8px", background: `${th.warning}22`, border: `1px solid ${th.warning}4D`, borderRadius: 10, color: th.warning, fontSize: 10, fontFamily: "-apple-system,sans-serif", whiteSpace: "nowrap" }}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 8px", background: `${th.warning}22`, border: `1px solid ${th.warning}4D`, borderRadius: 10, color: th.warning, fontSize: 10, fontFamily: "'Segoe UI',system-ui,sans-serif", whiteSpace: "nowrap" }}
               title={`Proximity: ±${proximityFilter.label} around ${proximityFilter.pivotRaw}`}>
               ⏱ ±{proximityFilter.label}
               <span style={{ color: th.textMuted, maxWidth: 80, overflow: "hidden", textOverflow: "ellipsis" }}>{" near "}{(proximityFilter.pivotRaw || "").slice(11, 19)}</span>
@@ -3562,7 +3562,7 @@ export default function App() {
           </select>
           <button onClick={() => ct && up("searchHighlight", !ct.searchHighlight)}
             title={ct?.searchHighlight ? "Highlight mode (showing all rows, highlighting matches)" : "Filter mode (hiding non-matching rows)"}
-            style={{ background: ct?.searchHighlight ? `${th.warning}33` : "none", border: ct?.searchHighlight ? `1px solid ${th.warning}66` : "1px solid transparent", color: ct?.searchHighlight ? th.warning : th.textMuted, cursor: "pointer", fontSize: 10, padding: "1px 5px", borderRadius: 3, fontFamily: "-apple-system,sans-serif", whiteSpace: "nowrap" }}>
+            style={{ background: ct?.searchHighlight ? `${th.warning}33` : "none", border: ct?.searchHighlight ? `1px solid ${th.warning}66` : "1px solid transparent", color: ct?.searchHighlight ? th.warning : th.textMuted, cursor: "pointer", fontSize: 10, padding: "1px 5px", borderRadius: 3, fontFamily: "'Segoe UI',system-ui,sans-serif", whiteSpace: "nowrap" }}>
             {ct?.searchHighlight ? "HL" : "FL"}
           </button>
           {ct?.searchTerm && !isGrouped && (
@@ -3585,12 +3585,12 @@ export default function App() {
           <div style={{ position: "relative" }}>
             <button onClick={() => setRegexPaletteOpen((v) => !v)}
               title="Regex Pattern Palette — quick-insert common forensic patterns"
-              style={{ background: regexPaletteOpen ? `${th.accent}22` : "none", border: regexPaletteOpen ? `1px solid ${th.accent}66` : "1px solid transparent", color: regexPaletteOpen ? th.accent : th.textMuted, cursor: "pointer", fontSize: 10, padding: "1px 5px", borderRadius: 3, fontFamily: "'SF Mono',Menlo,monospace", fontWeight: 700, whiteSpace: "nowrap", lineHeight: "16px" }}>Rx</button>
+              style={{ background: regexPaletteOpen ? `${th.accent}22` : "none", border: regexPaletteOpen ? `1px solid ${th.accent}66` : "1px solid transparent", color: regexPaletteOpen ? th.accent : th.textMuted, cursor: "pointer", fontSize: 10, padding: "1px 5px", borderRadius: 3, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 700, whiteSpace: "nowrap", lineHeight: "16px" }}>Rx</button>
             {regexPaletteOpen && (<>
               <div onClick={() => setRegexPaletteOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 149 }} />
               <div style={{ position: "absolute", top: "100%", right: 0, marginTop: 6, background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 8, padding: "6px 0", zIndex: 150, boxShadow: "0 8px 24px rgba(0,0,0,0.4)", minWidth: 260, maxHeight: "70vh", overflow: "auto" }}>
                 <div style={{ padding: "4px 12px 6px", borderBottom: `1px solid ${th.border}`, marginBottom: 4 }}>
-                  <span style={{ fontSize: 10, fontWeight: 600, color: th.textDim, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system, sans-serif" }}>Forensic Regex Patterns</span>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: th.textDim, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Forensic Regex Patterns</span>
                 </div>
                 {[
                   { label: "IPv4 Address", pattern: "\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b", icon: "IP" },
@@ -3622,10 +3622,10 @@ export default function App() {
                   }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = th.btnBg; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                    style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "5px 12px", background: "none", border: "none", color: th.text, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif" }}>
-                    <span style={{ width: 22, textAlign: "center", fontSize: 9, fontWeight: 700, color: th.accent, fontFamily: "'SF Mono',Menlo,monospace", flexShrink: 0 }}>{item.icon}</span>
+                    style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "5px 12px", background: "none", border: "none", color: th.text, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+                    <span style={{ width: 22, textAlign: "center", fontSize: 9, fontWeight: 700, color: th.accent, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flexShrink: 0 }}>{item.icon}</span>
                     <span style={{ flex: 1 }}>{item.label}</span>
-                    <span style={{ color: th.textMuted, fontSize: 9, fontFamily: "'SF Mono',Menlo,monospace", maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={item.pattern}>{item.pattern.length > 18 ? item.pattern.slice(0, 18) + "..." : item.pattern}</span>
+                    <span style={{ color: th.textMuted, fontSize: 9, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={item.pattern}>{item.pattern.length > 18 ? item.pattern.slice(0, 18) + "..." : item.pattern}</span>
                   </button>
                 ))}
               </div>
@@ -3637,7 +3637,7 @@ export default function App() {
           <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "0 6px", flexShrink: 0 }}>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={th.warning} strokeWidth="2.5" style={{ animation: "tle-spin 1s linear infinite", flexShrink: 0 }}>
               <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" /></svg>
-            <span style={{ color: th.warning, fontSize: 9, fontFamily: "-apple-system,sans-serif", whiteSpace: "nowrap" }}>
+            <span style={{ color: th.warning, fontSize: 9, fontFamily: "'Segoe UI',system-ui,sans-serif", whiteSpace: "nowrap" }}>
               {!ct.indexesReady && (!ct.ftsReady && ct.ftsTotal > 0)
                 ? `Indexing cols ${ct.indexesBuilt || 0}/${ct.indexesTotal || "..."} + search ${Math.round((ct.ftsIndexed / ct.ftsTotal) * 100)}%`
                 : !ct.indexesReady
@@ -3707,7 +3707,7 @@ export default function App() {
               requestAnimationFrame(() => { if (scrollRef.current) scrollRef.current.scrollTop = saved.scrollTop; });
             }
           }}
-            style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 14px", cursor: "pointer", color: t.id === activeTab ? th.text : th.textDim, fontSize: 11, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", background: t.id === activeTab ? th.glassBg : "transparent", border: t.id === activeTab ? `1px solid ${th.glassBorder}` : "1px solid transparent", borderRadius: 8, boxShadow: t.id === activeTab ? `0 1px 3px rgba(0,0,0,0.15), inset 0 1px 0 ${th.glassBorder}` : "none" }}>
+            style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 14px", cursor: "pointer", color: t.id === activeTab ? th.text : th.textDim, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", background: t.id === activeTab ? th.glassBg : "transparent", border: t.id === activeTab ? `1px solid ${th.glassBorder}` : "1px solid transparent", borderRadius: 8, boxShadow: t.id === activeTab ? `0 1px 3px rgba(0,0,0,0.15), inset 0 1px 0 ${th.glassBorder}` : "none" }}>
             {t.importing && <span style={{ color: th.warning }}>⏳</span>}
             {t.id === activeTab && <span style={{ width: 6, height: 6, borderRadius: 3, background: th.accent, flexShrink: 0 }} />}
             <span style={{ maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis" }}>{t.name}</span>
@@ -3719,7 +3719,7 @@ export default function App() {
           <div style={{ display: "flex", alignItems: "center", marginLeft: "auto", flexShrink: 0, padding: "0 4px" }}>
             <input value={tabFilter} onChange={(e) => setTabFilter(e.target.value)}
               placeholder="Filter tabs..."
-              style={{ width: 110, padding: "2px 6px", background: th.glassBg, border: `1px solid ${th.glassBorder}`, borderRadius: 6, color: th.text, fontSize: 10, outline: "none", fontFamily: "-apple-system, sans-serif" }} />
+              style={{ width: 110, padding: "2px 6px", background: th.glassBg, border: `1px solid ${th.glassBorder}`, borderRadius: 6, color: th.text, fontSize: 10, outline: "none", fontFamily: "'Segoe UI', system-ui, sans-serif" }} />
             {tabFilter && <button onClick={() => setTabFilter("")} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 10, padding: "0 3px", marginLeft: 2 }}>✕</button>}
           </div>
         )}
@@ -3740,7 +3740,7 @@ export default function App() {
             <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
           </svg>
           {groupDragOver && !isGrouped ? (
-            <span style={{ color: th.accent, fontSize: 10, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>Drop here to group by column</span>
+            <span style={{ color: th.accent, fontSize: 10, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Drop here to group by column</span>
           ) : isGrouped ? (<>
             {(ct.groupByColumns || []).map((col, i) => (
               <span key={col} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
@@ -3750,23 +3750,23 @@ export default function App() {
                   onDragEnd={() => setGroupReorderDrag(null)}
                   onDragOver={(e) => { if (groupReorderDrag && groupReorderDrag !== col) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; } }}
                   onDrop={(e) => { e.preventDefault(); e.stopPropagation(); const dragCol = e.dataTransfer.getData("text/group-reorder"); if (dragCol && dragCol !== col) { setTabs((prev) => prev.map((t) => { if (t.id !== ct.id) return t; const cols = [...(t.groupByColumns || [])]; const fromIdx = cols.indexOf(dragCol); const toIdx = cols.indexOf(col); if (fromIdx < 0 || toIdx < 0) return t; cols.splice(fromIdx, 1); cols.splice(toIdx, 0, dragCol); return { ...t, groupByColumns: cols, expandedGroups: {}, groupData: [] }; })); setGroupReorderDrag(null); } }}
-                  style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", background: groupReorderDrag === col ? `${th.accent}44` : `${th.accent}22`, border: `1px solid ${th.accent}4D`, borderRadius: 4, color: th.accent, fontSize: 10, fontWeight: 500, fontFamily: "-apple-system, sans-serif", cursor: "grab" }}>
+                  style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", background: groupReorderDrag === col ? `${th.accent}44` : `${th.accent}22`, border: `1px solid ${th.accent}4D`, borderRadius: 4, color: th.accent, fontSize: 10, fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif", cursor: "grab" }}>
                   {col}
                   <button onClick={() => removeGroupBy(col)} style={{ background: "none", border: "none", color: th.accent, cursor: "pointer", fontSize: 9, padding: 0, lineHeight: 1, opacity: 0.7 }} title={`Remove ${col} grouping`}>✕</button>
                 </span>
               </span>
             ))}
-            <button onClick={() => setTabs((prev) => prev.map((t) => t.id === ct.id ? { ...t, groupByColumns: [], expandedGroups: {}, groupData: [] } : t))} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 9, padding: "1px 4px", fontFamily: "-apple-system, sans-serif" }} title="Clear all grouping">Clear</button>
+            <button onClick={() => setTabs((prev) => prev.map((t) => t.id === ct.id ? { ...t, groupByColumns: [], expandedGroups: {}, groupData: [] } : t))} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 9, padding: "1px 4px", fontFamily: "'Segoe UI', system-ui, sans-serif" }} title="Clear all grouping">Clear</button>
           </>) : (
-            <span style={{ color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>Drag a column header here to group</span>
+            <span style={{ color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Drag a column header here to group</span>
           )}
           {totalActiveFilters > 0 && (
-            <span style={{ marginLeft: "auto", display: "inline-flex", alignItems: "center", gap: 8, fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>
+            <span style={{ marginLeft: "auto", display: "inline-flex", alignItems: "center", gap: 8, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
               <span style={{ color: th.borderAccent }}>
                 {totalActiveFilters} filter{totalActiveFilters > 1 ? "s" : ""} active
                 {activeCheckboxCount > 0 ? ` (${activeCheckboxCount} value)` : ""}
               </span>
-              <button onClick={clearAllFilters} style={{ background: (th.danger || "#f85149") + "18", border: `1px solid ${(th.danger || "#f85149")}55`, borderRadius: 4, color: th.danger || "#f85149", cursor: "pointer", fontSize: 10, padding: "1px 8px", fontFamily: "-apple-system, sans-serif", fontWeight: 600 }}>Clear All</button>
+              <button onClick={clearAllFilters} style={{ background: (th.danger || "#f85149") + "18", border: `1px solid ${(th.danger || "#f85149")}55`, borderRadius: 4, color: th.danger || "#f85149", cursor: "pointer", fontSize: 10, padding: "1px 8px", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 600 }}>Clear All</button>
             </span>
           )}
         </div>
@@ -3855,7 +3855,7 @@ export default function App() {
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3, height: HEADER_BAR - 6 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "2px 8px", background: `${th.panelBg}88`, borderRadius: 6, border: `1px solid ${th.border}33` }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="2"><rect x="3" y="12" width="4" height="9" rx="1" /><rect x="10" y="6" width="4" height="15" rx="1" /><rect x="17" y="3" width="4" height="18" rx="1" /></svg>
-                <span style={{ color: th.textDim, fontSize: 10, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>Timeline</span>
+                <span style={{ color: th.textDim, fontSize: 10, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Timeline</span>
               </div>
               <select value={effectiveHistCol || ""} onChange={(e) => { setHistogramCol(e.target.value); histBrushRef.current = { startIdx: null, endIdx: null, active: false }; hideBrushDOM(); }}
                 style={{ background: th.bgInput, border: `1px solid ${th.btnBorder}`, color: th.textDim, fontSize: 10, padding: "2px 6px", borderRadius: 4, cursor: "pointer", outline: "none" }}>
@@ -3865,11 +3865,11 @@ export default function App() {
               <div style={{ display: "flex", background: th.btnBg, borderRadius: 5, border: `1px solid ${th.btnBorder}`, overflow: "hidden" }}>
                 {["day", "hour"].map((g) => (
                   <button key={g} onClick={() => { setHistGranularity(g); histBrushRef.current = { startIdx: null, endIdx: null, active: false }; hideBrushDOM(); }}
-                    style={{ padding: "2px 8px", fontSize: 9, fontWeight: histGranularity === g ? 600 : 400, background: histGranularity === g ? th.accent + "22" : "transparent", color: histGranularity === g ? th.accent : th.textMuted, border: "none", cursor: "pointer", fontFamily: "-apple-system,sans-serif", textTransform: "capitalize" }}>{g}</button>
+                    style={{ padding: "2px 8px", fontSize: 9, fontWeight: histGranularity === g ? 600 : 400, background: histGranularity === g ? th.accent + "22" : "transparent", color: histGranularity === g ? th.accent : th.textMuted, border: "none", cursor: "pointer", fontFamily: "'Segoe UI',system-ui,sans-serif", textTransform: "capitalize" }}>{g}</button>
                 ))}
               </div>
               {histogramData.length > 0 && (
-                <span style={{ color: th.textMuted, fontSize: 9, fontFamily: "-apple-system, sans-serif" }}>
+                <span style={{ color: th.textMuted, fontSize: 9, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                   {histogramData[0]?.day} — {histogramData[histogramData.length - 1]?.day} ({histogramData.length} {bucketLabel}{histogramData.length !== 1 ? "s" : ""})
                 </span>
               )}
@@ -3878,7 +3878,7 @@ export default function App() {
                   const next = { ...(ct.dateRangeFilters || {}) };
                   delete next[effectiveHistCol];
                   up("dateRangeFilters", next);
-                }} style={{ background: `${th.warning}22`, border: `1px solid ${th.warning}4D`, color: th.warning, cursor: "pointer", fontSize: 9, padding: "1px 8px", borderRadius: 3, marginLeft: "auto", fontFamily: "-apple-system,sans-serif" }}>
+                }} style={{ background: `${th.warning}22`, border: `1px solid ${th.warning}4D`, color: th.warning, cursor: "pointer", fontSize: 9, padding: "1px 8px", borderRadius: 3, marginLeft: "auto", fontFamily: "'Segoe UI',system-ui,sans-serif" }}>
                   Clear filter
                 </button>
               )}
@@ -3919,7 +3919,7 @@ export default function App() {
                       const y = CHART_PAD_T + chartH - (v / yMax) * chartH;
                       return <g key={`y-${v}`}>
                         <line x1={Y_AXIS_W} y1={y} x2={Y_AXIS_W + chartW} y2={y} stroke={gridColor} strokeWidth={1} strokeOpacity={0.6} />
-                        <text x={Y_AXIS_W - 4} y={y + 3} textAnchor="end" fill={textColor} fontSize={9} fontFamily="-apple-system,sans-serif">{v >= 1000 ? `${(v/1000).toFixed(v >= 10000 ? 0 : 1)}k` : v}</text>
+                        <text x={Y_AXIS_W - 4} y={y + 3} textAnchor="end" fill={textColor} fontSize={9} fontFamily="'Segoe UI',system-ui,sans-serif">{v >= 1000 ? `${(v/1000).toFixed(v >= 10000 ? 0 : 1)}k` : v}</text>
                       </g>;
                     })}
                     {histogramData.map((d, i) => {
@@ -3940,7 +3940,7 @@ export default function App() {
                       fill={th.accent + "15"} stroke={th.accent} strokeWidth={1} strokeDasharray="3 2" rx={2}
                       style={{ pointerEvents: "none", display: "none" }} />
                     <text ref={histBrushLabelRef} x={0} y={CHART_PAD_T - 3} textAnchor="middle"
-                      fill={th.accent} fontSize={8} fontWeight="600" fontFamily="-apple-system,sans-serif"
+                      fill={th.accent} fontSize={8} fontWeight="600" fontFamily="'Segoe UI',system-ui,sans-serif"
                       style={{ pointerEvents: "none", display: "none" }} />
                     <line x1={Y_AXIS_W} y1={CHART_PAD_T + chartH} x2={Y_AXIS_W + chartW} y2={CHART_PAD_T + chartH} stroke={gridColor} strokeWidth={1} />
                     {histogramData.map((d, i) => {
@@ -3950,18 +3950,18 @@ export default function App() {
                         const p = d.day.split(" ");
                         const dateParts = (p[0] || "").split("-");
                         const label = dateParts.length === 3 ? `${dateParts[1]}/${dateParts[2]} ${p[1] || ""}:00` : d.day;
-                        return <text key={`xl-${i}`} x={x} y={svgH - 2} textAnchor="middle" fill={textColor} fontSize={7} fontFamily="-apple-system,sans-serif">{label}</text>;
+                        return <text key={`xl-${i}`} x={x} y={svgH - 2} textAnchor="middle" fill={textColor} fontSize={7} fontFamily="'Segoe UI',system-ui,sans-serif">{label}</text>;
                       }
                       const parts = d.day.split("-");
                       const label = parts.length === 3 ? `${parts[1]}/${parts[2]}` : d.day;
-                      return <text key={`xl-${i}`} x={x} y={svgH - 2} textAnchor="middle" fill={textColor} fontSize={8} fontFamily="-apple-system,sans-serif">{label}</text>;
+                      return <text key={`xl-${i}`} x={x} y={svgH - 2} textAnchor="middle" fill={textColor} fontSize={8} fontFamily="'Segoe UI',system-ui,sans-serif">{label}</text>;
                     })}
                   </>);
                 })()}
               </svg>
             ) : (
               <div style={{ height: svgH, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>{histogramLoaded ? "No timestamp data to display" : "Loading histogram..."}</span>
+                <span style={{ color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{histogramLoaded ? "No timestamp data to display" : "Loading histogram..."}</span>
               </div>
             )}
             {/* Drag handle */}
@@ -3988,10 +3988,10 @@ export default function App() {
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill={(th.accent || "#58a6ff") + "18"} />
                   <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <div style={{ color: th.text, fontSize: 15, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>
+                <div style={{ color: th.text, fontSize: 15, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                   Building Indexes
                 </div>
-                <div style={{ color: th.textMuted, fontSize: 12, fontFamily: "-apple-system, sans-serif", textAlign: "center", maxWidth: 320, lineHeight: 1.5 }}>
+                <div style={{ color: th.textMuted, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif", textAlign: "center", maxWidth: 320, lineHeight: 1.5 }}>
                   {ct.indexesTotal
                     ? `Column indexes: ${ct.indexesBuilt || 0} / ${ct.indexesTotal}`
                     : "Preparing column indexes..."}
@@ -4002,7 +4002,7 @@ export default function App() {
                     <div style={{ height: "100%", borderRadius: 2, background: th.accent || "#58a6ff", transition: "width 0.3s ease", width: `${Math.round(((ct.indexesBuilt || 0) / ct.indexesTotal) * 100)}%` }} />
                   </div>
                 )}
-                <div style={{ color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, sans-serif", marginTop: 4 }}>
+                <div style={{ color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif", marginTop: 4 }}>
                   Search index will build next. Please wait...
                 </div>
               </div>
@@ -4015,16 +4015,16 @@ export default function App() {
                   <circle cx="11" cy="11" r="8" fill={(th.accent || "#58a6ff") + "18"} />
                   <path d="M21 21l-4.35-4.35" strokeLinecap="round" />
                 </svg>
-                <div style={{ color: th.text, fontSize: 15, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>
+                <div style={{ color: th.text, fontSize: 15, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                   Building Search Index
                 </div>
-                <div style={{ color: th.textMuted, fontSize: 12, fontFamily: "-apple-system, sans-serif", textAlign: "center", maxWidth: 320, lineHeight: 1.5 }}>
+                <div style={{ color: th.textMuted, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif", textAlign: "center", maxWidth: 320, lineHeight: 1.5 }}>
                   {`${Math.round((ct.ftsIndexed / ct.ftsTotal) * 100)}% — ${(ct.ftsIndexed || 0).toLocaleString()} / ${ct.ftsTotal.toLocaleString()} rows`}
                 </div>
                 <div style={{ width: 220, height: 4, borderRadius: 2, background: (th.textMuted || "#484f58") + "33", overflow: "hidden" }}>
                   <div style={{ height: "100%", borderRadius: 2, background: th.accent || "#58a6ff", transition: "width 0.3s ease", width: `${Math.round(((ct.ftsIndexed || 0) / ct.ftsTotal) * 100)}%` }} />
                 </div>
-                <div style={{ color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, sans-serif", marginTop: 4 }}>
+                <div style={{ color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif", marginTop: 4 }}>
                   Almost there...
                 </div>
               </div>
@@ -4039,10 +4039,10 @@ export default function App() {
                   <line x1="16" y1="13" x2="8" y2="13" />
                   <line x1="16" y1="17" x2="8" y2="17" />
                 </svg>
-                <div style={{ color: th.text, fontSize: 15, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>
+                <div style={{ color: th.text, fontSize: 15, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                   Extracting Resident Data
                 </div>
-                <div style={{ color: th.textMuted, fontSize: 12, fontFamily: "-apple-system, sans-serif", textAlign: "center", maxWidth: 320, lineHeight: 1.5 }}>
+                <div style={{ color: th.textMuted, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif", textAlign: "center", maxWidth: 320, lineHeight: 1.5 }}>
                   {extractProgress.total > 0
                     ? `${extractProgress.percent}% — ${extractProgress.processed.toLocaleString()} / ${extractProgress.total.toLocaleString()} records`
                     : "Preparing..."}
@@ -4064,7 +4064,7 @@ export default function App() {
                 </div>
                 {/* Tags column header — sticky, resizable, standard style */}
                 <div
-                  onClick={(e) => { if (e.metaKey || e.ctrlKey) { e.preventDefault(); e.stopPropagation(); setContextMenu({ x: e.clientX, y: e.clientY, colName: "__tags__" }); return; } handleSort("__tags__"); }}
+                  onClick={(e) => { if (e.ctrlKey || e.ctrlKey) { e.preventDefault(); e.stopPropagation(); setContextMenu({ x: e.clientX, y: e.clientY, colName: "__tags__" }); return; } handleSort("__tags__"); }}
                   onDoubleClick={() => { clearTimeout(sortTimerRef.current); }}
                   onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setContextMenu({ x: e.clientX, y: e.clientY, colName: "__tags__" }); }}
                   style={{ display: "flex", alignItems: "center", height: HEADER_HEIGHT, width: tagColWidth, minWidth: tagColWidth, boxSizing: "border-box", padding: "0 8px", cursor: "pointer", userSelect: "none", fontWeight: 600, color: th.headerText, fontSize: 11, borderRight: `1px solid ${th.border}`, position: "sticky", left: isGrouped ? (16 + 26 + CHECKBOX_COL_WIDTH) : (BKMK_COL_WIDTH + CHECKBOX_COL_WIDTH), zIndex: 12, background: th.headerBg, overflow: "hidden" }}>
@@ -4099,7 +4099,7 @@ export default function App() {
                     onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; setHeaderDragOver(h); }}
                     onDragLeave={() => setHeaderDragOver((prev) => prev === h ? null : prev)}
                     onDrop={(e) => { e.preventDefault(); e.stopPropagation(); setHeaderDragOver(null); const src = e.dataTransfer.getData("text/column-name"); if (src && src !== h) reorderColumn(src, h); }}
-                    onClick={(e) => { if (e.metaKey || e.ctrlKey) { e.preventDefault(); e.stopPropagation(); setContextMenu({ x: e.clientX, y: e.clientY, colName: h }); return; } handleSort(h); }}
+                    onClick={(e) => { if (e.ctrlKey || e.ctrlKey) { e.preventDefault(); e.stopPropagation(); setContextMenu({ x: e.clientX, y: e.clientY, colName: h }); return; } handleSort(h); }}
                     onDoubleClick={() => handleHeaderDblClick(h)}
                     onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setContextMenu({ x: e.clientX, y: e.clientY, colName: h }); }}
                     style={{ display: "flex", alignItems: "center", height: HEADER_HEIGHT, width: gw(h), minWidth: gw(h), boxSizing: "border-box", padding: "0 8px", cursor: "pointer", userSelect: "none", fontWeight: 600, color: th.headerText, fontSize: 11, borderRight: h === pinnedH[pinnedH.length - 1] ? `2px solid ${th.borderAccent}` : `1px solid ${th.border}`, position: "sticky", left: pinnedOffsets.offsets[h], zIndex: 12, background: headerDragOver === h ? th.selection : th.headerBg, overflow: "hidden" }}>
@@ -4118,7 +4118,7 @@ export default function App() {
                     onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; setHeaderDragOver(h); }}
                     onDragLeave={() => setHeaderDragOver((prev) => prev === h ? null : prev)}
                     onDrop={(e) => { e.preventDefault(); e.stopPropagation(); setHeaderDragOver(null); const src = e.dataTransfer.getData("text/column-name"); if (src && src !== h) reorderColumn(src, h); }}
-                    onClick={(e) => { if (e.metaKey || e.ctrlKey) { e.preventDefault(); e.stopPropagation(); setContextMenu({ x: e.clientX, y: e.clientY, colName: h }); return; } handleSort(h); }}
+                    onClick={(e) => { if (e.ctrlKey || e.ctrlKey) { e.preventDefault(); e.stopPropagation(); setContextMenu({ x: e.clientX, y: e.clientY, colName: h }); return; } handleSort(h); }}
                     onDoubleClick={() => handleHeaderDblClick(h)}
                     onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setContextMenu({ x: e.clientX, y: e.clientY, colName: h }); }}
                     style={{ display: "flex", alignItems: "center", height: HEADER_HEIGHT, width: gw(h), minWidth: gw(h), boxSizing: "border-box", padding: "0 8px", cursor: "pointer", userSelect: "none", fontWeight: 600, color: th.headerText, fontSize: 11, borderRight: `1px solid ${th.border}`, position: "relative", overflow: "hidden", background: headerDragOver === h ? th.selection : undefined }}>
@@ -4233,9 +4233,9 @@ export default function App() {
                           </div>
                         )}
                         <span style={{ color: th.accent, fontSize: 10, width: 14, textAlign: "center", flexShrink: 0 }}>{isExpanded ? "▼" : "▶"}</span>
-                        <span style={{ color: th.text, fontSize: 12, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>{item.colName}:</span>
-                        <span style={{ color: th.text, fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>{item.value || "(empty)"}</span>
-                        <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>— {formatNumber(item.count)} rows</span>
+                        <span style={{ color: th.text, fontSize: 12, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{item.colName}:</span>
+                        <span style={{ color: th.text, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{item.value || "(empty)"}</span>
+                        <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>— {formatNumber(item.count)} rows</span>
                       </div>
                     );
                   }
@@ -4245,7 +4245,7 @@ export default function App() {
                     const indent = (item.depth || 0) * 20 + 32;
                     const remaining = item.total - item.loaded;
                     return (
-                      <div key={`m-${item.pathKey}`} style={{ height: ROW_HEIGHT, position: "absolute", top: ai * ROW_HEIGHT, display: "flex", alignItems: "center", paddingLeft: indent, color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif", gap: 8 }}>
+                      <div key={`m-${item.pathKey}`} style={{ height: ROW_HEIGHT, position: "absolute", top: ai * ROW_HEIGHT, display: "flex", alignItems: "center", paddingLeft: indent, color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif", gap: 8 }}>
                         <span style={{ fontStyle: "italic" }}>Showing {formatNumber(item.loaded)} of {formatNumber(item.total)}</span>
                         <button onClick={() => loadMoreGroupRows(item.pathKey, false)}
                           style={{ background: th.accent + "22", color: th.accent, border: `1px solid ${th.accent}44`, borderRadius: 3, padding: "1px 8px", fontSize: 10, cursor: "pointer", fontFamily: "inherit" }}>
@@ -4323,7 +4323,7 @@ export default function App() {
                             {worstVerdict && (
                               <span title={tooltip}
                                 onClick={worstUrl ? (e) => { e.stopPropagation(); window.open(worstUrl, "_blank"); } : undefined}
-                                style={{ fontSize: 8, padding: "1px 4px", borderRadius: 3, fontWeight: 700, fontFamily: "'SF Mono', Menlo, monospace",
+                                style={{ fontSize: 8, padding: "1px 4px", borderRadius: 3, fontWeight: 700, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace",
                                   background: `${vtColor}22`, color: vtColor, border: `1px solid ${vtColor}44`, lineHeight: "14px",
                                   cursor: worstUrl ? "pointer" : "default", flexShrink: 0 }}>
                                 {worstScore}
@@ -4338,7 +4338,7 @@ export default function App() {
                       {/* Pinned data cells */}
                       {pinnedH.map((h) => (
                         <div key={h} data-cell-col={h} onDoubleClick={() => setCellPopup({ column: h, value: row[h] || "" })} title={fmtCell(h, row[h])}
-                          onClick={(e) => { if (e.metaKey || e.ctrlKey) { e.stopPropagation(); setCellContextMenu({ x: e.clientX, y: e.clientY, colName: h, cellValue: row[h] || "" }); } }}
+                          onClick={(e) => { if (e.ctrlKey || e.ctrlKey) { e.stopPropagation(); setCellContextMenu({ x: e.clientX, y: e.clientY, colName: h, cellValue: row[h] || "" }); } }}
                           onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setRowContextMenu({ x: e.clientX, y: e.clientY, rowId: row.__idx, rowIndex: ai, currentTags: rTags, row, cellColumn: h, cellValue: row[h] || "" }); }}
                           style={{ width: gw(h), minWidth: gw(h), boxSizing: "border-box", padding: "0 8px", display: "flex", alignItems: "center", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", borderRight: h === pinnedH[pinnedH.length - 1] ? `2px solid ${th.borderAccent}44` : `1px solid ${th.cellBorder}`, fontSize: fontSize - 0.5, position: "sticky", left: pinnedOffsets.offsets[h], zIndex: 2, background: stickyBase, boxShadow: stickyOverlay }}>
                           {renderCell(h, row[h])}
@@ -4347,7 +4347,7 @@ export default function App() {
                       {/* Scrollable data cells */}
                       {scrollH.map((h) => (
                         <div key={h} data-cell-col={h} onDoubleClick={() => setCellPopup({ column: h, value: row[h] || "" })} title={fmtCell(h, row[h])}
-                          onClick={(e) => { if (e.metaKey || e.ctrlKey) { e.stopPropagation(); setCellContextMenu({ x: e.clientX, y: e.clientY, colName: h, cellValue: row[h] || "" }); } }}
+                          onClick={(e) => { if (e.ctrlKey || e.ctrlKey) { e.stopPropagation(); setCellContextMenu({ x: e.clientX, y: e.clientY, colName: h, cellValue: row[h] || "" }); } }}
                           onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setRowContextMenu({ x: e.clientX, y: e.clientY, rowId: row.__idx, rowIndex: ai, currentTags: rTags, row, cellColumn: h, cellValue: row[h] || "" }); }}
                           style={{ width: gw(h), minWidth: gw(h), boxSizing: "border-box", padding: "0 8px", display: "flex", alignItems: "center", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", borderRight: `1px solid ${th.cellBorder}`, fontSize: fontSize - 0.5 }}>
                           {renderCell(h, row[h])}
@@ -4377,7 +4377,7 @@ export default function App() {
               {/* Drag handle for resizing */}
               <div onMouseDown={onDetailResizeStart} style={{ position: "absolute", top: -4, left: 0, right: 0, height: 8, cursor: "row-resize", zIndex: 20 }} />
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4px 12px", background: th.bgAlt, borderBottom: `1px solid ${th.border}`, flexShrink: 0 }}>
-                <span style={{ color: th.accent, fontSize: 11, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>
+                <span style={{ color: th.accent, fontSize: 11, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                   Row Detail — Row {selectedRow + 1} (ID: {selectedRowData.__idx})
                 </span>
                 <button onClick={() => setDetailPanelOpen(false)} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 13, padding: "2px 6px" }}>✕</button>
@@ -4385,10 +4385,10 @@ export default function App() {
               <div style={{ flex: 1, overflow: "auto", padding: "4px 12px" }}>
                 {ct.headers.map((h) => (
                   <div key={h} style={{ display: "flex", gap: 12, padding: "3px 0", borderBottom: `1px solid ${th.bgAlt}`, alignItems: "flex-start" }}>
-                    <span style={{ width: 180, minWidth: 180, fontWeight: 600, color: ct.hiddenColumns.has(h) ? th.textMuted : th.textDim, fontSize: 11, flexShrink: 0, fontFamily: "-apple-system, sans-serif" }}>
+                    <span style={{ width: 180, minWidth: 180, fontWeight: 600, color: ct.hiddenColumns.has(h) ? th.textMuted : th.textDim, fontSize: 11, flexShrink: 0, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                       {h}{ct.hiddenColumns.has(h) && <span style={{ fontSize: 9, marginLeft: 4, color: th.textMuted }}>(hidden)</span>}
                     </span>
-                    <span style={{ flex: 1, color: th.text, fontSize: 11, fontFamily: "'SF Mono', Menlo, monospace", wordBreak: "break-all", whiteSpace: "pre-wrap" }}>
+                    <span style={{ flex: 1, color: th.text, fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", wordBreak: "break-all", whiteSpace: "pre-wrap" }}>
                       {selectedRowData[h] || ""}
                     </span>
                     <button onClick={() => copyCell(selectedRowData[h])} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 10, flexShrink: 0, padding: "1px 4px" }} title="Copy value">
@@ -4408,7 +4408,7 @@ export default function App() {
 
       {/* Status bar */}
       {ct && ct.dataReady && (
-        <div style={{ display: "flex", justifyContent: "space-between", padding: "3px 12px", background: th.bgAlt, borderTop: `1px solid ${th.border}`, fontSize: 11, color: th.textDim, flexShrink: 0, fontFamily: "-apple-system, sans-serif" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", padding: "3px 12px", background: th.bgAlt, borderTop: `1px solid ${th.border}`, fontSize: 11, color: th.textDim, flexShrink: 0, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ color: th.accent, fontWeight: 500, cursor: "pointer", maxWidth: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "inline-block", verticalAlign: "middle" }}
               title={ct.filePath ? `Double-click to copy: ${ct.filePath}` : ct.name}
@@ -4494,9 +4494,9 @@ export default function App() {
                   )}
                 </div>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ color: th.text, fontSize: 14, fontWeight: 700, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</div>
+                  <div style={{ color: th.text, fontSize: 14, fontWeight: 700, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</div>
                   {updaterPopup.version && phase !== "no-update" && phase !== "checking" && (
-                    <div style={{ color: th.textMuted, fontSize: 11, marginTop: 2, fontFamily: "'SF Mono', Menlo, monospace" }}>Version {updaterPopup.version}</div>
+                    <div style={{ color: th.textMuted, fontSize: 11, marginTop: 2, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>Version {updaterPopup.version}</div>
                   )}
                 </div>
               </div>
@@ -4506,10 +4506,10 @@ export default function App() {
             </div>
 
             <div style={{ padding: "12px 14px 14px" }}>
-              <div style={{ color: th.text, fontSize: 13, lineHeight: 1.45, fontFamily: "-apple-system, sans-serif" }}>
+              <div style={{ color: th.text, fontSize: 13, lineHeight: 1.45, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                 {updaterPopup.message || (phase === "checking" ? "Checking for updates..." : "")}
               </div>
-              {detailText && <div style={{ color: th.textMuted, fontSize: 11, lineHeight: 1.45, marginTop: 6, fontFamily: "-apple-system, sans-serif" }}>{detailText}</div>}
+              {detailText && <div style={{ color: th.textMuted, fontSize: 11, lineHeight: 1.45, marginTop: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{detailText}</div>}
 
               {phase === "downloading" && (
                 <div style={{ marginTop: 12 }}>
@@ -4520,13 +4520,13 @@ export default function App() {
               )}
 
               {phase === "downloaded" && (
-                <div style={{ marginTop: 12, padding: "10px 11px", borderRadius: 10, background: `${th.success || "#4ade80"}14`, border: `1px solid ${(th.success || "#4ade80")}33`, color: th.text, fontSize: 12, lineHeight: 1.45, fontFamily: "-apple-system, sans-serif" }}>
+                <div style={{ marginTop: 12, padding: "10px 11px", borderRadius: 10, background: `${th.success || "#4ade80"}14`, border: `1px solid ${(th.success || "#4ade80")}33`, color: th.text, fontSize: 12, lineHeight: 1.45, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                   Restart required. Install the update to apply the new version to the app currently open.
                 </div>
               )}
 
               {releaseNotes && phase !== "checking" && phase !== "installing" && (
-                <div style={{ marginTop: 12, maxHeight: 112, overflow: "auto", padding: "10px 11px", borderRadius: 10, background: `${th.border}12`, border: `1px solid ${th.border}22`, color: th.textMuted, fontSize: 11, lineHeight: 1.45, whiteSpace: "pre-wrap", fontFamily: "-apple-system, sans-serif" }}>
+                <div style={{ marginTop: 12, maxHeight: 112, overflow: "auto", padding: "10px 11px", borderRadius: 10, background: `${th.border}12`, border: `1px solid ${th.border}22`, color: th.textMuted, fontSize: 11, lineHeight: 1.45, whiteSpace: "pre-wrap", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                   {releaseNotes}
                 </div>
               )}
@@ -4590,7 +4590,7 @@ export default function App() {
             .catch(() => setModal((p) => p?.type === "stacking" ? { ...p, loading: false, data: { values: [], totalUnique: 0, totalRows: 0 } } : p));
         };
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div id="stacking-modal" style={{ WebkitAppRegion: "no-drag", background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 12, padding: 0, width: mw, maxWidth: "96vw", maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 48px rgba(0,0,0,0.5)", position: "relative" }}>
               {/* Right edge resize handle */}
               <div onMouseDown={onModalResize} style={{ position: "absolute", top: 12, bottom: 12, right: -3, width: 6, cursor: "ew-resize", zIndex: 1 }} />
@@ -4602,7 +4602,7 @@ export default function App() {
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="1.5" strokeLinecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="16" y2="12"/><line x1="4" y1="18" x2="10" y2="18"/></svg>
                     </div>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.3px" }}>Value Frequency Analysis</h3>
+                      <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.3px" }}>Value Frequency Analysis</h3>
                       <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
                         <select value={colName} onChange={(e) => {
                           setModal((p) => ({ ...p, colName: e.target.value, loading: true, filterText: "" }));
@@ -4613,7 +4613,7 @@ export default function App() {
                       </div>
                     </div>
                   </div>
-                  <button onClick={() => setModal(null)} style={{ width: 24, height: 24, borderRadius: 12, background: th.textMuted + "15", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 13, fontFamily: "-apple-system, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}
+                  <button onClick={() => setModal(null)} style={{ width: 24, height: 24, borderRadius: 12, background: th.textMuted + "15", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 13, fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}
                     onMouseEnter={(ev) => { ev.currentTarget.style.background = (th.danger || "#f85149") + "33"; ev.currentTarget.style.color = th.danger || "#f85149"; }}
                     onMouseLeave={(ev) => { ev.currentTarget.style.background = th.textMuted + "15"; ev.currentTarget.style.color = th.textMuted; }}>{"\u2715"}</button>
                 </div>
@@ -4628,8 +4628,8 @@ export default function App() {
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={s.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}><path d={s.icon}/></svg>
                         <div>
-                          <div style={{ fontSize: 16, fontWeight: 600, color: th.text, fontFamily: "'SF Mono',Menlo,monospace", letterSpacing: "-0.5px" }}>{formatNumber(s.val)}</div>
-                          <div style={{ fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system, sans-serif" }}>{s.label}</div>
+                          <div style={{ fontSize: 16, fontWeight: 600, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", letterSpacing: "-0.5px" }}>{formatNumber(s.val)}</div>
+                          <div style={{ fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{s.label}</div>
                         </div>
                       </div>
                     </div>
@@ -4645,7 +4645,7 @@ export default function App() {
                     const ns = sortBy === "count" ? "value" : "count";
                     setModal((p) => ({ ...p, sortBy: ns, loading: true }));
                     reloadStack(colName, ns);
-                  }} style={{ padding: "3px 10px", background: th.btnBg, border: `1px solid ${th.btnBorder}`, borderRadius: 6, color: th.textDim, fontSize: 10, cursor: "pointer", fontFamily: "-apple-system,sans-serif", whiteSpace: "nowrap" }}>
+                  }} style={{ padding: "3px 10px", background: th.btnBg, border: `1px solid ${th.btnBorder}`, borderRadius: 6, color: th.textDim, fontSize: 10, cursor: "pointer", fontFamily: "'Segoe UI',system-ui,sans-serif", whiteSpace: "nowrap" }}>
                     {sortBy === "count" ? "Count \u2193" : "A\u2192Z"}
                   </button>
                   <button onClick={() => {
@@ -4655,13 +4655,13 @@ export default function App() {
                       lines.push(`${v.val ?? "(empty)"}\t${v.cnt}\t${p}%`);
                     }
                     navigator.clipboard.writeText(lines.join("\n"));
-                  }} style={{ padding: "3px 10px", background: th.btnBg, border: `1px solid ${th.btnBorder}`, borderRadius: 6, color: th.textDim, fontSize: 10, cursor: "pointer", fontFamily: "-apple-system,sans-serif", whiteSpace: "nowrap" }}>
+                  }} style={{ padding: "3px 10px", background: th.btnBg, border: `1px solid ${th.btnBorder}`, borderRadius: 6, color: th.textDim, fontSize: 10, cursor: "pointer", fontFamily: "'Segoe UI',system-ui,sans-serif", whiteSpace: "nowrap" }}>
                     Copy
                   </button>
                 </div>
               </div>
               {/* Table header */}
-              <div style={{ display: "flex", padding: "6px 20px", borderBottom: `1px solid ${th.border}33`, background: `${th.bgAlt}cc`, fontSize: 9, color: th.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system,sans-serif" }}>
+              <div style={{ display: "flex", padding: "6px 20px", borderBottom: `1px solid ${th.border}33`, background: `${th.bgAlt}cc`, fontSize: 9, color: th.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Segoe UI',system-ui,sans-serif" }}>
                 <span style={{ width: 40, flexShrink: 0, textAlign: "right", paddingRight: 10 }}>#</span>
                 <span style={{ width: vw, flexShrink: 0, position: "relative" }}>
                   Value
@@ -4678,11 +4678,11 @@ export default function App() {
                 {modal.loading ? (
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: 40, flexDirection: "column", gap: 8 }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="1.5" strokeLinecap="round"><line x1="4" y1="6" x2="20" y2="6" opacity="0.3"/><line x1="4" y1="12" x2="16" y2="12" opacity="0.5"/><line x1="4" y1="18" x2="10" y2="18" opacity="0.7"/></svg>
-                    <span style={{ color: th.textMuted, fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>Loading...</span>
+                    <span style={{ color: th.textMuted, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Loading...</span>
                   </div>
                 ) : displayed.length === 0 ? (
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
-                    <span style={{ color: th.textMuted, fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>{filterText ? "No matching values" : "No data"}</span>
+                    <span style={{ color: th.textMuted, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{filterText ? "No matching values" : "No data"}</span>
                   </div>
                 ) : displayed.map((v, i) => {
                   const pct = data.totalRows > 0 ? (v.cnt / data.totalRows) * 100 : 0;
@@ -4701,10 +4701,10 @@ export default function App() {
                       onMouseEnter={(e) => { e.currentTarget.style.background = th.btnBg + "88"; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                       style={{ display: "flex", alignItems: "center", padding: "5px 20px", cursor: "pointer", borderBottom: `1px solid ${th.border}15`, fontSize: 12, transition: "background 0.1s" }}>
-                      <span style={{ width: 40, flexShrink: 0, textAlign: "right", paddingRight: 10, color: th.textMuted, fontSize: 10, fontFamily: "'SF Mono',Menlo,monospace" }}>{i + 1}</span>
+                      <span style={{ width: 40, flexShrink: 0, textAlign: "right", paddingRight: 10, color: th.textMuted, fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{i + 1}</span>
                       <span style={{ width: vw, flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: isRare ? th.accent : th.text, fontWeight: isRare ? 500 : 400 }} title={valStr}>{valStr}</span>
-                      <span style={{ width: 90, flexShrink: 0, textAlign: "right", color: th.text, fontWeight: 500, fontFamily: "'SF Mono',Menlo,monospace", fontSize: 11 }}>{formatNumber(v.cnt)}</span>
-                      <span style={{ width: 50, flexShrink: 0, textAlign: "right", color: th.textDim, fontSize: 10, fontFamily: "'SF Mono',Menlo,monospace" }}>{pct.toFixed(1)}%</span>
+                      <span style={{ width: 90, flexShrink: 0, textAlign: "right", color: th.text, fontWeight: 500, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 11 }}>{formatNumber(v.cnt)}</span>
+                      <span style={{ width: 50, flexShrink: 0, textAlign: "right", color: th.textDim, fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{pct.toFixed(1)}%</span>
                       <div style={{ flex: 1, paddingLeft: 12 }}>
                         <div style={{ height: 12, background: th.border + "22", borderRadius: 6, overflow: "hidden" }}>
                           <div style={{ height: "100%", width: `${Math.max(1, barPct)}%`, background: isRare ? `linear-gradient(90deg, ${th.danger || "#f85149"}CC, ${th.danger || "#f85149"}88)` : `linear-gradient(90deg, ${th.accent}BB, ${th.accent}66)`, borderRadius: 6, transition: "width 0.2s", boxShadow: isRare ? `0 0 6px ${th.danger || "#f85149"}33` : "none" }} />
@@ -4715,7 +4715,7 @@ export default function App() {
                 })}
               </div>
               {/* Footer — glass */}
-              <div style={{ padding: "10px 20px", borderTop: `1px solid ${th.border}22`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, background: `linear-gradient(135deg, ${th.panelBg}ee, ${th.modalBg}dd)`, backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", fontSize: 11, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>
+              <div style={{ padding: "10px 20px", borderTop: `1px solid ${th.border}22`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, background: `linear-gradient(135deg, ${th.panelBg}ee, ${th.modalBg}dd)`, backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", fontSize: 11, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                 <span>{filterText ? `${formatNumber(displayed.length)} of ${formatNumber(data.totalUnique)} values shown` : `${formatNumber(data.totalUnique)} unique values`}{data.truncated ? <span style={{ color: th.warning, marginLeft: 6 }}>(top 10k)</span> : ""}</span>
                 <span style={{ color: th.textDim, fontSize: 10 }}>Click row to filter</span>
               </div>
@@ -4738,11 +4738,11 @@ export default function App() {
           return `${m}m`;
         };
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 12, padding: 0, width: 520, maxWidth: "94vw", maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 48px rgba(0,0,0,0.5)" }}>
               <div style={{ padding: "16px 20px 12px", borderBottom: `1px solid ${th.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Column Statistics</h3>
+                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Column Statistics</h3>
                   <span style={{ color: th.accent, fontSize: 12 }}>{colName}</span>
                   {isTs && <span style={{ marginLeft: 6, fontSize: 9, color: th.textMuted, textTransform: "uppercase" }}>Timestamp</span>}
                   {isNum && <span style={{ marginLeft: 6, fontSize: 9, color: th.textMuted, textTransform: "uppercase" }}>Numeric</span>}
@@ -4761,15 +4761,15 @@ export default function App() {
                       { label: "Fill Rate", value: `${data.fillRate}%` },
                     ].map((c) => (
                       <div key={c.label} style={{ background: th.bgAlt, border: `1px solid ${th.border}`, borderRadius: 8, padding: "10px 12px", textAlign: "center" }}>
-                        <div style={{ fontSize: 18, fontWeight: 700, color: th.text, fontFamily: "'SF Mono',Menlo,monospace" }}>{c.value}</div>
-                        <div style={{ fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginTop: 2, fontFamily: "-apple-system, sans-serif" }}>{c.label}</div>
+                        <div style={{ fontSize: 18, fontWeight: 700, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{c.value}</div>
+                        <div style={{ fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginTop: 2, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{c.label}</div>
                       </div>
                     ))}
                   </div>
                   {isTs && data.tsStats && (
                     <div style={{ background: th.bgAlt, border: `1px solid ${th.border}`, borderRadius: 8, padding: "10px 14px", marginBottom: 12 }}>
                       <div style={{ fontSize: 10, color: th.textMuted, textTransform: "uppercase", marginBottom: 6 }}>Time Range</div>
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: th.text, fontFamily: "'SF Mono',Menlo,monospace" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                         <span>{data.tsStats.earliest}</span>
                         <span style={{ color: th.textDim }}>to</span>
                         <span>{data.tsStats.latest}</span>
@@ -4785,7 +4785,7 @@ export default function App() {
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, textAlign: "center" }}>
                         {[{ label: "Min", value: data.numStats.min }, { label: "Avg", value: data.numStats.avg }, { label: "Max", value: data.numStats.max }].map((s) => (
                           <div key={s.label}>
-                            <div style={{ fontSize: 14, fontWeight: 600, color: th.text, fontFamily: "'SF Mono',Menlo,monospace" }}>{s.value}</div>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{s.value}</div>
                             <div style={{ fontSize: 9, color: th.textMuted }}>{s.label}</div>
                           </div>
                         ))}
@@ -4803,7 +4803,7 @@ export default function App() {
                         <div style={{ flex: 1, height: 14, background: th.border + "44", borderRadius: 3, overflow: "hidden" }}>
                           <div style={{ height: "100%", width: `${Math.max(1, barPct)}%`, background: th.accent + "99", borderRadius: 3 }} />
                         </div>
-                        <span style={{ width: 60, textAlign: "right", color: th.textDim, fontFamily: "'SF Mono',Menlo,monospace", flexShrink: 0 }}>{formatNumber(v.cnt)}</span>
+                        <span style={{ width: 60, textAlign: "right", color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flexShrink: 0 }}>{formatNumber(v.cnt)}</span>
                         <span style={{ width: 48, textAlign: "right", color: th.textMuted, fontSize: 10, flexShrink: 0 }}>{pct.toFixed(1)}%</span>
                       </div>
                     );
@@ -4952,9 +4952,9 @@ export default function App() {
         return (
           <Overlay>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Filter Presets</h3>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Filter Presets</h3>
               <button onClick={clearFilters}
-                style={{ padding: "4px 10px", background: th.danger + "22", border: `1px solid ${th.danger}44`, color: th.danger, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "-apple-system,sans-serif" }}>
+                style={{ padding: "4px 10px", background: th.danger + "22", border: `1px solid ${th.danger}44`, color: th.danger, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "'Segoe UI',system-ui,sans-serif" }}>
                 Clear All Filters
               </button>
             </div>
@@ -4971,7 +4971,7 @@ export default function App() {
             {/* User presets */}
             {filterPresets.length > 0 && (
               <>
-                <div style={{ fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system,sans-serif" }}>Saved Presets</div>
+                <div style={{ fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI',system-ui,sans-serif" }}>Saved Presets</div>
                 <div style={{ maxHeight: "30vh", overflow: "auto", marginBottom: 14 }}>
                   {filterPresets.map((p, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 0", borderBottom: `1px solid ${th.border}33` }}>
@@ -4980,7 +4980,7 @@ export default function App() {
                         <div style={{ color: th.textMuted, fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{presetSummary(p)}</div>
                       </div>
                       <button onClick={() => applyPreset(p)}
-                        style={{ padding: "3px 10px", background: th.accent + "22", border: `1px solid ${th.accent}44`, color: th.accent, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "-apple-system,sans-serif", whiteSpace: "nowrap" }}>
+                        style={{ padding: "3px 10px", background: th.accent + "22", border: `1px solid ${th.accent}44`, color: th.accent, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "'Segoe UI',system-ui,sans-serif", whiteSpace: "nowrap" }}>
                         Apply
                       </button>
                       <button onClick={() => deletePreset(i)}
@@ -4991,7 +4991,7 @@ export default function App() {
               </>
             )}
             {/* Built-in DFIR presets */}
-            <div style={{ fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system,sans-serif" }}>DFIR Quick Filters</div>
+            <div style={{ fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI',system-ui,sans-serif" }}>DFIR Quick Filters</div>
             <div style={{ maxHeight: "30vh", overflow: "auto" }}>
               {BUILTIN_PRESETS.map((p, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: `1px solid ${th.border}22` }}>
@@ -5000,15 +5000,15 @@ export default function App() {
                     <div style={{ color: th.textMuted, fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{presetSummary(p)}</div>
                   </div>
                   <button onClick={() => applyPreset(p)}
-                    style={{ padding: "3px 10px", background: th.accent + "22", border: `1px solid ${th.accent}44`, color: th.accent, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "-apple-system,sans-serif", whiteSpace: "nowrap" }}>
+                    style={{ padding: "3px 10px", background: th.accent + "22", border: `1px solid ${th.accent}44`, color: th.accent, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "'Segoe UI',system-ui,sans-serif", whiteSpace: "nowrap" }}>
                     Apply
                   </button>
                 </div>
               ))}
             </div>
             {/* Noise Suppression presets */}
-            <div style={{ fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, marginTop: 14, fontFamily: "-apple-system,sans-serif" }}>Noise Suppression</div>
-            <div style={{ fontSize: 10, color: th.textMuted, marginBottom: 8, fontFamily: "-apple-system,sans-serif", lineHeight: 1.4 }}>
+            <div style={{ fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, marginTop: 14, fontFamily: "'Segoe UI',system-ui,sans-serif" }}>Noise Suppression</div>
+            <div style={{ fontSize: 10, color: th.textMuted, marginBottom: 8, fontFamily: "'Segoe UI',system-ui,sans-serif", lineHeight: 1.4 }}>
               Exclude common benign Windows event sources. Targets Provider/Channel columns — filters are ignored if those columns don't exist in your data.
             </div>
             <div style={{ maxHeight: "30vh", overflow: "auto" }}>
@@ -5019,7 +5019,7 @@ export default function App() {
                     <div style={{ color: th.textMuted, fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{(p.advancedFilters || []).length} exclusion rules</div>
                   </div>
                   <button onClick={() => applyPreset(p)}
-                    style={{ padding: "3px 10px", background: th.warning + "22", border: `1px solid ${th.warning}44`, color: th.warning, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "-apple-system,sans-serif", whiteSpace: "nowrap" }}>
+                    style={{ padding: "3px 10px", background: th.warning + "22", border: `1px solid ${th.warning}44`, color: th.warning, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "'Segoe UI',system-ui,sans-serif", whiteSpace: "nowrap" }}>
                     Apply
                   </button>
                 </div>
@@ -5035,16 +5035,16 @@ export default function App() {
       {modal?.type === "columns" && ct && <ColModal />}
       {modal?.type === "shortcuts" && <ShortModal />}
       {modal?.type === "quickHelp" && (
-        <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+        <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
           <div style={{ background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 12, padding: 0, width: 620, maxWidth: "92vw", maxHeight: "85vh", overflow: "hidden", boxShadow: "0 24px 48px rgba(0,0,0,0.5)", WebkitAppRegion: "no-drag", display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", borderBottom: `1px solid ${th.border}`, flexShrink: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                <span style={{ fontSize: 16, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Quick Help</span>
+                <span style={{ fontSize: 16, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Quick Help</span>
               </div>
               <button onClick={() => setModal(null)} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 18, padding: "2px 6px" }}>✕</button>
             </div>
-            <div style={{ overflow: "auto", padding: "20px 24px", fontSize: 12.5, color: th.text, lineHeight: 1.7, fontFamily: "-apple-system, sans-serif" }}>
+            <div style={{ overflow: "auto", padding: "20px 24px", fontSize: 12.5, color: th.text, lineHeight: 1.7, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
               {(() => {
                 const S = ({ children }) => <h3 style={{ fontSize: 13, fontWeight: 700, color: th.accent, marginTop: 18, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>{children}</h3>;
                 const P = ({ children }) => <p style={{ margin: "0 0 8px", color: th.text }}>{children}</p>;
@@ -5071,7 +5071,7 @@ export default function App() {
 
                   <S>Column Filters</S>
                   <P>Each column has a text filter input and a dropdown (▼) for value-based checkbox filtering. Filters can be combined across columns. Use the toggle button to temporarily disable individual filters without clearing them.</P>
-                  <Li><b>Filter in / Filter out</b> — Right-click any cell or <K>⌘</K>+Click to quickly filter. "Filter in" shows only rows matching that value; "Filter out" excludes rows with that value.</Li>
+                  <Li><b>Filter in / Filter out</b> — Right-click any cell or <K>Ctrl+</K>+Click to quickly filter. "Filter in" shows only rows matching that value; "Filter out" excludes rows with that value.</Li>
                   <Li><b>Date range filter</b> — Click the ⏱ icon on timestamp columns to filter by date range.</Li>
                   <Li><b>Advanced filter</b> — Use "Edit Filter" in the status bar for complex AND/OR filter logic.</Li>
 
@@ -5080,7 +5080,7 @@ export default function App() {
 
                   <S>Tagging & Bookmarks</S>
                   <Li><b>Tags</b> — Right-click any row to add colored tags via the Tags submenu. Select multiple rows (checkboxes) first to apply a tag to all selected rows at once. Tags are searchable, filterable, and visible in the Tags column.</Li>
-                  <Li><b>Bookmarks</b> — Click the bookmark icon (flag) on any row. Use <K>⌘B</K> to toggle "Flagged Only" view.</Li>
+                  <Li><b>Bookmarks</b> — Click the bookmark icon (flag) on any row. Use <K>Ctrl+B</K> to toggle "Flagged Only" view.</Li>
                   <Li><b>Bulk tagging</b> — Use Bulk Actions to tag all filtered/visible rows at once, or tag by time ranges from the histogram.</Li>
                   <Li><b>IOC tagging</b> — Load IOC files (CSV, XLSX, TSV) and auto-tag matching rows with per-IOC tags.</Li>
 
@@ -5106,8 +5106,8 @@ export default function App() {
                   <S>Tips</S>
                   <Li>Drag column headers to reorder. Double-click a header divider to auto-fit column width.</Li>
                   <Li>Right-click column headers for options: pin, hide, group, sort, stacking, stats. Right-click cells for copy, filter in/out, tags, and VT lookup.</Li>
-                  <Li><K>⌘</K>+Click any cell to quickly access Filter in, Filter out, and Hide column.</Li>
-                  <Li><K>⌘C</K> copies selected rows as tab-separated text (with headers). Works in both normal and grouped mode.</Li>
+                  <Li><K>Ctrl+</K>+Click any cell to quickly access Filter in, Filter out, and Hide column.</Li>
+                  <Li><K>Ctrl+C</K> copies selected rows as tab-separated text (with headers). Works in both normal and grouped mode.</Li>
                   <Li>Double-click any cell to see its full content in a popup.</Li>
                   <Li>Drop files directly onto the window to import them.</Li>
                   <Li>The status bar (bottom) shows active filters, row counts, and sort state. Double-click the file path to copy it.</Li>
@@ -5121,29 +5121,29 @@ export default function App() {
         <Overlay>
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: 40, marginBottom: 8 }}>⌬</div>
-            <h2 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>IRFlow Timeline</h2>
-            <div style={{ fontSize: 12, color: th.textMuted, marginBottom: 16, fontFamily: "-apple-system, sans-serif" }}>Version 1.0.5</div>
+            <h2 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>IRFlow Timeline</h2>
+            <div style={{ fontSize: 12, color: th.textMuted, marginBottom: 16, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Version 1.0.5</div>
             <div style={{ textAlign: "left", background: th.bgAlt, borderRadius: 8, padding: 16, marginBottom: 16 }}>
-              <p style={{ margin: "0 0 8px", fontSize: 12, color: th.text, lineHeight: 1.6, fontFamily: "-apple-system, sans-serif" }}>
+              <p style={{ margin: "0 0 8px", fontSize: 12, color: th.text, lineHeight: 1.6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                 A high-performance native macOS timeline analysis tool built for DFIR professionals, capable of ingesting millions of rows from CSV, XLSX, EVTX, Plaso, raw $MFT, and $J ($UsnJrnl) files without breaking a sweat.
               </p>
-              <p style={{ margin: "0 0 8px", fontSize: 12, color: th.text, lineHeight: 1.6, fontFamily: "-apple-system, sans-serif" }}>
+              <p style={{ margin: "0 0 8px", fontSize: 12, color: th.text, lineHeight: 1.6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                 Powered by SQLite with automated threat detection — including process tree chain analysis with 340+ MITRE ATT&CK rules, lateral movement tracking with RDP session correlation, persistence mechanism identification across 30+ techniques, and ransomware impact analytics via $MFT.
               </p>
-              <p style={{ margin: 0, fontSize: 12, color: th.text, lineHeight: 1.6, fontFamily: "-apple-system, sans-serif" }}>
+              <p style={{ margin: 0, fontSize: 12, color: th.text, lineHeight: 1.6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                 Designed to replace legacy Windows-only forensic viewers with a modern, fast, and intuitive experience — from IOC matching with VirusTotal enrichment and timeline histograms to color-coded tagging and one-click HTML report generation.
               </p>
             </div>
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: th.text, marginBottom: 8, fontFamily: "-apple-system, sans-serif" }}>Author</div>
-              <div style={{ fontSize: 13, color: th.text, marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>Renzon Cruz</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: th.text, marginBottom: 8, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Author</div>
+              <div style={{ fontSize: 13, color: th.text, marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Renzon Cruz</div>
               <div style={{ display: "flex", justifyContent: "center", gap: 16 }}>
                 <a href="#" onClick={(e) => { e.preventDefault(); window.open?.("https://www.linkedin.com/in/renzoncruz") || window.location.assign("https://www.linkedin.com/in/renzoncruz"); }}
-                  style={{ fontSize: 12, color: th.accent, textDecoration: "none", cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>LinkedIn</a>
+                  style={{ fontSize: 12, color: th.accent, textDecoration: "none", cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>LinkedIn</a>
                 <a href="#" onClick={(e) => { e.preventDefault(); window.open?.("https://x.com/r3nzsec") || window.location.assign("https://x.com/r3nzsec"); }}
-                  style={{ fontSize: 12, color: th.accent, textDecoration: "none", cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Twitter</a>
+                  style={{ fontSize: 12, color: th.accent, textDecoration: "none", cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Twitter</a>
                 <a href="#" onClick={(e) => { e.preventDefault(); window.open?.("https://github.com/r3nzsec/irflow-timeline") || window.location.assign("https://github.com/r3nzsec/irflow-timeline"); }}
-                  style={{ fontSize: 12, color: th.accent, textDecoration: "none", cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>GitHub</a>
+                  style={{ fontSize: 12, color: th.accent, textDecoration: "none", cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>GitHub</a>
               </div>
             </div>
             <button onClick={() => setModal(null)} style={ms.bp}>OK</button>
@@ -5254,7 +5254,7 @@ export default function App() {
             <h3 style={ms.mh}>Find Nearby Events</h3>
             <div style={{ background: th.bgAlt, border: `1px solid ${th.border}`, borderRadius: 6, padding: "8px 10px", marginBottom: 12 }}>
               <div style={{ ...ms.lb, marginBottom: 2 }}>Pivot Timestamp</div>
-              <div style={{ color: th.text, fontSize: 12, fontFamily: "'SF Mono',Menlo,monospace", wordBreak: "break-all" }}>
+              <div style={{ color: th.text, fontSize: 12, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", wordBreak: "break-all" }}>
                 {pivotVal || <span style={{ color: th.textMuted, fontStyle: "italic" }}>(empty — select a timestamp column)</span>}
               </div>
             </div>
@@ -5274,7 +5274,7 @@ export default function App() {
                     onClick={() => applyProximity(selCol, pivotVal, p.ms, p.short)}
                     onMouseEnter={(e) => { if (pivotVal) e.currentTarget.style.borderColor = th.accent; }}
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = th.btnBorder; }}
-                    style={{ padding: "5px 12px", background: th.btnBg, border: `1px solid ${th.btnBorder}`, borderRadius: 5, color: pivotVal ? th.text : th.textMuted, fontSize: 12, cursor: pivotVal ? "pointer" : "not-allowed", fontFamily: "-apple-system,sans-serif", transition: "border-color 0.15s" }}>
+                    style={{ padding: "5px 12px", background: th.btnBg, border: `1px solid ${th.btnBorder}`, borderRadius: 5, color: pivotVal ? th.text : th.textMuted, fontSize: 12, cursor: pivotVal ? "pointer" : "not-allowed", fontFamily: "'Segoe UI',system-ui,sans-serif", transition: "border-color 0.15s" }}>
                     {p.label}
                   </button>
                 ))}
@@ -5345,7 +5345,7 @@ export default function App() {
                     Found <b style={{ color: th.accent }}>{result.dupes.length}</b> values with duplicates
                     ({result.dupes.reduce((s, d) => s + d.cnt, 0)} total rows)
                   </div>
-                  <div style={{ maxHeight: 200, overflow: "auto", fontSize: 11, fontFamily: "'SF Mono',Menlo,monospace" }}>
+                  <div style={{ maxHeight: 200, overflow: "auto", fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                     {result.dupes.slice(0, 100).map((d, i) => (
                       <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "2px 0", borderBottom: `1px solid ${th.border}22` }}>
                         <span style={{ color: th.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 320 }}>{d.val || "(empty)"}</span>
@@ -5510,13 +5510,13 @@ export default function App() {
         const missedCount = results ? results.perIocResults.filter((r) => r.hits === 0).length : 0;
 
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 12, padding: 0, width: 580, maxWidth: "94vw", maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 48px rgba(0,0,0,0.5)" }}>
               {/* Header */}
               <div style={{ padding: "16px 20px 12px", borderBottom: `1px solid ${th.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Known-Bad IOC Matching</h3>
-                  <p style={{ margin: "3px 0 0", color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>Load an IOC list and auto-tag every matching row</p>
+                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Known-Bad IOC Matching</h3>
+                  <p style={{ margin: "3px 0 0", color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Load an IOC list and auto-tag every matching row</p>
                 </div>
                 <button onClick={() => {
                   if (vtEnriching && vtRequestId) tle.vtCancel(vtRequestId);
@@ -5535,7 +5535,7 @@ export default function App() {
                   {/* VirusTotal API Key Config */}
                   <div style={{ background: th.bgAlt, borderRadius: 6, border: `1px solid ${th.border}`, overflow: "hidden" }}>
                     <button onClick={() => setModal((p) => ({ ...p, vtConfigExpanded: !vtConfigExpanded }))}
-                      style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "8px 12px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif" }}>
+                      style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "8px 12px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                       <span style={{ width: 8, height: 8, borderRadius: "50%", background: vtKeyStatus?.hasKey ? th.success : th.textMuted, flexShrink: 0 }} />
                       <span style={{ fontWeight: 500 }}>VirusTotal</span>
                       <span style={{ color: th.textMuted, fontSize: 11, marginLeft: "auto" }}>{vtConfigExpanded ? "Hide" : "Configure"}</span>
@@ -5548,7 +5548,7 @@ export default function App() {
                           <div style={{ display: "flex", gap: 6 }}>
                             <input type="password" value={vtKeyInput} onChange={(e) => setModal((p) => ({ ...p, vtKeyInput: e.target.value }))}
                               placeholder={vtKeyStatus?.hasKey ? "Enter new key to replace" : "Paste your VT API key"}
-                              style={{ ...ms.ip, flex: 1, fontFamily: "'SF Mono', Menlo, monospace", fontSize: 11 }} />
+                              style={{ ...ms.ip, flex: 1, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 11 }} />
                             <button onClick={async () => {
                               if (vtKeyInput.trim()) {
                                 await tle.vtSetApiKey(vtKeyInput.trim(), vtRateLimit, vtCacheTtl);
@@ -5620,7 +5620,7 @@ export default function App() {
                     <label style={ms.lb}>IOC List — one per line, # for comments{parsedIocs.length > 0 && <span style={{ color: th.success, marginLeft: 6 }}>{parsedIocs.length} IOCs parsed</span>}</label>
                     <textarea value={iocText} onChange={(e) => handlePasteChange(e.target.value)}
                       placeholder={"# Paste IOCs here — one per line\n192.168.1.1\nevil.example.com\nabc123def456...sha256hash\nC:\\malware\\payload.exe"} rows={10}
-                      style={{ ...ms.ip, resize: "vertical", fontFamily: "'SF Mono', Menlo, monospace", fontSize: 11, lineHeight: 1.5 }} />
+                      style={{ ...ms.ip, resize: "vertical", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 11, lineHeight: 1.5 }} />
                   </div>
                   {parsedIocs.length > 0 && (
                     <div style={{ background: th.bgAlt, borderRadius: 6, padding: "10px 12px" }}>
@@ -5628,7 +5628,7 @@ export default function App() {
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                         {Object.entries(categories).map(([cat, count]) => {
                           const clr = /^(IPv[46]|Domain|Email|URL|Crypto|User_Agent|Phone|Payment)/.test(cat) ? th.accent : /^(SHA|MD5)/.test(cat) ? th.warning : cat === "Other" ? th.textMuted : "#a78bfa";
-                          return <span key={cat} style={{ padding: "2px 8px", background: `${clr}22`, border: `1px solid ${clr}44`, borderRadius: 4, fontSize: 11, color: clr, fontFamily: "-apple-system, sans-serif" }}>{cat.replace(/_/g, " ")}: {count}</span>;
+                          return <span key={cat} style={{ padding: "2px 8px", background: `${clr}22`, border: `1px solid ${clr}44`, borderRadius: 4, fontSize: 11, color: clr, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{cat.replace(/_/g, " ")}: {count}</span>;
                         })}
                       </div>
                     </div>
@@ -5641,7 +5641,7 @@ export default function App() {
                     <div style={{ padding: "16px 0 8px" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                         <span style={{ fontSize: 12, color: th.text, fontWeight: 500 }}>{scanProgress.label}</span>
-                        <span style={{ fontSize: 11, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace" }}>
+                        <span style={{ fontSize: 11, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                           {scanProgress.stage === "scan" ? `${scanProgress.current}/${scanProgress.total}` : `${pct}%`}
                         </span>
                       </div>
@@ -5832,15 +5832,15 @@ export default function App() {
                   <div style={{ display: "flex", gap: 8 }}>
                     <div style={{ flex: 1, padding: "10px 14px", background: results.matchedCount > 0 ? `${th.danger}22` : th.bgAlt, border: `1px solid ${results.matchedCount > 0 ? th.danger + "44" : th.border}`, borderRadius: 8, textAlign: "center" }}>
                       <div style={{ fontSize: 22, fontWeight: 700, color: results.matchedCount > 0 ? th.danger : th.textDim }}>{results.matchedCount != null ? formatNumber(results.matchedCount) : "—"}</div>
-                      <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>{results.matchedCount != null ? "matching rows" : "re-scan for count"}</div>
+                      <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{results.matchedCount != null ? "matching rows" : "re-scan for count"}</div>
                     </div>
                     <div style={{ flex: 1, padding: "10px 14px", background: foundCount > 0 ? `${th.warning}22` : th.bgAlt, border: `1px solid ${foundCount > 0 ? th.warning + "44" : th.border}`, borderRadius: 8, textAlign: "center" }}>
                       <div style={{ fontSize: 22, fontWeight: 700, color: foundCount > 0 ? th.warning : th.textDim }}>{foundCount}</div>
-                      <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>IOCs hit</div>
+                      <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>IOCs hit</div>
                     </div>
                     <div style={{ flex: 1, padding: "10px 14px", background: th.bgAlt, border: `1px solid ${th.border}`, borderRadius: 8, textAlign: "center" }}>
                       <div style={{ fontSize: 22, fontWeight: 700, color: th.textDim }}>{missedCount}</div>
-                      <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>IOCs not found</div>
+                      <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>IOCs not found</div>
                     </div>
                   </div>
 
@@ -5858,7 +5858,7 @@ export default function App() {
                             border: `1px solid ${vtFilterVerdict === card.filter ? card.color + "66" : th.border}`, borderRadius: 6, textAlign: "center",
                             cursor: hasVtData ? "pointer" : "default", transition: "all 0.15s", opacity: hasVtData ? 1 : 0.5 }}>
                           <div style={{ fontSize: 18, fontWeight: 700, color: card.count > 0 ? card.color : th.textDim }}>{hasVtData ? card.count : "—"}</div>
-                          <div style={{ fontSize: 9, color: card.count > 0 ? card.color : th.textMuted, fontFamily: "-apple-system, sans-serif" }}>VT {card.label}</div>
+                          <div style={{ fontSize: 9, color: card.count > 0 ? card.color : th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>VT {card.label}</div>
                         </button>
                       ))}
                     </div>
@@ -5946,7 +5946,7 @@ export default function App() {
                           <div style={{ height: "100%", borderRadius: 3, background: th.accent, transition: "width 0.3s", width: `${vtProgress && vtProgress.total > 0 ? Math.round((vtProgress.completed / vtProgress.total) * 100) : 0}%` }} />
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: th.textMuted }}>
-                          <span style={{ fontFamily: "'SF Mono', Menlo, monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 300 }}>{vtProgress?.currentIoc || ""}</span>
+                          <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 300 }}>{vtProgress?.currentIoc || ""}</span>
                           <span>{vtProgress?.completed || 0}/{vtProgress?.total || 0}{(() => { const rem = (vtProgress?.total || 0) - (vtProgress?.completed || 0); if (rem <= 0) return ""; const maxMin = Math.ceil(rem / (vtRateLimit || 4)); return ` — ≤${maxMin} min remaining`; })()}</span>
                         </div>
                       </div>
@@ -5968,7 +5968,7 @@ export default function App() {
                             <button key={s.key} onClick={() => setModal((p) => ({ ...p, vtSortBy: s.key }))}
                               style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, border: `1px solid ${vtSortBy === s.key ? th.accent + "66" : th.border}`,
                                 background: vtSortBy === s.key ? `${th.accent}22` : "transparent", color: vtSortBy === s.key ? th.accent : th.textMuted,
-                                cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>{s.label}</button>
+                                cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{s.label}</button>
                           ))}
                         </div>
                       )}
@@ -5985,15 +5985,15 @@ export default function App() {
                         <div key={i}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "5px 10px", borderBottom: relExpanded ? "none" : `1px solid ${th.border}22`, background: i % 2 === 0 ? "transparent" : `${th.bgAlt}44` }}>
                           <span style={{ width: 8, height: 8, borderRadius: "50%", flexShrink: 0, background: ioc.hits > 0 ? th.danger : th.textMuted, opacity: ioc.hits > 0 ? 1 : 0.4 }} />
-                          <span style={{ flex: 1, fontFamily: "'SF Mono', Menlo, monospace", fontSize: 11, color: ioc.hits > 0 ? th.text : th.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={ioc.raw}>{ioc.raw}</span>
-                          <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 3, flexShrink: 0, fontFamily: "-apple-system, sans-serif",
+                          <span style={{ flex: 1, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 11, color: ioc.hits > 0 ? th.text : th.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={ioc.raw}>{ioc.raw}</span>
+                          <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 3, flexShrink: 0, fontFamily: "'Segoe UI', system-ui, sans-serif",
                             background: /^(IPv[46]|Domain|Email|URL|Crypto|User_Agent|Phone|Payment)/.test(ioc.category) ? `${th.accent}20` : /^(SHA|MD5)/.test(ioc.category) ? `${th.warning}20` : ioc.category === "Other" ? `${th.textMuted}20` : `#8b5cf620`,
                             color: /^(IPv[46]|Domain|Email|URL|Crypto|User_Agent|Phone|Payment)/.test(ioc.category) ? th.accent : /^(SHA|MD5)/.test(ioc.category) ? th.warning : ioc.category === "Other" ? th.textMuted : "#a78bfa",
                           }}>{ioc.category.replace(/_/g, " ")}</span>
                           {vtr ? (<>
                             <span onClick={() => vtr.vtUrl && window.open(vtr.vtUrl, "_blank")}
                               title={vtr.vtUrl ? `Open on VirusTotal: ${vtr.score}` : vtr.error ? `Error: ${vtr.error}` : vtr.score}
-                              style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, flexShrink: 0, fontFamily: "'SF Mono', Menlo, monospace",
+                              style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, flexShrink: 0, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace",
                                 background: `${vtScoreColor}20`, color: vtScoreColor, cursor: vtr.vtUrl ? "pointer" : "default",
                                 border: `1px solid ${vtScoreColor}44`, fontWeight: 600 }}>
                               {vtr.error ? "Err" : vtr.score}
@@ -6012,7 +6012,7 @@ export default function App() {
                             {vtr.threatLabel && <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, flexShrink: 0, background: `${vtScoreColor}12`, color: vtScoreColor, fontStyle: "italic" }}>{vtr.threatLabel}</span>}
                           </>
                           ) : isVtCompat ? (
-                            <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, flexShrink: 0, color: th.textDim, fontFamily: "'SF Mono', Menlo, monospace" }}>—</span>
+                            <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, flexShrink: 0, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>—</span>
                           ) : null}
                           {canPivot && (
                             <span title="Show related artifacts from VirusTotal" onClick={async () => {
@@ -6032,7 +6032,7 @@ export default function App() {
                               {relData?.loading ? "..." : relExpanded ? "Hide Related" : "Pivot"}
                             </span>
                           )}
-                          <span style={{ fontWeight: 600, fontSize: 12, color: ioc.hits > 0 ? th.danger : th.textMuted, flexShrink: 0, minWidth: 40, textAlign: "right", fontFamily: "'SF Mono', Menlo, monospace" }}>{ioc.hits > 0 ? `+${formatNumber(ioc.hits)}` : "—"}</span>
+                          <span style={{ fontWeight: 600, fontSize: 12, color: ioc.hits > 0 ? th.danger : th.textMuted, flexShrink: 0, minWidth: 40, textAlign: "right", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{ioc.hits > 0 ? `+${formatNumber(ioc.hits)}` : "—"}</span>
                         </div>
                         {relExpanded && relData && !relData.loading && (
                           <div style={{ padding: "4px 10px 8px 28px", borderBottom: `1px solid ${th.border}22`, background: `${th.accent}08` }}>
@@ -6043,9 +6043,9 @@ export default function App() {
                                 <div style={{ fontSize: 9, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", marginBottom: 2 }}>{rel.type} ({rel.items.length})</div>
                                 {rel.items.slice(0, 8).map((item, ii) => (
                                   <div key={ii} style={{ display: "flex", alignItems: "center", gap: 6, padding: "1px 0", fontSize: 10 }}>
-                                    <span style={{ fontFamily: "'SF Mono', Menlo, monospace", color: item.malicious > 0 ? th.danger : th.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 300 }}
+                                    <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: item.malicious > 0 ? th.danger : th.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 300 }}
                                       title={item.name}>{item.name}</span>
-                                    {item.score && <span style={{ color: item.malicious > 0 ? th.danger : th.textMuted, fontFamily: "'SF Mono', Menlo, monospace", fontSize: 9, flexShrink: 0 }}>{item.score}</span>}
+                                    {item.score && <span style={{ color: item.malicious > 0 ? th.danger : th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 9, flexShrink: 0 }}>{item.score}</span>}
                                     {item.threatLabel && <span style={{ color: th.danger, fontSize: 9, fontStyle: "italic", flexShrink: 0 }}>{item.threatLabel}</span>}
                                     {item.date && <span style={{ color: th.textDim, fontSize: 9, flexShrink: 0 }}>{new Date(item.date * 1000).toISOString().slice(0, 10)}</span>}
                                     {(item.type === "file" || item.type === "domain" || item.type === "ip") && (
@@ -6164,17 +6164,17 @@ export default function App() {
         const rowStyle = (i) => ({
           display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 11,
           background: i % 2 === 0 ? "transparent" : th.rowAlt, cursor: "pointer",
-          borderBottom: `1px solid ${th.border}22`, fontFamily: "'SF Mono',Menlo,monospace",
+          borderBottom: `1px solid ${th.border}22`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace",
         });
 
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 12, padding: 0, width: 600, maxWidth: "94vw", maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 48px rgba(0,0,0,0.5)" }}>
               {/* Header */}
               <div style={{ padding: "16px 20px 12px", borderBottom: `1px solid ${th.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Timeline Gap Analysis</h3>
-                  <p style={{ margin: "3px 0 0", color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>Detect activity bursts and quiet periods</p>
+                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Timeline Gap Analysis</h3>
+                  <p style={{ margin: "3px 0 0", color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Detect activity bursts and quiet periods</p>
                 </div>
                 <button onClick={() => setModal(null)} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 16, padding: "2px 6px" }}>✕</button>
               </div>
@@ -6194,13 +6194,13 @@ export default function App() {
                     <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
                       {[15, 30, 60, 120, 480].map((v) => (
                         <button key={v} onClick={() => setModal((p) => ({ ...p, gapThreshold: v }))}
-                          style={{ padding: "5px 12px", background: gapThreshold === v ? th.accent : th.btnBg, color: gapThreshold === v ? "#fff" : th.text, border: `1px solid ${gapThreshold === v ? th.accent : th.btnBorder}`, borderRadius: 5, fontSize: 12, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>
+                          style={{ padding: "5px 12px", background: gapThreshold === v ? th.accent : th.btnBg, color: gapThreshold === v ? "#fff" : th.text, border: `1px solid ${gapThreshold === v ? th.accent : th.btnBorder}`, borderRadius: 5, fontSize: 12, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                           {v < 60 ? `${v}m` : `${v / 60}h`}
                         </button>
                       ))}
                       <input type="number" min="1" value={gapThreshold} onChange={(e) => setModal((p) => ({ ...p, gapThreshold: Math.max(1, Number(e.target.value) || 60) }))}
                         style={{ ...ms.ip, width: 70 }} />
-                      <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>minutes</span>
+                      <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>minutes</span>
                     </div>
                   </div>
                   {modal.error && <div style={{ color: th.danger, fontSize: 11, padding: "8px 10px", background: `${th.danger}15`, borderRadius: 6, marginBottom: 10 }}>Error: {modal.error}</div>}
@@ -6209,7 +6209,7 @@ export default function App() {
                 {/* Loading phase */}
                 {phase === "loading" && (
                   <div style={{ textAlign: "center", padding: 40 }}>
-                    <div style={{ color: th.textMuted, fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>Analyzing timeline for gaps &gt;{gapThreshold}m...</div>
+                    <div style={{ color: th.textMuted, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Analyzing timeline for gaps &gt;{gapThreshold}m...</div>
                   </div>
                 )}
 
@@ -6223,8 +6223,8 @@ export default function App() {
                       { val: data.totalEvents.toLocaleString(), label: "total events", color: th.textDim },
                     ].map((c, i) => (
                       <div key={i} style={{ flex: 1, textAlign: "center", padding: "12px 8px", background: th.panelBg, borderRadius: 8, border: `1px solid ${th.border}` }}>
-                        <div style={{ fontSize: 22, fontWeight: 700, color: c.color, fontFamily: "-apple-system, sans-serif" }}>{c.val}</div>
-                        <div style={{ fontSize: 10, color: th.textMuted, marginTop: 2, fontFamily: "-apple-system, sans-serif" }}>{c.label}</div>
+                        <div style={{ fontSize: 22, fontWeight: 700, color: c.color, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{c.val}</div>
+                        <div style={{ fontSize: 10, color: th.textMuted, marginTop: 2, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{c.label}</div>
                       </div>
                     ))}
                   </div>
@@ -6237,7 +6237,7 @@ export default function App() {
                         <div key={s.idx} style={rowStyle(i)} onClick={() => zoomTo(s.from, s.to)}
                           onMouseEnter={(e) => e.currentTarget.style.background = th.rowHover}
                           onMouseLeave={(e) => e.currentTarget.style.background = i % 2 === 0 ? "transparent" : th.rowAlt}>
-                          <span style={{ padding: "1px 8px", borderRadius: 3, fontSize: 10, fontWeight: 600, color: "#fff", background: ["#58a6ff", "#3fb950", "#a371f7", "#f0883e", "#d29922", "#da3633", "#f85149", "#8b949e"][(s.idx - 1) % 8], fontFamily: "-apple-system, sans-serif" }}>Session {s.idx}</span>
+                          <span style={{ padding: "1px 8px", borderRadius: 3, fontSize: 10, fontWeight: 600, color: "#fff", background: ["#58a6ff", "#3fb950", "#a371f7", "#f0883e", "#d29922", "#da3633", "#f85149", "#8b949e"][(s.idx - 1) % 8], fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Session {s.idx}</span>
                           <span style={{ color: th.textDim, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.from} — {s.to}</span>
                           <span style={{ color: th.textMuted, fontSize: 10, whiteSpace: "nowrap" }}>{s.eventCount.toLocaleString()} events</span>
                           <span style={{ color: th.accent, fontSize: 10, fontWeight: 600, whiteSpace: "nowrap" }}>{fmtDur(s.durationMinutes)}</span>
@@ -6266,7 +6266,7 @@ export default function App() {
 
                   {/* Tagged confirmation */}
                   {modal.tagged && (
-                    <div style={{ padding: "8px 12px", background: `${th.success || "#3fb950"}15`, border: `1px solid ${th.success || "#3fb950"}33`, borderRadius: 6, color: th.success || "#3fb950", fontSize: 11, fontFamily: "-apple-system, sans-serif", marginBottom: 10 }}>
+                    <div style={{ padding: "8px 12px", background: `${th.success || "#3fb950"}15`, border: `1px solid ${th.success || "#3fb950"}33`, borderRadius: 6, color: th.success || "#3fb950", fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 10 }}>
                       Tagged {modal.taggedCount?.toLocaleString()} rows across {data.sessions.length} sessions
                     </div>
                   )}
@@ -6334,7 +6334,7 @@ export default function App() {
               </div>
             </div>
             <div style={{ padding: "16px", overflow: "auto", maxHeight: "calc(80vh - 50px)" }}>
-              <pre style={{ color: th.text, fontSize: 12, fontFamily: "'SF Mono', Menlo, monospace", whiteSpace: "pre-wrap", wordBreak: "break-all", margin: 0, lineHeight: 1.5 }}>{cpVal || <span style={{ color: th.textMuted, fontStyle: "italic" }}>(empty)</span>}</pre>
+              <pre style={{ color: th.text, fontSize: 12, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", whiteSpace: "pre-wrap", wordBreak: "break-all", margin: 0, lineHeight: 1.5 }}>{cpVal || <span style={{ color: th.textMuted, fontStyle: "italic" }}>(empty)</span>}</pre>
               {/* Timestamp Converter */}
               {cpIsTs && (() => {
                 const epoch = Math.floor(cpDate.getTime() / 1000);
@@ -6367,14 +6367,14 @@ export default function App() {
                 return (
                   <div style={{ marginTop: 12, padding: "10px 12px", background: th.accentSubtle, border: `1px solid ${th.accent}33`, borderRadius: 8 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                      <span style={{ fontSize: 11, color: th.accent, fontWeight: 600, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.01em" }}>Timestamp Converter</span>
+                      <span style={{ fontSize: 11, color: th.accent, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.01em" }}>Timestamp Converter</span>
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "4px 12px", alignItems: "baseline" }}>
                       {formats.map(([label, val]) => (
                         <Fragment key={label}>
-                          <span style={{ color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, sans-serif", textAlign: "right", whiteSpace: "nowrap" }}>{label}</span>
+                          <span style={{ color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif", textAlign: "right", whiteSpace: "nowrap" }}>{label}</span>
                           <span onClick={() => { navigator.clipboard?.writeText(val); setCopiedMsg(true); setTimeout(() => setCopiedMsg(false), 1200); }}
-                            style={{ color: th.text, fontSize: 11, fontFamily: "'SF Mono', Menlo, monospace", cursor: "pointer", padding: "1px 4px", borderRadius: 3, wordBreak: "break-all" }}
+                            style={{ color: th.text, fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", cursor: "pointer", padding: "1px 4px", borderRadius: 3, wordBreak: "break-all" }}
                             title="Click to copy"
                             onMouseEnter={(e) => { e.currentTarget.style.background = th.glassBg; }}
                             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}>
@@ -6390,14 +6390,14 @@ export default function App() {
               {cpDecoded && (
                 <div style={{ marginTop: 12, padding: "10px 12px", background: `${th.danger}11`, border: `1px solid ${th.danger}33`, borderRadius: 8 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                    <span style={{ fontSize: 11, color: th.danger, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>Decoded PowerShell (-enc)</span>
+                    <span style={{ fontSize: 11, color: th.danger, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Decoded PowerShell (-enc)</span>
                     <button onClick={() => { navigator.clipboard?.writeText(cpDecoded); setCopiedMsg(true); setTimeout(() => setCopiedMsg(false), 1200); }}
                       style={{ background: th.btnBg, border: `1px solid ${th.btnBorder}`, borderRadius: 4, color: th.text, fontSize: 10, padding: "2px 8px", cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
                       Copy
                     </button>
                   </div>
-                  <pre style={{ color: th.text, fontSize: 11, fontFamily: "'SF Mono', Menlo, monospace", whiteSpace: "pre-wrap", wordBreak: "break-all", margin: 0, lineHeight: 1.5 }}>{cpDecoded}</pre>
+                  <pre style={{ color: th.text, fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", whiteSpace: "pre-wrap", wordBreak: "break-all", margin: 0, lineHeight: 1.5 }}>{cpDecoded}</pre>
                 </div>
               )}
             </div>
@@ -6423,7 +6423,7 @@ export default function App() {
                 document.addEventListener("mousemove", onMove);
                 document.addEventListener("mouseup", onUp);
               }}>
-              <span style={{ color: th.textDim, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system, sans-serif", flex: 1 }}>Filter — {filterDropdown.colName === "__tags__" ? "Tags" : filterDropdown.colName === "__vt__" ? "VT Verdict" : filterDropdown.colName}</span>
+              <span style={{ color: th.textDim, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Segoe UI', system-ui, sans-serif", flex: 1 }}>Filter — {filterDropdown.colName === "__tags__" ? "Tags" : filterDropdown.colName === "__vt__" ? "VT Verdict" : filterDropdown.colName}</span>
               <button onClick={() => setFilterDropdown(null)} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 13, padding: "0 2px", lineHeight: 1 }}>✕</button>
             </div>
             <div style={{ padding: "8px 8px 4px", flexShrink: 0, display: "flex", gap: 4 }}>
@@ -6460,7 +6460,7 @@ export default function App() {
                 const newCbf = { ...ct.checkboxFilters }; delete newCbf[filterDropdown.colName]; up("checkboxFilters", newCbf); setFilterDropdown(null);
               }} style={ms.bsm}>Reset</button>
               <button onClick={() => setFilterDropdown(null)} style={ms.bsm}>Cancel</button>
-              <button onClick={applyCheckboxFilter} style={{ padding: "3px 10px", background: th.primaryBtn, color: "#fff", border: "none", borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Apply</button>
+              <button onClick={applyCheckboxFilter} style={{ padding: "3px 10px", background: th.primaryBtn, color: "#fff", border: "none", borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Apply</button>
             </div>
           </div>
         </>
@@ -6471,14 +6471,14 @@ export default function App() {
         <>
           <div onClick={() => setDateRangeDropdown(null)} style={{ position: "fixed", inset: 0, zIndex: 199 }} />
           <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", position: "fixed", left: Math.min(dateRangeDropdown.x, window.innerWidth - 300), top: Math.min(dateRangeDropdown.y, window.innerHeight - 220), width: 290, background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 8, boxShadow: "0 12px 28px rgba(0,0,0,0.5)", zIndex: 200, padding: 12 }}>
-            <div style={{ color: th.textDim, fontSize: 10, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system, sans-serif" }}>Date Range — {dateRangeDropdown.colName}</div>
+            <div style={{ color: th.textDim, fontSize: 10, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Date Range — {dateRangeDropdown.colName}</div>
             <div style={{ marginBottom: 8 }}>
-              <label style={{ display: "block", color: th.textMuted, fontSize: 10, marginBottom: 2, fontFamily: "-apple-system, sans-serif" }}>From</label>
+              <label style={{ display: "block", color: th.textMuted, fontSize: 10, marginBottom: 2, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>From</label>
               <input type="datetime-local" value={dateRangeDropdown.from} onChange={(e) => setDateRangeDropdown({ ...dateRangeDropdown, from: e.target.value })}
                 style={{ width: "100%", background: th.bgInput, border: `1px solid ${th.btnBorder}`, borderRadius: 4, color: th.text, fontSize: 11, padding: "4px 6px", outline: "none", fontFamily: "inherit", boxSizing: "border-box", colorScheme: themeName }} />
             </div>
             <div style={{ marginBottom: 10 }}>
-              <label style={{ display: "block", color: th.textMuted, fontSize: 10, marginBottom: 2, fontFamily: "-apple-system, sans-serif" }}>To</label>
+              <label style={{ display: "block", color: th.textMuted, fontSize: 10, marginBottom: 2, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>To</label>
               <input type="datetime-local" value={dateRangeDropdown.to} onChange={(e) => setDateRangeDropdown({ ...dateRangeDropdown, to: e.target.value })}
                 style={{ width: "100%", background: th.bgInput, border: `1px solid ${th.btnBorder}`, borderRadius: 4, color: th.text, fontSize: 11, padding: "4px 6px", outline: "none", fontFamily: "inherit", boxSizing: "border-box", colorScheme: themeName }} />
             </div>
@@ -6501,7 +6501,7 @@ export default function App() {
                 }
                 up("dateRangeFilters", newDrf);
                 setDateRangeDropdown(null);
-              }} style={{ padding: "3px 10px", background: th.primaryBtn, color: "#fff", border: "none", borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Apply</button>
+              }} style={{ padding: "3px 10px", background: th.primaryBtn, color: "#fff", border: "none", borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Apply</button>
             </div>
           </div>
         </>
@@ -6564,17 +6564,17 @@ export default function App() {
         const rowStyle = (i) => ({
           display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 11,
           background: i % 2 === 0 ? "transparent" : `${th.border}15`, cursor: "pointer",
-          borderBottom: `1px solid ${th.border}22`, fontFamily: "'SF Mono',Menlo,monospace",
+          borderBottom: `1px solid ${th.border}22`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace",
         });
 
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 12, padding: 0, width: 700, maxWidth: "94vw", maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 48px rgba(0,0,0,0.5)" }}>
               {/* Header */}
               <div style={{ padding: "16px 20px 12px", borderBottom: `1px solid ${th.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Log Source Coverage Map</h3>
-                  <p style={{ margin: "3px 0 0", color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>Visualize evidence coverage across log sources</p>
+                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Log Source Coverage Map</h3>
+                  <p style={{ margin: "3px 0 0", color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Visualize evidence coverage across log sources</p>
                 </div>
                 <button onClick={() => setModal(null)} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 16, padding: "2px 6px" }}>✕</button>
               </div>
@@ -6606,7 +6606,7 @@ export default function App() {
 
                 {phase === "loading" && (
                   <div style={{ textAlign: "center", padding: 40 }}>
-                    <div style={{ color: th.textMuted, fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>Analyzing log source coverage...</div>
+                    <div style={{ color: th.textMuted, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Analyzing log source coverage...</div>
                   </div>
                 )}
 
@@ -6646,8 +6646,8 @@ export default function App() {
                         { val: fmtDur(gEnd - gStart), label: "time span", color: th.textDim },
                       ].map((c, i) => (
                         <div key={i} style={{ flex: 1, textAlign: "center", padding: "12px 8px", background: th.panelBg, borderRadius: 8, border: `1px solid ${th.border}` }}>
-                          <div style={{ fontSize: 22, fontWeight: 700, color: c.color, fontFamily: "-apple-system, sans-serif" }}>{c.val}</div>
-                          <div style={{ fontSize: 10, color: th.textMuted, marginTop: 2, fontFamily: "-apple-system, sans-serif" }}>{c.label}</div>
+                          <div style={{ fontSize: 22, fontWeight: 700, color: c.color, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{c.val}</div>
+                          <div style={{ fontSize: 10, color: th.textMuted, marginTop: 2, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{c.label}</div>
                         </div>
                       ))}
                     </div>
@@ -6657,7 +6657,7 @@ export default function App() {
                       <div style={ms.lb}>Coverage Timeline</div>
                       <div style={{ border: `1px solid ${th.border}`, borderRadius: 6, overflow: "hidden" }}>
                         {/* Time axis header */}
-                        <div style={{ display: "flex", padding: "4px 10px", borderBottom: `1px solid ${th.border}`, fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>
+                        <div style={{ display: "flex", padding: "4px 10px", borderBottom: `1px solid ${th.border}`, fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                           <span style={{ width: 160, flexShrink: 0 }}>Source</span>
                           <span style={{ flex: 1, display: "flex", justifyContent: "space-between" }}>
                             <span>{data.globalEarliest?.slice(0, 16)}</span>
@@ -6684,7 +6684,7 @@ export default function App() {
                                     height: "100%", background: heatColor(ratio), borderRadius: 3, minWidth: 2,
                                   }} title={`${s.source}: ${formatNumber(s.cnt)} events\n${s.earliest} — ${s.latest}`} />
                                 </div>
-                                <span style={{ width: 60, flexShrink: 0, textAlign: "right", color: th.textMuted, fontSize: 10, fontFamily: "'SF Mono',Menlo,monospace" }}>{formatNumber(s.cnt)}</span>
+                                <span style={{ width: 60, flexShrink: 0, textAlign: "right", color: th.textMuted, fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{formatNumber(s.cnt)}</span>
                               </div>
                             );
                           })}
@@ -6694,10 +6694,10 @@ export default function App() {
 
                     {/* Sort controls */}
                     <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
-                      <span style={{ color: th.textMuted, fontSize: 10, alignSelf: "center", fontFamily: "-apple-system, sans-serif" }}>Sort:</span>
+                      <span style={{ color: th.textMuted, fontSize: 10, alignSelf: "center", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Sort:</span>
                       {["count", "name", "earliest", "duration"].map((s) => (
                         <button key={s} onClick={() => setModal((p) => ({ ...p, sortBy: s }))}
-                          style={{ padding: "3px 10px", background: sortBy === s ? th.accent : th.btnBg, color: sortBy === s ? "#fff" : th.text, border: `1px solid ${sortBy === s ? th.accent : th.btnBorder}`, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>
+                          style={{ padding: "3px 10px", background: sortBy === s ? th.accent : th.btnBg, color: sortBy === s ? "#fff" : th.text, border: `1px solid ${sortBy === s ? th.accent : th.btnBorder}`, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                           {s.charAt(0).toUpperCase() + s.slice(1)}
                         </button>
                       ))}
@@ -6802,17 +6802,17 @@ export default function App() {
         const rowStyle = (i) => ({
           display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 11,
           background: i % 2 === 0 ? "transparent" : `${th.border}15`, cursor: "pointer",
-          borderBottom: `1px solid ${th.border}22`, fontFamily: "'SF Mono',Menlo,monospace",
+          borderBottom: `1px solid ${th.border}22`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace",
         });
 
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 12, padding: 0, width: 650, maxWidth: "94vw", maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 48px rgba(0,0,0,0.5)" }}>
               {/* Header */}
               <div style={{ padding: "16px 20px 12px", borderBottom: `1px solid ${th.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Event Burst Detection</h3>
-                  <p style={{ margin: "3px 0 0", color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>Find windows with abnormally high event density</p>
+                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Event Burst Detection</h3>
+                  <p style={{ margin: "3px 0 0", color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Find windows with abnormally high event density</p>
                 </div>
                 <button onClick={() => setModal(null)} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 16, padding: "2px 6px" }}>✕</button>
               </div>
@@ -6832,28 +6832,28 @@ export default function App() {
                     <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
                       {[{v: 1, l: "1m"}, {v: 5, l: "5m"}, {v: 15, l: "15m"}, {v: 30, l: "30m"}, {v: 60, l: "1h"}].map(({v, l}) => (
                         <button key={v} onClick={() => setModal((p) => ({ ...p, windowMinutes: v }))}
-                          style={{ padding: "5px 12px", background: windowMinutes === v ? th.accent : th.btnBg, color: windowMinutes === v ? "#fff" : th.text, border: `1px solid ${windowMinutes === v ? th.accent : th.btnBorder}`, borderRadius: 5, fontSize: 12, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>
+                          style={{ padding: "5px 12px", background: windowMinutes === v ? th.accent : th.btnBg, color: windowMinutes === v ? "#fff" : th.text, border: `1px solid ${windowMinutes === v ? th.accent : th.btnBorder}`, borderRadius: 5, fontSize: 12, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                           {l}
                         </button>
                       ))}
                       <input type="number" min="1" value={windowMinutes} onChange={(e) => setModal((p) => ({ ...p, windowMinutes: Math.max(1, Number(e.target.value) || 5) }))}
                         style={{ ...ms.ip, width: 60 }} />
-                      <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>minutes</span>
+                      <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>minutes</span>
                     </div>
                   </div>
                   <div style={ms.fg}>
                     <label style={ms.lb}>Threshold Multiplier</label>
-                    <p style={{ color: th.textMuted, fontSize: 10, margin: "0 0 6px", fontFamily: "-apple-system, sans-serif" }}>Flag windows with N times the median baseline event rate</p>
+                    <p style={{ color: th.textMuted, fontSize: 10, margin: "0 0 6px", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Flag windows with N times the median baseline event rate</p>
                     <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
                       {[3, 5, 10, 20].map((v) => (
                         <button key={v} onClick={() => setModal((p) => ({ ...p, thresholdMultiplier: v }))}
-                          style={{ padding: "5px 12px", background: thresholdMultiplier === v ? th.accent : th.btnBg, color: thresholdMultiplier === v ? "#fff" : th.text, border: `1px solid ${thresholdMultiplier === v ? th.accent : th.btnBorder}`, borderRadius: 5, fontSize: 12, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>
+                          style={{ padding: "5px 12px", background: thresholdMultiplier === v ? th.accent : th.btnBg, color: thresholdMultiplier === v ? "#fff" : th.text, border: `1px solid ${thresholdMultiplier === v ? th.accent : th.btnBorder}`, borderRadius: 5, fontSize: 12, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                           {v}×
                         </button>
                       ))}
                       <input type="number" min="1" step="0.5" value={thresholdMultiplier} onChange={(e) => setModal((p) => ({ ...p, thresholdMultiplier: Math.max(1, Number(e.target.value) || 5) }))}
                         style={{ ...ms.ip, width: 60 }} />
-                      <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>× baseline</span>
+                      <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>× baseline</span>
                     </div>
                   </div>
                   {modal.error && <div style={{ color: th.danger, fontSize: 11, padding: "8px 10px", background: `${th.danger}15`, borderRadius: 6, marginBottom: 10 }}>Error: {modal.error}</div>}
@@ -6862,7 +6862,7 @@ export default function App() {
                 {/* Loading phase */}
                 {phase === "loading" && (
                   <div style={{ textAlign: "center", padding: 40 }}>
-                    <div style={{ color: th.textMuted, fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>Analyzing event density ({windowMinutes}m windows, {thresholdMultiplier}× threshold)...</div>
+                    <div style={{ color: th.textMuted, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Analyzing event density ({windowMinutes}m windows, {thresholdMultiplier}× threshold)...</div>
                   </div>
                 )}
 
@@ -6877,8 +6877,8 @@ export default function App() {
                       { val: formatNumber(data.totalEvents), label: "total events", color: th.textDim },
                     ].map((c, i) => (
                       <div key={i} style={{ flex: 1, textAlign: "center", padding: "12px 8px", background: th.panelBg, borderRadius: 8, border: `1px solid ${th.border}` }}>
-                        <div style={{ fontSize: 22, fontWeight: 700, color: c.color, fontFamily: "-apple-system, sans-serif" }}>{c.val}</div>
-                        <div style={{ fontSize: 10, color: th.textMuted, marginTop: 2, fontFamily: "-apple-system, sans-serif" }}>{c.label}</div>
+                        <div style={{ fontSize: 22, fontWeight: 700, color: c.color, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{c.val}</div>
+                        <div style={{ fontSize: 10, color: th.textMuted, marginTop: 2, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{c.label}</div>
                       </div>
                     ))}
                   </div>
@@ -6902,7 +6902,7 @@ export default function App() {
                                 fill={s.isBurst ? (th.danger || "#f85149") : th.accent + "66"} />;
                             })}
                           </svg>
-                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: th.textMuted, marginTop: 4, padding: "0 2px", fontFamily: "-apple-system, sans-serif" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: th.textMuted, marginTop: 4, padding: "0 2px", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                             <span>{data.sparkline[0]?.ts?.slice(0, 16)}</span>
                             <span style={{ color: th.danger || "#f85149", fontSize: 8 }}>--- threshold ({data.threshold}/{windowMinutes}m)</span>
                             <span>{data.sparkline[data.sparkline.length - 1]?.ts?.slice(0, 16)}</span>
@@ -6921,7 +6921,7 @@ export default function App() {
                           <div key={i} style={rowStyle(i)} onClick={() => zoomTo(b.from, b.to)}
                             onMouseEnter={(e) => { e.currentTarget.style.background = th.btnBg; }}
                             onMouseLeave={(e) => { e.currentTarget.style.background = i % 2 === 0 ? "transparent" : `${th.border}15`; }}>
-                            <span style={{ padding: "1px 8px", borderRadius: 3, fontSize: 10, fontWeight: 600, color: "#fff", background: th.danger || "#f85149", fontFamily: "-apple-system, sans-serif" }}>Burst {i + 1}</span>
+                            <span style={{ padding: "1px 8px", borderRadius: 3, fontSize: 10, fontWeight: 600, color: "#fff", background: th.danger || "#f85149", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Burst {i + 1}</span>
                             <span style={{ color: th.textDim, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.from} — {b.to}</span>
                             <span style={{ color: th.textMuted, fontSize: 10, whiteSpace: "nowrap" }}>{formatNumber(b.eventCount)} events</span>
                             <span style={{ color: th.danger || "#f85149", fontSize: 10, fontWeight: 700, whiteSpace: "nowrap" }}>{b.burstFactor}×</span>
@@ -6931,14 +6931,14 @@ export default function App() {
                       </div>
                     </div>
                   ) : (
-                    <div style={{ padding: "20px 0", textAlign: "center", color: th.textMuted, fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>
+                    <div style={{ padding: "20px 0", textAlign: "center", color: th.textMuted, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                       No bursts detected above {thresholdMultiplier}× baseline. Try lowering the threshold or adjusting the window size.
                     </div>
                   )}
 
                   {/* Tagged confirmation */}
                   {modal.tagged && (
-                    <div style={{ padding: "8px 12px", background: `${th.success || "#3fb950"}15`, border: `1px solid ${th.success || "#3fb950"}33`, borderRadius: 6, color: th.success || "#3fb950", fontSize: 11, fontFamily: "-apple-system, sans-serif", marginBottom: 10 }}>
+                    <div style={{ padding: "8px 12px", background: `${th.success || "#3fb950"}15`, border: `1px solid ${th.success || "#3fb950"}33`, borderRadius: 6, color: th.success || "#3fb950", fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 10 }}>
                       Tagged {modal.taggedCount?.toLocaleString()} rows across {data.bursts.length} burst periods
                     </div>
                   )}
@@ -6976,12 +6976,12 @@ export default function App() {
         const totalMergeRows = checkedTabs.reduce((s, t) => s + t.rowCount, 0);
         const canMerge = checkedTabs.length >= 2 && checkedTabs.every((t) => t.selectedTsCol);
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 12, padding: 0, width: 560, maxWidth: "94vw", maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 48px rgba(0,0,0,0.5)" }}>
               <div style={{ padding: "16px 20px 12px", borderBottom: `1px solid ${th.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Merge Tabs</h3>
-                  <p style={{ margin: "3px 0 0", color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>
+                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Merge Tabs</h3>
+                  <p style={{ margin: "3px 0 0", color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                     Combine {checkedTabs.length} tab{checkedTabs.length !== 1 ? "s" : ""} into a unified timeline ({formatNumber(totalMergeRows)} rows)
                   </p>
                 </div>
@@ -7018,7 +7018,7 @@ export default function App() {
                   </div>
                 ))}
                 {checkedTabs.length < 2 && (
-                  <div style={{ padding: "12px 0", color: th.warning, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>
+                  <div style={{ padding: "12px 0", color: th.warning, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                     Select at least 2 tabs to merge.
                   </div>
                 )}
@@ -7119,15 +7119,15 @@ export default function App() {
           setModal(null);
         };
 
-        const selectStyle = { background: th.bgInput, color: th.text, border: `1px solid ${th.border}`, borderRadius: 4, padding: "5px 8px", fontSize: 12, fontFamily: "-apple-system, sans-serif", outline: "none" };
+        const selectStyle = { background: th.bgInput, color: th.text, border: `1px solid ${th.border}`, borderRadius: 4, padding: "5px 8px", fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif", outline: "none" };
         const inputStyle = { ...selectStyle, flex: 1, minWidth: 80 };
 
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 12, padding: 0, width: 720, maxWidth: "94vw", maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 48px rgba(0,0,0,0.5)" }}>
               {/* Header */}
               <div style={{ padding: "16px 20px 12px", borderBottom: `1px solid ${th.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Edit Filter</h3>
+                <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Edit Filter</h3>
                 <button onClick={() => setModal(null)} style={{ background: "none", border: "none", color: th.textDim, fontSize: 18, cursor: "pointer", padding: "2px 6px" }}>✕</button>
               </div>
 
@@ -7171,21 +7171,21 @@ export default function App() {
                 ))}
 
                 {/* Add Condition */}
-                <button onClick={addCondition} style={{ background: "none", border: `1px dashed ${th.border}`, borderRadius: 4, color: th.accent, fontSize: 12, padding: "6px 12px", cursor: "pointer", marginTop: 4, fontFamily: "-apple-system, sans-serif" }}>
+                <button onClick={addCondition} style={{ background: "none", border: `1px dashed ${th.border}`, borderRadius: 4, color: th.accent, fontSize: 12, padding: "6px 12px", cursor: "pointer", marginTop: 4, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                   + Add Condition
                 </button>
 
                 {/* Preview */}
-                <div style={{ marginTop: 16, padding: "10px 12px", background: th.bgInput, border: `1px solid ${th.border}`, borderRadius: 6, fontSize: 11, fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace", color: th.textDim, wordBreak: "break-word", lineHeight: 1.6 }}>
+                <div style={{ marginTop: 16, padding: "10px 12px", background: th.bgInput, border: `1px solid ${th.border}`, borderRadius: 6, fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.textDim, wordBreak: "break-word", lineHeight: 1.6 }}>
                   {buildPreview()}
                 </div>
               </div>
 
               {/* Footer */}
               <div style={{ padding: "12px 20px", borderTop: `1px solid ${th.border}`, display: "flex", justifyContent: "flex-end", gap: 8 }}>
-                <button onClick={handleClear} style={{ background: "none", border: `1px solid ${th.border}`, borderRadius: 6, padding: "6px 14px", color: th.danger || "#f85149", fontSize: 12, cursor: "pointer", fontFamily: "-apple-system, sans-serif", marginRight: "auto" }}>Clear All</button>
-                <button onClick={() => setModal(null)} style={{ background: "none", border: `1px solid ${th.border}`, borderRadius: 6, padding: "6px 14px", color: th.textDim, fontSize: 12, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Cancel</button>
-                <button onClick={handleApply} style={{ background: th.accent, border: "none", borderRadius: 6, padding: "6px 14px", color: "#fff", fontSize: 12, cursor: "pointer", fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>Apply</button>
+                <button onClick={handleClear} style={{ background: "none", border: `1px solid ${th.border}`, borderRadius: 6, padding: "6px 14px", color: th.danger || "#f85149", fontSize: 12, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", marginRight: "auto" }}>Clear All</button>
+                <button onClick={() => setModal(null)} style={{ background: "none", border: `1px solid ${th.border}`, borderRadius: 6, padding: "6px 14px", color: th.textDim, fontSize: 12, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Cancel</button>
+                <button onClick={handleApply} style={{ background: th.accent, border: "none", borderRadius: 6, padding: "6px 14px", color: "#fff", fontSize: 12, cursor: "pointer", fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Apply</button>
               </div>
             </div>
           </div>
@@ -7235,16 +7235,16 @@ export default function App() {
 
         const sectionStyle = { background: th.bgInput, border: `1px solid ${th.border}`, borderRadius: 8, padding: "12px 14px", marginBottom: 12 };
         const labelStyle = { fontSize: 11, color: th.textDim, marginBottom: 6, fontWeight: 500 };
-        const btnStyle = { padding: "6px 14px", borderRadius: 6, fontSize: 12, cursor: busy ? "wait" : "pointer", fontFamily: "-apple-system, sans-serif", border: "none" };
+        const btnStyle = { padding: "6px 14px", borderRadius: 6, fontSize: 12, cursor: busy ? "wait" : "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", border: "none" };
 
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 12, padding: 0, width: 480, maxWidth: "94vw", display: "flex", flexDirection: "column", boxShadow: "0 24px 48px rgba(0,0,0,0.5)" }}>
               {/* Header */}
               <div style={{ padding: "16px 20px 8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Bulk Actions</h3>
-                  <div style={{ fontSize: 11, color: th.textDim, marginTop: 2, fontFamily: "-apple-system, sans-serif" }}>
+                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Bulk Actions</h3>
+                  <div style={{ fontSize: 11, color: th.textDim, marginTop: 2, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                     Applies to <b style={{ color: ct.totalFiltered < ct.totalRows ? th.warning : th.text }}>{formatNumber(ct.totalFiltered)}</b> filtered rows
                   </div>
                 </div>
@@ -7259,7 +7259,7 @@ export default function App() {
                     <input type="text" value={tagName} onChange={(e) => setModal((p) => p?.type === "bulkActions" ? { ...p, tagName: e.target.value } : p)}
                       onKeyDown={(e) => { if (e.key === "Enter") handleTag(); }}
                       placeholder="Tag name..." list="bulk-tag-suggestions"
-                      style={{ flex: 1, background: th.modalBg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 4, padding: "6px 8px", fontSize: 12, outline: "none", fontFamily: "-apple-system, sans-serif" }} />
+                      style={{ flex: 1, background: th.modalBg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 4, padding: "6px 8px", fontSize: 12, outline: "none", fontFamily: "'Segoe UI', system-ui, sans-serif" }} />
                     <datalist id="bulk-tag-suggestions">
                       {existingTags.map((t) => <option key={t} value={t} />)}
                     </datalist>
@@ -7289,7 +7289,7 @@ export default function App() {
 
                 {/* Result message */}
                 {result && (
-                  <div style={{ padding: "8px 12px", borderRadius: 6, fontSize: 12, fontFamily: "-apple-system, sans-serif",
+                  <div style={{ padding: "8px 12px", borderRadius: 6, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif",
                     background: result.type === "success" ? (th.success + "18") : (th.danger + "18"),
                     color: result.type === "success" ? th.success : (th.danger || "#f85149"),
                     border: `1px solid ${result.type === "success" ? th.success : (th.danger || "#f85149")}44` }}>
@@ -8390,7 +8390,7 @@ export default function App() {
         const edgeStyle = (cursor, pos) => ({ position: "absolute", ...pos, zIndex: 2, cursor });
 
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", position: "absolute", left: px, top: py, width: pw, height: ph_, background: th.modalBg + "f2", border: `1px solid ${th.modalBorder}88`, borderRadius: 14, padding: 0, display: "flex", flexDirection: "column", boxShadow: "0 24px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04) inset", overflow: "hidden", backdropFilter: "blur(40px) saturate(1.6)", WebkitBackdropFilter: "blur(40px) saturate(1.6)" }}>
               {/* Resize handles — edges */}
               <div onMouseDown={(e) => startResize(e, "t")} style={edgeStyle("ns-resize", { top: 0, left: 8, right: 8, height: 5 })} />
@@ -8409,7 +8409,7 @@ export default function App() {
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <div style={{ width: 32, height: 32, borderRadius: 8, background: `linear-gradient(135deg, ${th.accent} 0%, ${th.accentHover || th.accent} 100%)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, color: "#fff", boxShadow: `0 2px 8px ${th.accent}44`, flexShrink: 0 }}>{"\u25B3"}</div>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.01em" }}>
+                      <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.01em" }}>
                         <span style={{ color: th.accent }}>IRFlow</span> {"\u2014"} Process Inspector
                       </h3>
                       {phase === "results" && data?.stats && (() => {
@@ -8418,7 +8418,7 @@ export default function App() {
                         const eids = [...new Set((data?.processes || []).map(p => p.eventId).filter(Boolean))].sort().join(", ");
                         const dateRange = (() => { const ts = (data?.processes || []).filter(p => p.ts).map(p => p.ts).sort(); if (!ts.length) return ""; const first = (ts[0] || "").split(" ")[0]; const last = (ts[ts.length - 1] || "").split(" ")[0]; return first === last ? first : `${first} \u2192 ${last}`; })();
                         return (
-                          <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace", marginTop: 2, display: "flex", flexWrap: "wrap", gap: 4 }}>
+                          <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", marginTop: 2, display: "flex", flexWrap: "wrap", gap: 4 }}>
                             {hostname && <span style={{ color: th.text, fontWeight: 500 }}>{hostname}</span>}
                             {hostname && providers && <span>{"\u00B7"}</span>}
                             {providers && <span>{providers}</span>}
@@ -8716,7 +8716,7 @@ export default function App() {
 
                 return (
                 <div style={{ padding: 20, overflowY: "auto", flex: 1, minHeight: 0 }}>
-                  {modal.error && <div style={{ padding: "10px 14px", marginBottom: 14, background: `${(th.danger || "#f85149")}15`, border: `1px solid ${(th.danger || "#f85149")}33`, borderRadius: 8, color: th.danger || "#f85149", fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>{modal.error}</div>}
+                  {modal.error && <div style={{ padding: "10px 14px", marginBottom: 14, background: `${(th.danger || "#f85149")}15`, border: `1px solid ${(th.danger || "#f85149")}33`, borderRadius: 8, color: th.danger || "#f85149", fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{modal.error}</div>}
                   <div style={{ marginBottom: 12 }}>
                     <div style={{ padding: "10px 14px", background: `${piCovColor}08`, border: `1px solid ${piCovColor}22`, borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -8724,10 +8724,10 @@ export default function App() {
                           {piCov.level === "high" ? <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></> : piCov.level === "medium" ? <><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></> : <><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></>}
                         </svg>
                         <div>
-                          <div style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                             {piCov.level === "high" ? "Tree-ready mapping detected" : piCov.level === "medium" ? "Core tree mapping detected" : "Missing required tree columns"}
                           </div>
-                          <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", marginTop: 1 }}>
+                          <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", marginTop: 1 }}>
                             {piCov.reqOk}/{piCov.required.length} required · {piCov.recOk}/{piCov.recommended.length} recommended{piCov.guidLink ? " · GUID linkage" : piCov.pidLink ? " · PID linkage" : ""}
                           </div>
                         </div>
@@ -8754,7 +8754,7 @@ export default function App() {
                             ["user", "User", false], ["provider", "Provider", false], ["integrity", "Integrity", false], ["elevation", "Elevation", false],
                           ].map(([key, label, req]) => (
                             <div key={key}>
-                              <label style={{ fontSize: 9, color: cols[key] ? th.textDim : req ? "#f85149" : th.textMuted, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase", letterSpacing: "0.04em", display: "flex", alignItems: "center", gap: 3, marginBottom: 2 }}>
+                              <label style={{ fontSize: 9, color: cols[key] ? th.textDim : req ? "#f85149" : th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: "0.04em", display: "flex", alignItems: "center", gap: 3, marginBottom: 2 }}>
                                 {cols[key] ? <span style={{ color: "#3fb950" }}>{"\u2713"}</span> : req ? <span style={{ color: "#f85149" }}>{"\u2717"}</span> : <span style={{ color: th.textMuted }}>{"\u25CB"}</span>}
                                 {label}
                               </label>
@@ -8774,14 +8774,14 @@ export default function App() {
                           const active = (modal.ptIntent || "balanced") === intent.id;
                           return (
                             <button key={intent.id} onClick={() => applyPiIntent(intent)} title={intent.desc}
-                              style={{ padding: "4px 10px", fontSize: 10, fontWeight: active ? 600 : 400, fontFamily: "-apple-system, sans-serif", background: active ? `${th.accent}18` : "transparent", color: active ? th.accent : th.textDim, border: `1px solid ${active ? th.accent + "44" : th.border + "22"}`, borderRadius: 6, cursor: "pointer", transition: "all 0.15s" }}>
+                              style={{ padding: "4px 10px", fontSize: 10, fontWeight: active ? 600 : 400, fontFamily: "'Segoe UI', system-ui, sans-serif", background: active ? `${th.accent}18` : "transparent", color: active ? th.accent : th.textDim, border: `1px solid ${active ? th.accent + "44" : th.border + "22"}`, borderRadius: 6, cursor: "pointer", transition: "all 0.15s" }}>
                               {intent.label}
                             </button>
                           );
                         })}
                       </div>
                       <button onClick={resetPiRules} title="Reset all rules to defaults"
-                        style={{ padding: "3px 8px", fontSize: 9, fontFamily: "-apple-system, sans-serif", background: "transparent", color: th.textMuted, border: `1px solid ${th.border}22`, borderRadius: 4, cursor: "pointer", display: "flex", alignItems: "center", gap: 3, transition: "all 0.15s" }}
+                        style={{ padding: "3px 8px", fontSize: 9, fontFamily: "'Segoe UI', system-ui, sans-serif", background: "transparent", color: th.textMuted, border: `1px solid ${th.border}22`, borderRadius: 4, cursor: "pointer", display: "flex", alignItems: "center", gap: 3, transition: "all 0.15s" }}
                         onMouseEnter={(e) => { e.currentTarget.style.color = th.accent; e.currentTarget.style.borderColor = th.accent + "44"; }}
                         onMouseLeave={(e) => { e.currentTarget.style.color = th.textMuted; e.currentTarget.style.borderColor = th.border + "22"; }}>
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
@@ -8790,7 +8790,7 @@ export default function App() {
                     </div>
 
                     <div style={{ marginBottom: 12 }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8, fontFamily: "-apple-system, sans-serif" }}>Detection Techniques</div>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Detection Techniques</div>
                       <div style={{ display: "grid", gridTemplateColumns: piTechniqueGridColumns, gap: 8, alignItems: "start" }}>
                         {PI_TECHNIQUE_GROUPS.map((group) => {
                           const state = piGroupState(group.rules, piDisabledSet);
@@ -8801,11 +8801,11 @@ export default function App() {
                               onClick={() => togglePiGroup(group)}>
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                                 <div style={{ minWidth: 0, paddingRight: 10 }}>
-                                  <div style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{group.label}</div>
-                                  <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", marginTop: 1, lineHeight: 1.4 }}>{group.desc}</div>
+                                  <div style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{group.label}</div>
+                                  <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", marginTop: 1, lineHeight: 1.4 }}>{group.desc}</div>
                                 </div>
                                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-                                  <span style={{ fontSize: 10, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{activeRuleCount}/{group.rules.length}</span>
+                                  <span style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{activeRuleCount}/{group.rules.length}</span>
                                   <div style={{ width: 32, height: 18, borderRadius: 9, background: isOn ? th.accent : th.textMuted + "33", transition: "background 0.2s", position: "relative" }}>
                                     <div style={{ width: 14, height: 14, borderRadius: 7, background: "#fff", position: "absolute", top: 2, left: isOn ? 16 : 2, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
                                   </div>
@@ -8819,7 +8819,7 @@ export default function App() {
                                     const off = piDisabledSet.has(key);
                                     return (
                                       <span key={key} onClick={(e) => { e.stopPropagation(); togglePiRule(key); }}
-                                        style={{ fontSize: 9, padding: "1px 6px", borderRadius: 3, background: off ? `${th.textMuted}11` : `${PI_SEV_COLORS[r.sev]}15`, color: off ? th.textMuted : PI_SEV_COLORS[r.sev], border: `1px solid ${off ? th.border + "22" : PI_SEV_COLORS[r.sev] + "33"}`, fontFamily: "-apple-system, sans-serif", cursor: "pointer", textDecoration: off ? "line-through" : "none", opacity: off ? 0.5 : 1, transition: "all 0.15s" }}>
+                                        style={{ fontSize: 9, padding: "1px 6px", borderRadius: 3, background: off ? `${th.textMuted}11` : `${PI_SEV_COLORS[r.sev]}15`, color: off ? th.textMuted : PI_SEV_COLORS[r.sev], border: `1px solid ${off ? th.border + "22" : PI_SEV_COLORS[r.sev] + "33"}`, fontFamily: "'Segoe UI', system-ui, sans-serif", cursor: "pointer", textDecoration: off ? "line-through" : "none", opacity: off ? 0.5 : 1, transition: "all 0.15s" }}>
                                         {r.name}
                                       </span>
                                     );
@@ -8838,32 +8838,32 @@ export default function App() {
                           const active = modal.ptTelemetry?.[src.id] !== false;
                           const srcCount = evCounts[src.eid] || 0;
                           return (
-                            <label key={src.id} style={{ fontSize: 11, color: th.textDim, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontFamily: "-apple-system, sans-serif" }}>
+                            <label key={src.id} style={{ fontSize: 11, color: th.textDim, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                               <input type="checkbox" checked={active} onChange={() => toggleTelemetry(src.id)} style={{ accentColor: th.accent }} />
                               {src.label}
-                              <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "SF Mono, monospace" }}>{srcCount.toLocaleString()}</span>
+                              <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{srcCount.toLocaleString()}</span>
                             </label>
                           );
                         })}
                       </div>
-                      <span style={{ fontSize: 10, color: th.textDim, fontFamily: "-apple-system, sans-serif" }}>{piActiveCount}/{PI_RULES.length} rules{piCustomCount > 0 ? ` + ${piCustomCount} custom` : ""}</span>
+                      <span style={{ fontSize: 10, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{piActiveCount}/{PI_RULES.length} rules{piCustomCount > 0 ? ` + ${piCustomCount} custom` : ""}</span>
                     </div>
 
                     <div style={{ padding: "10px 14px", background: `${th.panelBg}44`, border: `1px solid ${th.border}22`, borderRadius: 10 }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system, sans-serif" }}>Event Availability</div>
-                        {prev && <span style={{ fontSize: 9, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{trackedEvents > 0 ? `${trackedEvents.toLocaleString()} tracked events` : candidateRows > 0 ? `${candidateRows.toLocaleString()} candidate rows` : "0 rows"}</span>}
+                        <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Event Availability</div>
+                        {prev && <span style={{ fontSize: 9, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{trackedEvents > 0 ? `${trackedEvents.toLocaleString()} tracked events` : candidateRows > 0 ? `${candidateRows.toLocaleString()} candidate rows` : "0 rows"}</span>}
                       </div>
                       {prevLoading ? (
-                        <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", padding: "6px 0" }}>Scanning dataset...</div>
+                        <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", padding: "6px 0" }}>Scanning dataset...</div>
                       ) : !prev ? (
-                        <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", padding: "6px 0" }}>Preview unavailable</div>
+                        <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", padding: "6px 0" }}>Preview unavailable</div>
                       ) : (
                         <>
                           <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: allWarnings.length > 0 ? 8 : 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 8px", borderRadius: 5, background: `${_readiness.color}12`, border: `1px solid ${_readiness.color}22` }}>
                               <span style={{ width: 5, height: 5, borderRadius: 3, background: _readiness.color }} />
-                              <span style={{ fontSize: 9, color: th.text, fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>{_readiness.label}</span>
+                              <span style={{ fontSize: 9, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>{_readiness.label}</span>
                             </div>
                             {PI_TELEMETRY.map((src) => {
                               const total = evCounts[src.eid] || 0;
@@ -8871,37 +8871,37 @@ export default function App() {
                               return (
                                 <div key={src.id} style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 8px", borderRadius: 5, background: present ? "#3fb95010" : `${th.textMuted}08`, border: `1px solid ${present ? "#3fb95022" : th.border + "15"}` }}>
                                   <span style={{ width: 5, height: 5, borderRadius: 3, background: present ? "#3fb950" : th.textMuted + "44" }} />
-                                  <span style={{ fontSize: 9, color: present ? th.text : th.textMuted, fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>{src.label}</span>
-                                  {present && <span style={{ fontSize: 8, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{total >= 1000 ? (total / 1000).toFixed(1) + "k" : total}</span>}
+                                  <span style={{ fontSize: 9, color: present ? th.text : th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>{src.label}</span>
+                                  {present && <span style={{ fontSize: 8, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{total >= 1000 ? (total / 1000).toFixed(1) + "k" : total}</span>}
                                 </div>
                               );
                             })}
                             <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 8px", borderRadius: 5, background: `${linkDot}10`, border: `1px solid ${linkDot}22` }}>
                               <span style={{ width: 5, height: 5, borderRadius: 3, background: linkDot }} />
-                              <span style={{ fontSize: 9, color: th.text, fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>Linking</span>
-                              <span style={{ fontSize: 8, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{linkMode === "guid" ? "GUID" : linkMode === "pid-only" ? "PID" : "None"}</span>
+                              <span style={{ fontSize: 9, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>Linking</span>
+                              <span style={{ fontSize: 8, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{linkMode === "guid" ? "GUID" : linkMode === "pid-only" ? "PID" : "None"}</span>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 8px", borderRadius: 5, background: `${ptCoverageTone(linkQuality.cmdLineCoverage || 0, 30)}10`, border: `1px solid ${ptCoverageTone(linkQuality.cmdLineCoverage || 0, 30)}22` }}>
                               <span style={{ width: 5, height: 5, borderRadius: 3, background: ptCoverageTone(linkQuality.cmdLineCoverage || 0, 30) }} />
-                              <span style={{ fontSize: 9, color: th.text, fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>Command Line</span>
-                              <span style={{ fontSize: 8, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{linkQuality.cmdLineCoverage || 0}%</span>
+                              <span style={{ fontSize: 9, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>Command Line</span>
+                              <span style={{ fontSize: 8, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{linkQuality.cmdLineCoverage || 0}%</span>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 8px", borderRadius: 5, background: `${ptCoverageTone(linkQuality.parentImageCoverage || 0, 30)}10`, border: `1px solid ${ptCoverageTone(linkQuality.parentImageCoverage || 0, 30)}22` }}>
                               <span style={{ width: 5, height: 5, borderRadius: 3, background: ptCoverageTone(linkQuality.parentImageCoverage || 0, 30) }} />
-                              <span style={{ fontSize: 9, color: th.text, fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>Parent Image</span>
-                              <span style={{ fontSize: 8, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{linkQuality.parentImageCoverage || 0}%</span>
+                              <span style={{ fontSize: 9, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>Parent Image</span>
+                              <span style={{ fontSize: 8, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{linkQuality.parentImageCoverage || 0}%</span>
                             </div>
                             {candidateRows > 0 && trackedEvents === 0 && (
                               <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 8px", borderRadius: 5, background: `${th.accent}10`, border: `1px solid ${th.accent}22` }}>
                                 <span style={{ width: 5, height: 5, borderRadius: 3, background: th.accent }} />
-                                <span style={{ fontSize: 9, color: th.text, fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>Generic Rows</span>
-                                <span style={{ fontSize: 8, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{candidateRows >= 1000 ? (candidateRows / 1000).toFixed(1) + "k" : candidateRows}</span>
+                                <span style={{ fontSize: 9, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>Generic Rows</span>
+                                <span style={{ fontSize: 8, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{candidateRows >= 1000 ? (candidateRows / 1000).toFixed(1) + "k" : candidateRows}</span>
                               </div>
                             )}
                             {usingGenericRows && (
                               <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 8px", borderRadius: 5, background: `${th.accent}10`, border: `1px solid ${th.accent}22` }}>
                                 <span style={{ width: 5, height: 5, borderRadius: 3, background: th.accent }} />
-                                <span style={{ fontSize: 9, color: th.text, fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>Fallback Build Mode</span>
+                                <span style={{ fontSize: 9, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>Fallback Build Mode</span>
                               </div>
                             )}
                           </div>
@@ -8913,11 +8913,11 @@ export default function App() {
                                   <span style={{ fontSize: 10, flexShrink: 0, marginTop: 1, color: warning.level === "error" ? "#f85149" : warning.level === "warn" ? "#d29922" : th.textMuted }}>
                                     {warning.level === "error" ? "\u2717" : warning.level === "warn" ? "\u26A0" : "\u25CB"}
                                   </span>
-                                  <span style={{ fontSize: 10, color: warning.level === "error" ? "#f85149" : warning.level === "warn" ? "#d29922" : th.textMuted, fontFamily: "-apple-system, sans-serif", lineHeight: 1.4 }}>{warning.text}</span>
+                                  <span style={{ fontSize: 10, color: warning.level === "error" ? "#f85149" : warning.level === "warn" ? "#d29922" : th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1.4 }}>{warning.text}</span>
                                 </div>
                               ))}
                               {allWarnings.length > 4 && (
-                                <div style={{ fontSize: 10, color: th.textDim, fontFamily: "-apple-system, sans-serif", paddingTop: 2 }}>
+                                <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif", paddingTop: 2 }}>
                                   {allWarnings.length - 4} more notes in current scope.
                                 </div>
                               )}
@@ -8931,11 +8931,11 @@ export default function App() {
                   {/* 6h. Collapsible Advanced Section */}
                   <button onClick={() => setModal(p => ({ ...p, ptShowAdvanced: !p.ptShowAdvanced }))}
                     style={{ width: "100%", padding: "10px 14px", background: `${th.accent}08`, border: `1px solid ${th.border}33`, borderRadius: modal.ptShowAdvanced ? "10px 10px 0 0" : 10, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.15s", marginBottom: modal.ptShowAdvanced ? 0 : 0, opacity: buildableRows === 0 ? 0.5 : 1 }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={th.textMuted} strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                       Advanced
                     </span>
-                    <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
                       <span>{piActiveCount}/{PI_RULES.length} rules{piCustomCount > 0 ? `, ${piCustomCount} custom` : ""}</span>
                       <span style={{ transform: modal.ptShowAdvanced ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", fontSize: 12 }}>{"\u25BE"}</span>
                     </span>
@@ -8943,7 +8943,7 @@ export default function App() {
                   {modal.ptShowAdvanced && (
                     <div style={{ padding: "12px 14px", borderLeft: `1px solid ${th.border}33`, borderRight: `1px solid ${th.border}33`, borderBottom: `1px solid ${th.border}33`, borderRadius: "0 0 10px 10px", background: `${th.panelBg}55` }}>
                       {/* Custom EventID override + Max processes */}
-                      <div style={{ display: "grid", gridTemplateColumns: "110px 1fr 110px 1fr", gap: "6px 10px", alignItems: "center", fontSize: 12, fontFamily: "-apple-system, sans-serif", marginBottom: 12 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "110px 1fr 110px 1fr", gap: "6px 10px", alignItems: "center", fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 12 }}>
                         <label style={{ color: th.textDim, textAlign: "right", fontSize: 11 }}>EventID override:</label>
                         <input value={eventIdValue || ""} onChange={(e) => setModal(p => ({ ...p, eventIdValue: e.target.value }))} placeholder="1,4688 (blank = all)" style={{ ...selStyle, width: "100%" }} />
                         <label style={{ color: th.textDim, textAlign: "right", fontSize: 11 }}>Max processes:</label>
@@ -8954,7 +8954,7 @@ export default function App() {
                       </div>
 
                       {/* Individual rule toggles */}
-                      <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                         Detection Rules ({piActiveCount}/{PI_RULES.length})
                       </div>
                       {[...PI_RULES.map((r, i) => [r, i])].sort((a, b) => { const so = { critical: 0, high: 1, medium: 2, low: 3 }; return (so[a[0].sev] ?? 9) - (so[b[0].sev] ?? 9); }).map(([r, i]) => {
@@ -8965,14 +8965,14 @@ export default function App() {
                           <div key={key}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 0", cursor: "pointer", opacity: off ? 0.45 : 1, transition: "opacity 0.15s" }}>
                               <input type="checkbox" checked={!off} onChange={() => togglePiRule(key)} style={{ accentColor: th.accent, margin: 0, flexShrink: 0 }} />
-                              <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: PI_SEV_COLORS[r.sev] + "22", color: PI_SEV_COLORS[r.sev], fontWeight: 600, fontFamily: "-apple-system, sans-serif", minWidth: 52, textAlign: "center", textTransform: "uppercase" }}>{r.sev}</span>
-                              <span onClick={() => togglePiExpand(key)} style={{ fontSize: 11, color: th.text, fontFamily: "-apple-system, sans-serif", flex: 1, cursor: "pointer" }}>{r.cat} {"\u2014"} {r.name}</span>
-                              <span style={{ fontSize: 10, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{r.technique}</span>
+                              <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: PI_SEV_COLORS[r.sev] + "22", color: PI_SEV_COLORS[r.sev], fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", minWidth: 52, textAlign: "center", textTransform: "uppercase" }}>{r.sev}</span>
+                              <span onClick={() => togglePiExpand(key)} style={{ fontSize: 11, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", flex: 1, cursor: "pointer" }}>{r.cat} {"\u2014"} {r.name}</span>
+                              <span style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{r.technique}</span>
                               <span onClick={() => togglePiExpand(key)} style={{ fontSize: 9, color: expanded ? th.accent : th.textMuted, cursor: "pointer", padding: "0 2px", transform: expanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", flexShrink: 0 }}>{"\u25BE"}</span>
                             </div>
                             {expanded && r.logic && (
                               <div style={{ margin: "2px 0 6px 28px", padding: "8px 12px", background: `${th.accent}06`, border: `1px solid ${th.accent}18`, borderRadius: 6 }}>
-                                <div style={{ display: "grid", gridTemplateColumns: "90px 1fr", gap: "3px 10px", fontSize: 10, fontFamily: "'SF Mono', Menlo, monospace" }}>
+                                <div style={{ display: "grid", gridTemplateColumns: "90px 1fr", gap: "3px 10px", fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                   {r.logic.map((l, li) => (
                                     <div key={li} style={{ display: "contents" }}>
                                       <span style={{ color: th.textMuted, textTransform: "uppercase", fontSize: 9, fontWeight: 600, letterSpacing: "0.04em", paddingTop: 1 }}>{l.label}</span>
@@ -8989,13 +8989,13 @@ export default function App() {
                       {/* Custom rules */}
                       {(modal.ptCustomRules || []).length > 0 && (
                         <div style={{ marginTop: 10 }}>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>Custom Rules</div>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Custom Rules</div>
                           {(modal.ptCustomRules || []).map((cr, i) => (
                             <div key={`custom-${i}`} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 0" }}>
-                              <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: PI_SEV_COLORS[cr.severity || "medium"] + "22", color: PI_SEV_COLORS[cr.severity || "medium"], fontWeight: 600, fontFamily: "-apple-system, sans-serif", minWidth: 52, textAlign: "center", textTransform: "uppercase" }}>{cr.severity || "med"}</span>
-                              <span style={{ fontSize: 11, color: th.text, fontFamily: "-apple-system, sans-serif", flex: 1 }}>{cr.category || "Custom"} {"\u2014"} {cr.name || "Custom Rule"}</span>
-                              {cr.behavior && <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontFamily: "SF Mono, monospace", fontWeight: 600 }}>{cr.behavior}</span>}
-                              <span style={{ fontSize: 10, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{cr.technique || ""}</span>
+                              <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: PI_SEV_COLORS[cr.severity || "medium"] + "22", color: PI_SEV_COLORS[cr.severity || "medium"], fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", minWidth: 52, textAlign: "center", textTransform: "uppercase" }}>{cr.severity || "med"}</span>
+                              <span style={{ fontSize: 11, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", flex: 1 }}>{cr.category || "Custom"} {"\u2014"} {cr.name || "Custom Rule"}</span>
+                              {cr.behavior && <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 600 }}>{cr.behavior}</span>}
+                              <span style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{cr.technique || ""}</span>
                               <button onClick={() => deletePiCustomRule(i)} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 14, padding: "0 4px", lineHeight: 1 }} onMouseEnter={(e) => e.currentTarget.style.color = th.danger || "#f85149"} onMouseLeave={(e) => e.currentTarget.style.color = th.textMuted}>{"\u00D7"}</button>
                             </div>
                           ))}
@@ -9040,7 +9040,7 @@ export default function App() {
                             </select>
                           </div>
                           {!(modal.ptNewRule || {}).behavior && (modal.ptNewRule || {}).name && (
-                            <div style={{ fontSize: 9, color: "#d29922", fontFamily: "-apple-system, sans-serif", marginTop: 4 }}>
+                            <div style={{ fontSize: 9, color: "#d29922", fontFamily: "'Segoe UI', system-ui, sans-serif", marginTop: 4 }}>
                               Without a behavior tag this rule won{"'"}t participate in sequence detection.
                             </div>
                           )}
@@ -9055,8 +9055,8 @@ export default function App() {
 
                   {/* 6i. Action Buttons */}
                   <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
-                    <button onClick={() => setModal(null)} style={{ padding: "6px 14px", borderRadius: 6, fontSize: 12, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "-apple-system, sans-serif" }}>Cancel</button>
-                    <button onClick={handleBuild} disabled={!hasCols} style={{ padding: "6px 14px", borderRadius: 6, fontSize: 12, cursor: hasCols ? "pointer" : "not-allowed", background: hasCols ? (th.accent) : th.border, color: "#fff", border: "none", fontFamily: "-apple-system, sans-serif" }}>Build Tree</button>
+                    <button onClick={() => setModal(null)} style={{ padding: "6px 14px", borderRadius: 6, fontSize: 12, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Cancel</button>
+                    <button onClick={handleBuild} disabled={!hasCols} style={{ padding: "6px 14px", borderRadius: 6, fontSize: 12, cursor: hasCols ? "pointer" : "not-allowed", background: hasCols ? (th.accent) : th.border, color: "#fff", border: "none", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Build Tree</button>
                   </div>
                 </div>
                 );
@@ -9077,16 +9077,16 @@ export default function App() {
                       <path d="M8 12.5h3v-7h3M11 12.5v5.5h3" />
                     </svg>
                     <div style={{ marginBottom: 20 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif", marginBottom: 4 }}>Building Process Tree</div>
-                      <div style={{ fontSize: 11, color: th.accent, fontFamily: "-apple-system, sans-serif", height: 16 }}>{ptPhases[pi]}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 4 }}>Building Process Tree</div>
+                      <div style={{ fontSize: 11, color: th.accent, fontFamily: "'Segoe UI', system-ui, sans-serif", height: 16 }}>{ptPhases[pi]}</div>
                     </div>
                     <div style={{ width: 280, margin: "0 auto", height: 6, background: th.border + "33", borderRadius: 3, overflow: "hidden" }}>
                       <div style={{ height: "100%", width: `${prog}%`, background: `linear-gradient(90deg, ${th.accent}, ${th.accent}cc)`, borderRadius: 3, transition: "width 0.3s ease-out" }} />
                     </div>
-                    <div style={{ fontSize: 11, color: th.textMuted, marginTop: 8, fontFamily: "SF Mono, Menlo, monospace" }}>{Math.round(prog)}%</div>
+                    <div style={{ fontSize: 11, color: th.textMuted, marginTop: 8, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{Math.round(prog)}%</div>
                     <div style={{ marginTop: 24 }}>
                       <button onClick={() => setModal((p) => ({ ...p, phase: "config", loading: false, ptProgress: 0, _cancelled: true }))}
-                        style={{ padding: "4px 16px", fontSize: 11, background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, borderRadius: 6, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Cancel</button>
+                        style={{ padding: "4px 16px", fontSize: 11, background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, borderRadius: 6, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Cancel</button>
                     </div>
                   </div>
                 );
@@ -9131,7 +9131,7 @@ export default function App() {
                   users: new Set(filteredStories.flatMap((s) => s.users)).size,
                   sequences: filteredStories.reduce((sum, s) => sum + s.sequenceCount, 0),
                 };
-                const _ptPivotBtn = { padding: "2px 8px", background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: 500 };
+                const _ptPivotBtn = { padding: "2px 8px", background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 };
                 const _ptSevLabel = (lv) => lv >= 3 ? "CRIT" : lv >= 2 ? "HIGH" : lv >= 1 ? "MED" : "LOW";
                 const _ptSevPill = (color) => ({ fontSize: 9, padding: "1px 6px", borderRadius: 3, background: color + "22", color, fontWeight: 600 });
                 const _ptCopyStory = (story) => {
@@ -9156,20 +9156,20 @@ export default function App() {
                     {/* View mode toggle */}
                     {Object.entries(PT_VIEW_MODES).map(([k, m]) => (
                       <button key={k} onClick={() => setModal(p => ({ ...p, ptViewMode: k, _ptExpandedCluster: null, _ptExpandedIncident: null, ptClusterKeys: m.clustered ? null : p.ptClusterKeys, ptClusterContext: m.clustered ? false : p.ptClusterContext }))} title={m.incident ? `${m.label}: grouped into investigation stories` : m.clustered ? `${m.label}: clustered by chain` : `${m.label}: full tree view`}
-                        style={{ padding: "4px 10px", fontSize: 10, fontWeight: ptViewMode === k ? 700 : 500, background: ptViewMode === k ? th.accent : `${th.accent}15`, color: ptViewMode === k ? "#fff" : th.accent, border: `1px solid ${ptViewMode === k ? th.accent : th.accent + "33"}`, borderRadius: 4, cursor: "pointer", fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>{m.label}</button>
+                        style={{ padding: "4px 10px", fontSize: 10, fontWeight: ptViewMode === k ? 700 : 500, background: ptViewMode === k ? th.accent : `${th.accent}15`, color: ptViewMode === k ? "#fff" : th.accent, border: `1px solid ${ptViewMode === k ? th.accent : th.accent + "33"}`, borderRadius: 4, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>{m.label}</button>
                     ))}
                     <div style={{ width: 1, height: 16, background: th.border, flexShrink: 0 }} />
                     <input value={searchText || ""} onChange={(e) => setModal((p) => ({ ...p, searchText: e.target.value }))} placeholder={ptMode.incident ? "Search stories by host, user, ATT&CK, process, or reason..." : ptMode.clustered ? "Search chains by name, host, user, command..." : "Search by process name, PID, command line, or user..."} style={{ flex: 1, background: th.bgInput, color: th.text, border: `1px solid ${th.border}`, borderRadius: 5, padding: "6px 10px", fontSize: 12, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
-                    {!ptMode.clustered && <button onClick={expandAll} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }} title="Expand all nodes">Expand All</button>}
-                    {!ptMode.clustered && <button onClick={collapseAll} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }} title="Collapse all nodes">Collapse</button>}
-                    {!ptMode.clustered && <select onChange={(e) => { if (e.target.value) expandToDepth(parseInt(e.target.value)); }} value="" style={{ padding: "4px 4px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.bgInput, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>
+                    {!ptMode.clustered && <button onClick={expandAll} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }} title="Expand all nodes">Expand All</button>}
+                    {!ptMode.clustered && <button onClick={collapseAll} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }} title="Collapse all nodes">Collapse</button>}
+                    {!ptMode.clustered && <select onChange={(e) => { if (e.target.value) expandToDepth(parseInt(e.target.value)); }} value="" style={{ padding: "4px 4px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.bgInput, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>
                       <option value="">Depth...</option>
                       {[1, 2, 3, 4, 5].filter((d) => d <= (data.stats.maxDepth || 5)).map((d) => <option key={d} value={d}>Depth {d}</option>)}
                     </select>}
-                    {!ptMode.clustered && <button onClick={() => setModal((p) => p ? { ...p, susOnlyFilter: !p.susOnlyFilter } : p)} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: modal.susOnlyFilter ? (th.danger || "#f85149") + "22" : th.btnBg, color: modal.susOnlyFilter ? (th.danger || "#f85149") : th.textDim, border: `1px solid ${modal.susOnlyFilter ? (th.danger || "#f85149") + "55" : th.border}`, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0, fontWeight: modal.susOnlyFilter ? 600 : 400 }} title="Show only suspicious processes">{modal.susOnlyFilter ? "\u26A0 Suspicious Only" : "Suspicious Only"}</button>}
-                    {!ptMode.clustered && selectedKey && <button onClick={() => setModal((p) => p ? { ...p, selectedKey: null } : p)} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: (th.accent || "#58a6ff") + "22", color: th.accent || "#58a6ff", border: `1px solid ${(th.accent || "#58a6ff")}55`, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>Clear Chain</button>}
-                    {!ptMode.clustered && modal.ptClusterKeys && <button onClick={() => setModal((p) => p ? { ...p, ptClusterKeys: null, ptClusterContext: false } : p)} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: (th.accent || "#58a6ff") + "22", color: th.accent || "#58a6ff", border: `1px solid ${(th.accent || "#58a6ff")}55`, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0, fontWeight: 600 }}>{"\u2716"} Cluster ({modal.ptClusterKeys.size})</button>}
-                    {!ptMode.clustered && modal.ptClusterKeys && <button onClick={() => setModal((p) => p ? { ...p, ptClusterContext: !p.ptClusterContext } : p)} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: modal.ptClusterContext ? (th.accent || "#58a6ff") + "22" : th.btnBg, color: modal.ptClusterContext ? (th.accent || "#58a6ff") : th.textDim, border: `1px solid ${modal.ptClusterContext ? (th.accent || "#58a6ff") + "55" : th.border}`, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0, fontWeight: modal.ptClusterContext ? 600 : 400 }}>{modal.ptClusterContext ? "Tree Context" : "Flat View"}</button>}
+                    {!ptMode.clustered && <button onClick={() => setModal((p) => p ? { ...p, susOnlyFilter: !p.susOnlyFilter } : p)} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: modal.susOnlyFilter ? (th.danger || "#f85149") + "22" : th.btnBg, color: modal.susOnlyFilter ? (th.danger || "#f85149") : th.textDim, border: `1px solid ${modal.susOnlyFilter ? (th.danger || "#f85149") + "55" : th.border}`, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0, fontWeight: modal.susOnlyFilter ? 600 : 400 }} title="Show only suspicious processes">{modal.susOnlyFilter ? "\u26A0 Suspicious Only" : "Suspicious Only"}</button>}
+                    {!ptMode.clustered && selectedKey && <button onClick={() => setModal((p) => p ? { ...p, selectedKey: null } : p)} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: (th.accent || "#58a6ff") + "22", color: th.accent || "#58a6ff", border: `1px solid ${(th.accent || "#58a6ff")}55`, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>Clear Chain</button>}
+                    {!ptMode.clustered && modal.ptClusterKeys && <button onClick={() => setModal((p) => p ? { ...p, ptClusterKeys: null, ptClusterContext: false } : p)} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: (th.accent || "#58a6ff") + "22", color: th.accent || "#58a6ff", border: `1px solid ${(th.accent || "#58a6ff")}55`, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0, fontWeight: 600 }}>{"\u2716"} Cluster ({modal.ptClusterKeys.size})</button>}
+                    {!ptMode.clustered && modal.ptClusterKeys && <button onClick={() => setModal((p) => p ? { ...p, ptClusterContext: !p.ptClusterContext } : p)} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: modal.ptClusterContext ? (th.accent || "#58a6ff") + "22" : th.btnBg, color: modal.ptClusterContext ? (th.accent || "#58a6ff") : th.textDim, border: `1px solid ${modal.ptClusterContext ? (th.accent || "#58a6ff") + "55" : th.border}`, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0, fontWeight: modal.ptClusterContext ? 600 : 400 }}>{modal.ptClusterContext ? "Tree Context" : "Flat View"}</button>}
                     {/* Separator */}
                     <div style={{ width: 1, height: 16, background: th.border, flexShrink: 0 }} />
                     {/* Raw mode: Copy Chain / Tree / CSV / Selected */}
@@ -9185,7 +9185,7 @@ export default function App() {
                         if (n.cmdLine) lines.push(`${indent}   ${n.cmdLine}`);
                       });
                       navigator.clipboard.writeText(lines.join("\n"));
-                    }} title="Copy ancestry chain to clipboard" style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.btnBg, color: th.accent || "#58a6ff", border: `1px solid ${th.border}`, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>Copy Chain</button>}
+                    }} title="Copy ancestry chain to clipboard" style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.btnBg, color: th.accent || "#58a6ff", border: `1px solid ${th.border}`, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>Copy Chain</button>}
                     {!ptMode.clustered && <button onClick={() => {
                       const lines = [];
                       flatNodes.forEach((n) => {
@@ -9195,7 +9195,7 @@ export default function App() {
                         if (n.cmdLine) lines.push(`${indent}${n.depth > 0 ? "   " : ""}  ${n.cmdLine}`);
                       });
                       navigator.clipboard.writeText(lines.join("\n"));
-                    }} title="Copy visible tree as text" style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>Copy Tree</button>}
+                    }} title="Copy visible tree as text" style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>Copy Tree</button>}
                     {!ptMode.clustered && <button onClick={() => {
                       const header = ["Hostname", "ParentProcessName", "ProcessName", "PID", "PPID", "User", "Timestamp", "ImagePath", "CommandLine", "Provider", "EventID", "Elevation", "Integrity", "Depth"].join("\t");
                       const rows = flatNodes.map((n) => [
@@ -9203,7 +9203,7 @@ export default function App() {
                         n.provider || "", n.eventId || "", n.elevation || "", n.integrity || "", n.depth
                       ].join("\t"));
                       navigator.clipboard.writeText([header, ...rows].join("\n"));
-                    }} title="Copy as tab-separated CSV" style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>Copy CSV</button>}
+                    }} title="Copy as tab-separated CSV" style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>Copy CSV</button>}
                     {!ptMode.clustered && ptCheckedCount > 0 && <button onClick={() => {
                       const header = ["Timestamp", "Detection", "Provider", "EventID", "ParentProcess", "Process", "PID", "PPID", "User", "CommandLine", "ImagePath", "Integrity"].join("\t");
                       const rows = flatNodes.filter((n) => ptChecked.has(n.key)).map((n) => {
@@ -9211,7 +9211,7 @@ export default function App() {
                         return [n.ts || "", det, _providerShort(n.provider), n.eventId || "", n.parentProcessName || "", n.processName, n.pid, n.ppid, n.user || "", n.cmdLine || "", n.image || "", _integrityShort(n.integrity)].join("\t");
                       });
                       navigator.clipboard.writeText([header, ...rows].join("\n"));
-                    }} title="Copy selected rows as tab-separated" style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: (th.accent) + "22", color: th.accent, border: `1px solid ${th.accent}55`, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0, fontWeight: 600 }}>Copy Selected ({ptCheckedCount})</button>}
+                    }} title="Copy selected rows as tab-separated" style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: (th.accent) + "22", color: th.accent, border: `1px solid ${th.accent}55`, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0, fontWeight: 600 }}>Copy Selected ({ptCheckedCount})</button>}
                     {/* Clustered mode: Copy Chains */}
                     {ptMode.clustered && <button onClick={() => {
                       if (ptMode.incident) {
@@ -9231,7 +9231,7 @@ export default function App() {
                         const sev = c.level >= 3 ? "CRITICAL" : c.level >= 2 ? "HIGH" : "MEDIUM";
                         return `[${sev}] ${c.reason}\n  Host: ${c.hostname} | Users: ${c.users.join(", ")}\n  Time: ${(c.firstSeen||"").slice(0,19)} \u2014 ${(c.lastSeen||"").slice(0,19)} | Count: ${c.count}\n  Cmd variants: ${c.cmdVariants.length}`;
                       }).join("\n\n"));
-                    }} title={ptMode.incident ? "Copy all visible stories" : "Copy all visible chains"} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>{ptMode.incident ? "Copy Stories" : "Copy Chains"}</button>}
+                    }} title={ptMode.incident ? "Copy all visible stories" : "Copy all visible chains"} style={{ padding: "4px 8px", borderRadius: 4, fontSize: 10, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}`, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>{ptMode.incident ? "Copy Stories" : "Copy Chains"}</button>}
                   </div>
 
                   {/* Event Timeline — interactive dots */}
@@ -9247,12 +9247,12 @@ export default function App() {
                     const dotEvents = times.slice(0, 500);
                     return (
                       <div style={{ padding: "8px 20px 4px", borderBottom: `1px solid ${th.border}44`, background: `${th.modalBg}99`, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", flexShrink: 0 }}>
-                        <div style={{ fontSize: 9, color: th.textMuted, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "'SF Mono', Menlo, monospace" }}>Event Timeline</div>
+                        <div style={{ fontSize: 9, color: th.textMuted, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>Event Timeline</div>
                         <div style={{ position: "relative", height: 40, background: `${th.bgInput}99`, borderRadius: 6, overflow: "hidden", border: `1px solid ${th.border}55` }}>
                           {/* Time axis labels */}
                           {[0, 0.25, 0.5, 0.75, 1].map((pct) => {
                             const t = new Date(tMin + range * pct);
-                            return <span key={pct} style={{ position: "absolute", bottom: 2, left: `${pct * 100}%`, transform: "translateX(-50%)", fontSize: 8, color: th.textMuted + "88", fontFamily: "'SF Mono', Menlo, monospace", whiteSpace: "nowrap" }}>{t.toISOString().substr(11, 8)}</span>;
+                            return <span key={pct} style={{ position: "absolute", bottom: 2, left: `${pct * 100}%`, transform: "translateX(-50%)", fontSize: 8, color: th.textMuted + "88", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", whiteSpace: "nowrap" }}>{t.toISOString().substr(11, 8)}</span>;
                           })}
                           {/* Event dots */}
                           {dotEvents.map((d) => {
@@ -9277,7 +9277,7 @@ export default function App() {
                     <div style={{ flex: 1, overflowY: "auto", padding: "8px 20px" }}>
                       {ptMode.incident ? (
                         <>
-                          <div style={{ padding: "8px 14px", marginBottom: 8, background: `${th.accent}08`, borderRadius: 6, border: `1px solid ${th.accent}22`, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>
+                          <div style={{ padding: "8px 14px", marginBottom: 8, background: `${th.accent}08`, borderRadius: 6, border: `1px solid ${th.accent}22`, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                             <span style={{ fontWeight: 700, color: th.text }}>{filteredStories.length} stor{filteredStories.length !== 1 ? "ies" : "y"}</span>
                             {filteredStoryStats.critical > 0 && <span style={_ptSevPill("#f85149")}>{filteredStoryStats.critical} critical</span>}
                             {filteredStoryStats.high > 0 && <span style={_ptSevPill("#f0883e")}>{filteredStoryStats.high} high</span>}
@@ -9296,36 +9296,36 @@ export default function App() {
                                 <div key={story.id} style={{ borderRadius: 8, border: `1px solid ${susColor}${isExp ? "44" : "22"}`, background: `${susColor}${isExp ? "0c" : "04"}`, cursor: "pointer", transition: "border-color 0.15s" }}
                                   onClick={() => setModal((p) => ({ ...p, _ptExpandedIncident: isExp ? null : story.id, selectedKey: story.anchorKey || p.selectedKey }))}>
                                   <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 10px", minHeight: 34, flexWrap: "wrap" }}>
-                                    <span style={{ padding: "1px 6px", background: susColor + "22", color: susColor, borderRadius: 3, fontSize: 8, fontWeight: 700, textTransform: "uppercase", fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>{_ptSevLabel(story.level)}</span>
-                                    <span style={{ fontSize: 10.5, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>{story.title}</span>
-                                    <span style={{ fontSize: 10, color: th.textDim, fontFamily: "-apple-system, sans-serif", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={story.narrative}>{story.leadReason}</span>
+                                    <span style={{ padding: "1px 6px", background: susColor + "22", color: susColor, borderRadius: 3, fontSize: 8, fontWeight: 700, textTransform: "uppercase", fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>{_ptSevLabel(story.level)}</span>
+                                    <span style={{ fontSize: 10.5, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>{story.title}</span>
+                                    <span style={{ fontSize: 10, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={story.narrative}>{story.leadReason}</span>
                                     {story.hostname && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontWeight: 500, flexShrink: 0 }}>{story.hostname}</span>}
                                     {story.users.length > 0 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#d2992218", color: "#d29922", fontWeight: 500, flexShrink: 0 }}>{story.users[0]}{story.users.length > 1 ? ` +${story.users.length - 1}` : ""}</span>}
                                     <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontWeight: 600, flexShrink: 0 }}>{story.eventCount} suspicious</span>
                                     {story.contextOnlyCount > 0 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.border}22`, color: th.textMuted, fontWeight: 500, flexShrink: 0 }}>{story.contextEventCount} with context</span>}
-                                    <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.border}22`, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace", flexShrink: 0 }}>{story.chainCount} chains{story.sequenceCount ? ` · ${story.sequenceCount} seq` : ""}</span>
-                                    {story.durationLabel && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.border}22`, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace", flexShrink: 0 }}>{story.durationLabel}</span>}
+                                    <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.border}22`, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flexShrink: 0 }}>{story.chainCount} chains{story.sequenceCount ? ` · ${story.sequenceCount} seq` : ""}</span>
+                                    {story.durationLabel && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.border}22`, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flexShrink: 0 }}>{story.durationLabel}</span>}
                                     <span style={{ fontSize: 8, color: th.textMuted, flexShrink: 0 }}>{isExp ? "\u25BC" : "\u25B6"}</span>
                                   </div>
                                   {isExp && (
                                     <div style={{ padding: "8px 10px 10px", borderTop: `1px solid ${susColor}22` }} onClick={(e) => e.stopPropagation()}>
-                                      <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace", marginBottom: 6, display: "flex", gap: 12, flexWrap: "wrap" }}>
+                                      <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", marginBottom: 6, display: "flex", gap: 12, flexWrap: "wrap" }}>
                                         <span>{story.hostname}{story.users.length ? ` (${story.users.join(", ")})` : ""}</span>
                                         <span>{(story.firstSeen || "").slice(0, 19)}{story.lastSeen && story.lastSeen !== story.firstSeen ? ` \u2014 ${(story.lastSeen || "").slice(0, 19)}` : ""}</span>
                                         <span>{story.eventCount} suspicious event{story.eventCount !== 1 ? "s" : ""}</span>
                                         {story.contextOnlyCount > 0 && <span>{story.contextEventCount} total in context</span>}
                                         {story.rootNames.length > 0 && <span>Roots: {story.rootNames.slice(0, 2).join(", ")}{story.rootNames.length > 2 ? ` +${story.rootNames.length - 2}` : ""}</span>}
                                       </div>
-                                      <div style={{ marginBottom: 8, fontSize: 11, color: th.textDim, fontFamily: "-apple-system, sans-serif", lineHeight: 1.5 }}>
+                                      <div style={{ marginBottom: 8, fontSize: 11, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1.5 }}>
                                         {story.narrative}
                                       </div>
                                       {story.steps.length > 0 && (
                                         <div style={{ marginBottom: 8 }}>
-                                          <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "-apple-system, sans-serif" }}>Storyline</div>
+                                          <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Storyline</div>
                                           <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                                             {story.steps.map((step) => (
                                               <div key={step.key} onClick={() => setModal((p) => ({ ...p, selectedKey: step.key }))}
-                                                style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 9.5, fontFamily: "'SF Mono', Menlo, monospace", color: th.textDim, padding: "3px 5px", borderRadius: 4, background: step.key === selectedKey ? `${th.accent}15` : `${th.border}10`, cursor: "pointer", border: step.key === selectedKey ? `1px solid ${th.accent}33` : `1px solid ${th.border}11` }}>
+                                                style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 9.5, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.textDim, padding: "3px 5px", borderRadius: 4, background: step.key === selectedKey ? `${th.accent}15` : `${th.border}10`, cursor: "pointer", border: step.key === selectedKey ? `1px solid ${th.accent}33` : `1px solid ${th.border}11` }}>
                                                 <span style={{ minWidth: 126, color: th.textMuted, flexShrink: 0 }}>{(step.ts || "").slice(0, 19) || "Unknown time"}</span>
                                                 <span style={{ color: th.text, flexShrink: 0 }}>{step.parent} {"\u2192"} {step.child}</span>
                                                 <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{step.reason}</span>
@@ -9338,10 +9338,10 @@ export default function App() {
                                       )}
                                       {story.sequences.length > 0 && (
                                         <div style={{ marginBottom: 8 }}>
-                                          <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "-apple-system, sans-serif" }}>Behavioral Sequences</div>
+                                          <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Behavioral Sequences</div>
                                           <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                                             {story.sequences.map((seq) => (
-                                              <span key={seq.seqId} style={{ fontSize: 8.5, padding: "1px 6px", borderRadius: 3, background: `${seq.confidence === "high" ? "#f85149" : "#f0883e"}18`, color: seq.confidence === "high" ? "#f85149" : "#f0883e", border: `1px solid ${seq.confidence === "high" ? "#f85149" : "#f0883e"}33`, fontFamily: "'SF Mono', Menlo, monospace" }}>
+                                              <span key={seq.seqId} style={{ fontSize: 8.5, padding: "1px 6px", borderRadius: 3, background: `${seq.confidence === "high" ? "#f85149" : "#f0883e"}18`, color: seq.confidence === "high" ? "#f85149" : "#f0883e", border: `1px solid ${seq.confidence === "high" ? "#f85149" : "#f0883e"}33`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                                 {seq.name} {seq.count > 1 ? `(${seq.count})` : ""}
                                               </span>
                                             ))}
@@ -9350,9 +9350,9 @@ export default function App() {
                                       )}
                                       {story.techniques.length > 0 && (
                                         <div style={{ marginBottom: 8 }}>
-                                          <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "-apple-system, sans-serif" }}>ATT&CK</div>
+                                          <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>ATT&CK</div>
                                           <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                                            {story.techniques.map((tid) => <span key={tid} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#58a6ff18", color: "#58a6ff", border: "1px solid #58a6ff33", fontFamily: "'SF Mono', Menlo, monospace" }}>{tid}</span>)}
+                                            {story.techniques.map((tid) => <span key={tid} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#58a6ff18", color: "#58a6ff", border: "1px solid #58a6ff33", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{tid}</span>)}
                                           </div>
                                         </div>
                                       )}
@@ -9367,7 +9367,7 @@ export default function App() {
                               );
                             })}
                             {filteredStories.length === 0 && (
-                              <div style={{ padding: "40px 20px", textAlign: "center", color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace", fontSize: 12 }}>
+                              <div style={{ padding: "40px 20px", textAlign: "center", color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 12 }}>
                                 No investigation stories built from current detections
                               </div>
                             )}
@@ -9376,7 +9376,7 @@ export default function App() {
                       ) : (
                         <>
                           {/* Summary strip */}
-                          <div style={{ padding: "8px 14px", marginBottom: 8, background: `${th.accent}08`, borderRadius: 6, border: `1px solid ${th.accent}22`, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>
+                          <div style={{ padding: "8px 14px", marginBottom: 8, background: `${th.accent}08`, borderRadius: 6, border: `1px solid ${th.accent}22`, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                             <span style={{ fontWeight: 700, color: th.text }}>{filteredClusters.length} chain{filteredClusters.length !== 1 ? "s" : ""}</span>
                             {filteredStats.critical > 0 && <span style={_ptSevPill("#f85149")}>{filteredStats.critical} critical</span>}
                             {filteredStats.high > 0 && <span style={_ptSevPill("#f0883e")}>{filteredStats.high} high</span>}
@@ -9396,11 +9396,11 @@ export default function App() {
                                   onClick={() => setModal(p => ({ ...p, _ptExpandedCluster: isExp ? null : cl.id, selectedKey: cl.members[0]?.key || p.selectedKey }))}>
                                   {/* Collapsed summary row */}
                                   <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", minHeight: 28, flexWrap: "wrap" }}>
-                                    <span style={{ padding: "1px 6px", background: susColor + "22", color: susColor, borderRadius: 3, fontSize: 8, fontWeight: 700, textTransform: "uppercase", fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>{_ptSevLabel(cl.level)}</span>
-                                    {cl.mitreId && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#58a6ff18", color: "#58a6ff", fontWeight: 600, fontFamily: "SF Mono, monospace", flexShrink: 0 }}>{cl.mitreId}</span>}
-                                    <span style={{ fontSize: 10, fontWeight: 600, color: th.text, fontFamily: "'SF Mono', Menlo, monospace", flexShrink: 0 }}>{cl.displayParent} {"\u2192"} {cl.displayChild}</span>
-                                    <span style={{ fontSize: 10.5, fontWeight: 500, color: th.textDim, fontFamily: "-apple-system, sans-serif", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={cl.displayReason}>{cl.displayReason}</span>
-                                    {cl.cmdTemplate && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.border}22`, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace", flexShrink: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 200 }} title={cl.cmdTemplate}>{cl.cmdTemplate}</span>}
+                                    <span style={{ padding: "1px 6px", background: susColor + "22", color: susColor, borderRadius: 3, fontSize: 8, fontWeight: 700, textTransform: "uppercase", fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>{_ptSevLabel(cl.level)}</span>
+                                    {cl.mitreId && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#58a6ff18", color: "#58a6ff", fontWeight: 600, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flexShrink: 0 }}>{cl.mitreId}</span>}
+                                    <span style={{ fontSize: 10, fontWeight: 600, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flexShrink: 0 }}>{cl.displayParent} {"\u2192"} {cl.displayChild}</span>
+                                    <span style={{ fontSize: 10.5, fontWeight: 500, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={cl.displayReason}>{cl.displayReason}</span>
+                                    {cl.cmdTemplate && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.border}22`, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flexShrink: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 200 }} title={cl.cmdTemplate}>{cl.cmdTemplate}</span>}
                                     {cl.hostname && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontWeight: 500, flexShrink: 0 }}>{cl.hostname}</span>}
                                     {cl.count > 1 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontWeight: 600, flexShrink: 0 }}>{cl.count}x</span>}
                                     {cl.users.length > 1 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#d2992218", color: "#d29922", fontWeight: 500, flexShrink: 0 }}>{cl.users.length} users</span>}
@@ -9410,7 +9410,7 @@ export default function App() {
                                   {isExp && (
                                     <div style={{ padding: "8px 10px 10px", borderTop: `1px solid ${susColor}22` }} onClick={e => e.stopPropagation()}>
                                       {/* Meta row */}
-                                      <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace", marginBottom: 6, display: "flex", gap: 12, flexWrap: "wrap" }}>
+                                      <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", marginBottom: 6, display: "flex", gap: 12, flexWrap: "wrap" }}>
                                         <span>{cl.hostname}{cl.users.length > 0 ? ` (${cl.users.join(", ")})` : ""}</span>
                                         <span>{(cl.firstSeen || "").slice(0, 19)}{cl.lastSeen && cl.lastSeen !== cl.firstSeen ? ` \u2014 ${cl.lastSeen.slice(0, 19)}` : ""}</span>
                                         <span>{cl.count} occurrence{cl.count !== 1 ? "s" : ""}</span>
@@ -9418,10 +9418,10 @@ export default function App() {
                                       {/* Command variants */}
                                       {cl.cmdVariants.length > 0 && (
                                         <div style={{ marginBottom: 8 }}>
-                                          <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "-apple-system, sans-serif" }}>Command Variants ({cl.cmdVariants.length})</div>
+                                          <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Command Variants ({cl.cmdVariants.length})</div>
                                           <div style={{ display: "flex", flexDirection: "column", gap: 2, maxHeight: 100, overflowY: "auto" }}>
                                             {cl.cmdVariants.map((cmd, ci) => (
-                                              <div key={ci} style={{ fontSize: 9, fontFamily: "'SF Mono', Menlo, monospace", color: th.danger || "#ff7b72", padding: "2px 4px", borderRadius: 3, background: `${th.accent}08`, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={cmd}>{cmd}</div>
+                                              <div key={ci} style={{ fontSize: 9, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.danger || "#ff7b72", padding: "2px 4px", borderRadius: 3, background: `${th.accent}08`, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={cmd}>{cmd}</div>
                                             ))}
                                           </div>
                                         </div>
@@ -9434,11 +9434,11 @@ export default function App() {
                                         const hasHidden = cl.count > cl.members.length;
                                         return (
                                         <div style={{ marginBottom: 8 }}>
-                                          <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "-apple-system, sans-serif" }}>All Occurrences{cl.count > visible.length ? ` (showing ${visible.length} of ${cl.count})` : ""}</div>
+                                          <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>All Occurrences{cl.count > visible.length ? ` (showing ${visible.length} of ${cl.count})` : ""}</div>
                                           <div style={{ display: "flex", flexDirection: "column", gap: 1, maxHeight: modal._ptClusterShowAll === cl.id ? 400 : 150, overflowY: "auto" }}>
                                             {visible.map((m, mi) => (
                                               <div key={m.key} onClick={e => { e.stopPropagation(); setModal(p => ({ ...p, selectedKey: m.key })); }}
-                                                style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 9, fontFamily: "'SF Mono', Menlo, monospace", color: th.textDim, padding: "2px 4px", borderRadius: 3, background: m.key === selectedKey ? `${th.accent}15` : mi % 2 === 0 ? "transparent" : `${th.border}11`, cursor: "pointer", border: m.key === selectedKey ? `1px solid ${th.accent}33` : "1px solid transparent" }}>
+                                                style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 9, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.textDim, padding: "2px 4px", borderRadius: 3, background: m.key === selectedKey ? `${th.accent}15` : mi % 2 === 0 ? "transparent" : `${th.border}11`, cursor: "pointer", border: m.key === selectedKey ? `1px solid ${th.accent}33` : "1px solid transparent" }}>
                                                 <span style={{ minWidth: 130, color: th.textMuted, flexShrink: 0 }}>{(m.ts || "").slice(0, 19)}</span>
                                                 <span style={{ minWidth: 70, flexShrink: 0 }}>{m.user || ""}</span>
                                                 <span style={{ color: th.text, flexShrink: 0 }}>{m.parentProcessName} {"\u2192"} {m.processName}</span>
@@ -9471,7 +9471,7 @@ export default function App() {
                               );
                             })}
                             {filteredClusters.length === 0 && (
-                              <div style={{ padding: "40px 20px", textAlign: "center", color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace", fontSize: 12 }}>
+                              <div style={{ padding: "40px 20px", textAlign: "center", color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 12 }}>
                                 No suspicious chains found{ptViewMode === "triage" ? " \u2014 try Hunt or Raw mode" : ""}
                               </div>
                             )}
@@ -9485,16 +9485,16 @@ export default function App() {
                       const selNode = selectedKey ? byKeyMap.get(selectedKey) : null;
                       if (!selNode) return (
                         <div style={{ width: detailW, borderLeft: `1px solid ${th.border}44`, background: `${th.modalBg}cc`, flexShrink: 0, display: "flex", flexDirection: "column" }}>
-                          <div style={{ padding: "10px 16px 8px", borderBottom: `1px solid ${th.border}44`, background: `${th.headerBg}88`, fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, fontFamily: "'SF Mono', Menlo, monospace" }}>Event Details</div>
-                          <div style={{ padding: 40, textAlign: "center", color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace", fontSize: 12 }}>Click an occurrence to view details</div>
+                          <div style={{ padding: "10px 16px 8px", borderBottom: `1px solid ${th.border}44`, background: `${th.headerBg}88`, fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>Event Details</div>
+                          <div style={{ padding: 40, textAlign: "center", color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 12 }}>Click an occurrence to view details</div>
                         </div>
                       );
                       const parentNode = byKeyMap.get(selNode.parentKey);
                       const selSusInfo = _ptDetMap.get(selectedKey) || { level: 0, reason: null };
                       const selSusColor = SUS_COLORS[selSusInfo.level];
                       const nodeCluster = _ptNodeClusterMap.get(selectedKey);
-                      const gLbl = { fontFamily: "'SF Mono', Menlo, monospace", fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", paddingTop: 2 };
-                      const gVal = { fontFamily: "'SF Mono', Menlo, monospace", fontSize: 11.5, color: th.text, wordBreak: "break-all", lineHeight: 1.5 };
+                      const gLbl = { fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", paddingTop: 2 };
+                      const gVal = { fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 11.5, color: th.text, wordBreak: "break-all", lineHeight: 1.5 };
                       const fields = [
                         ["Timestamp", selNode.ts ? selNode.ts.replace("T", " ").substring(0, 19) : ""],
                         ["Process", selNode.processName], ["Full Path", selNode.image],
@@ -9505,33 +9505,33 @@ export default function App() {
                       ].filter(([, v]) => v);
                       return (
                         <div style={{ width: detailW, borderLeft: `1px solid ${th.border}44`, background: `${th.modalBg}cc`, flexShrink: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                          <div style={{ padding: "10px 16px 8px", borderBottom: `1px solid ${th.border}44`, background: `${th.headerBg}aa`, fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, fontFamily: "'SF Mono', Menlo, monospace", flexShrink: 0 }}>Event Details</div>
+                          <div style={{ padding: "10px 16px 8px", borderBottom: `1px solid ${th.border}44`, background: `${th.headerBg}aa`, fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flexShrink: 0 }}>Event Details</div>
                           <div style={{ padding: "12px 16px 8px", borderBottom: `1px solid ${th.border}33`, flexShrink: 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                               {ptIcon(selNode.processName)}
-                              <span style={{ fontFamily: "'SF Mono', Menlo, monospace", fontWeight: 700, fontSize: 15, color: selSusColor || th.text }}>{selNode.processName}</span>
-                              <span style={{ fontFamily: "'SF Mono', Menlo, monospace", fontSize: 11, color: th.textMuted }}> PID {selNode.pid}</span>
+                              <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 700, fontSize: 15, color: selSusColor || th.text }}>{selNode.processName}</span>
+                              <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 11, color: th.textMuted }}> PID {selNode.pid}</span>
                             </div>
                             {selSusInfo.reason && <div style={{ marginBottom: 6 }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                                <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: `${selSusColor}22`, color: selSusColor, padding: "2px 8px", borderRadius: 3, fontSize: 10, fontFamily: "'SF Mono', Menlo, monospace", fontWeight: 600, border: `1px solid ${selSusColor}44` }}>{"\u26A0"} {selSusInfo.reason}</span>
-                                {selSusInfo.confidence && <span style={{ fontSize: 8.5, padding: "1px 6px", borderRadius: 3, background: selSusInfo.confidence === "confirmed" ? "#f8514922" : selSusInfo.confidence === "likely" ? "#f0883e22" : "#8b949e22", color: selSusInfo.confidence === "confirmed" ? "#f85149" : selSusInfo.confidence === "likely" ? "#f0883e" : "#8b949e", fontFamily: "'SF Mono', Menlo, monospace", fontWeight: 600, border: `1px solid ${selSusInfo.confidence === "confirmed" ? "#f8514944" : selSusInfo.confidence === "likely" ? "#f0883e44" : "#8b949e44"}`, textTransform: "uppercase", letterSpacing: "0.05em" }}>{selSusInfo.confidence}</span>}
-                                {selSusInfo.sanctioned && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontFamily: "'SF Mono', Menlo, monospace", fontWeight: 600, border: "1px solid #3fb95033", letterSpacing: "0.03em" }}>SANCTIONED {selSusInfo.sanctioned.cat.toUpperCase()}</span>}
-                                {(() => { const seqs = _ptSeqMap.get(selectedKey); if (!seqs?.length) return null; const best = seqs.reduce((a, b) => a.confidence === "high" ? a : b); const sc = best.confidence === "high" ? "#da3633" : "#f0883e"; return <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${sc}aa`, color: "#fff", fontFamily: "'SF Mono', Menlo, monospace", fontWeight: 700, letterSpacing: "0.03em" }}>SEQ {best.confidence === "high" ? "\u2191" : "\u2193"}</span>; })()}
-                                {(() => { const ev = selSusInfo.evidence; if (!ev || ev.length <= 1) return null; const pc = ev.filter(e => e.cat !== "context").length - 1; const cc = ev.filter(e => e.cat === "context").length; const parts = []; if (pc > 0) parts.push(`${pc} primary`); if (cc > 0) parts.push(`${cc} context`); return parts.length ? <span style={{ fontSize: 8.5, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace" }}>+{parts.join(" + ")}</span> : null; })()}
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: `${selSusColor}22`, color: selSusColor, padding: "2px 8px", borderRadius: 3, fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 600, border: `1px solid ${selSusColor}44` }}>{"\u26A0"} {selSusInfo.reason}</span>
+                                {selSusInfo.confidence && <span style={{ fontSize: 8.5, padding: "1px 6px", borderRadius: 3, background: selSusInfo.confidence === "confirmed" ? "#f8514922" : selSusInfo.confidence === "likely" ? "#f0883e22" : "#8b949e22", color: selSusInfo.confidence === "confirmed" ? "#f85149" : selSusInfo.confidence === "likely" ? "#f0883e" : "#8b949e", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 600, border: `1px solid ${selSusInfo.confidence === "confirmed" ? "#f8514944" : selSusInfo.confidence === "likely" ? "#f0883e44" : "#8b949e44"}`, textTransform: "uppercase", letterSpacing: "0.05em" }}>{selSusInfo.confidence}</span>}
+                                {selSusInfo.sanctioned && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 600, border: "1px solid #3fb95033", letterSpacing: "0.03em" }}>SANCTIONED {selSusInfo.sanctioned.cat.toUpperCase()}</span>}
+                                {(() => { const seqs = _ptSeqMap.get(selectedKey); if (!seqs?.length) return null; const best = seqs.reduce((a, b) => a.confidence === "high" ? a : b); const sc = best.confidence === "high" ? "#da3633" : "#f0883e"; return <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${sc}aa`, color: "#fff", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 700, letterSpacing: "0.03em" }}>SEQ {best.confidence === "high" ? "\u2191" : "\u2193"}</span>; })()}
+                                {(() => { const ev = selSusInfo.evidence; if (!ev || ev.length <= 1) return null; const pc = ev.filter(e => e.cat !== "context").length - 1; const cc = ev.filter(e => e.cat === "context").length; const parts = []; if (pc > 0) parts.push(`${pc} primary`); if (cc > 0) parts.push(`${cc} context`); return parts.length ? <span style={{ fontSize: 8.5, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>+{parts.join(" + ")}</span> : null; })()}
                               </div>
                               {selSusInfo.evidence?.length > 1 && (() => {
                                 const rest = selSusInfo.evidence.filter(e => e.reason !== selSusInfo.reason);
                                 const prim = rest.filter(e => e.cat !== "context");
                                 const ctxs = rest.filter(e => e.cat === "context");
                                 return <div style={{ marginTop: 4, display: "flex", flexWrap: "wrap", gap: 3, alignItems: "center" }}>
-                                  {prim.map((e, i) => { const eColor = SUS_COLORS[e.level] || "#8b949e"; return <span key={`p${i}`} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${eColor}14`, color: eColor, fontFamily: "'SF Mono', Menlo, monospace", border: `1px solid ${eColor}22` }}>{e.cat === "chain" ? "chain: " : ""}{e.reason}{e.tid?.length ? ` [${e.tid.join(", ")}]` : ""}</span>; })}
+                                  {prim.map((e, i) => { const eColor = SUS_COLORS[e.level] || "#8b949e"; return <span key={`p${i}`} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${eColor}14`, color: eColor, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", border: `1px solid ${eColor}22` }}>{e.cat === "chain" ? "chain: " : ""}{e.reason}{e.tid?.length ? ` [${e.tid.join(", ")}]` : ""}</span>; })}
                                   {prim.length > 0 && ctxs.length > 0 && <span style={{ color: th.border, fontSize: 10, margin: "0 2px" }}>{"\u00B7"}</span>}
-                                  {ctxs.map((e, i) => { const eColor = e.dampen ? "#3fb950" : "#8b949e"; return <span key={`c${i}`} style={{ fontSize: 7.5, padding: "1px 4px", borderRadius: 3, background: `${eColor}0a`, color: eColor, fontFamily: "'SF Mono', Menlo, monospace", border: `1px solid ${eColor}18`, fontStyle: "italic" }}>{e.dampen ? "\u25BC " : ""}{e.reason}</span>; })}
+                                  {ctxs.map((e, i) => { const eColor = e.dampen ? "#3fb950" : "#8b949e"; return <span key={`c${i}`} style={{ fontSize: 7.5, padding: "1px 4px", borderRadius: 3, background: `${eColor}0a`, color: eColor, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", border: `1px solid ${eColor}18`, fontStyle: "italic" }}>{e.dampen ? "\u25BC " : ""}{e.reason}</span>; })}
                                 </div>;
                               })()}
                               {selSusInfo.techniques?.length > 0 && <div style={{ marginTop: 3, display: "flex", gap: 3, flexWrap: "wrap" }}>
-                                {selSusInfo.techniques.map(t => <span key={t} style={{ fontSize: 7.5, padding: "0px 4px", borderRadius: 2, background: `${th.accent}18`, color: th.accent, fontFamily: "'SF Mono', Menlo, monospace", border: `1px solid ${th.accent}22` }}>{t}</span>)}
+                                {selSusInfo.techniques.map(t => <span key={t} style={{ fontSize: 7.5, padding: "0px 4px", borderRadius: 2, background: `${th.accent}18`, color: th.accent, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", border: `1px solid ${th.accent}22` }}>{t}</span>)}
                               </div>}
                             </div>}
                           </div>
@@ -9555,7 +9555,7 @@ export default function App() {
                                   {seqs.map((s, i) => {
                                     const sc = seqConfColor[s.confidence] || "#8b949e";
                                     return (
-                                    <div key={i} style={{ fontSize: 10, color: th.textDim, fontFamily: "'SF Mono', Menlo, monospace", marginBottom: i < seqs.length - 1 ? 6 : 0 }}>
+                                    <div key={i} style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", marginBottom: i < seqs.length - 1 ? 6 : 0 }}>
                                       <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
                                         <span style={{ color: sc, fontWeight: 600 }}>{s.seqName}</span>
                                         <span style={{ fontSize: 8, padding: "0px 4px", borderRadius: 2, background: `${sc}18`, color: sc, border: `1px solid ${sc}33` }}>{s.stageName}</span>
@@ -9573,13 +9573,13 @@ export default function App() {
                               return (
                                 <div style={{ marginTop: 12, padding: "8px 10px", background: `${th.accent}08`, borderRadius: 6, border: `1px solid ${th.accent}22` }}>
                                   <div style={{ ...gLbl, marginBottom: 4 }}>Investigation Story</div>
-                                  <div style={{ fontSize: 10, color: th.textDim, fontFamily: "-apple-system, sans-serif", lineHeight: 1.45, marginBottom: 6 }}>
+                                  <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1.45, marginBottom: 6 }}>
                                     {nodeStory.narrative}
                                   </div>
                                   <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 6 }}>
-                                    <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontFamily: "'SF Mono', Menlo, monospace" }}>{nodeStory.eventCount} events</span>
-                                    <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontFamily: "'SF Mono', Menlo, monospace" }}>{nodeStory.chainCount} chains</span>
-                                    {nodeStory.sequenceCount > 0 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#f8514918", color: "#f85149", fontFamily: "'SF Mono', Menlo, monospace" }}>{nodeStory.sequenceCount} seq</span>}
+                                    <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{nodeStory.eventCount} events</span>
+                                    <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{nodeStory.chainCount} chains</span>
+                                    {nodeStory.sequenceCount > 0 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#f8514918", color: "#f85149", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{nodeStory.sequenceCount} seq</span>}
                                   </div>
                                   <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                                     <button onClick={() => setModal((p) => ({ ...p, ptViewMode: "story", _ptExpandedIncident: nodeStory.id, selectedKey: nodeStory.anchorKey || selectedKey }))} style={_ptPivotBtn}>View Story</button>
@@ -9592,7 +9592,7 @@ export default function App() {
                             {nodeCluster && nodeCluster.count > 1 && (
                               <div style={{ marginTop: 12, padding: "8px 10px", background: `${th.accent}08`, borderRadius: 6, border: `1px solid ${th.accent}22` }}>
                                 <div style={{ ...gLbl, marginBottom: 4 }}>Chain Context</div>
-                                <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'SF Mono', Menlo, monospace", display: "flex", flexDirection: "column", gap: 3 }}>
+                                <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", display: "flex", flexDirection: "column", gap: 3 }}>
                                   <div>Repeated <strong style={{ color: th.accent }}>{nodeCluster.count}x</strong> across {nodeCluster.users.length} user{nodeCluster.users.length !== 1 ? "s" : ""}</div>
                                   <div>First: {(nodeCluster.firstSeen || "").slice(0, 19)} {"\u2014"} Last: {(nodeCluster.lastSeen || "").slice(0, 19)}</div>
                                   <div>{nodeCluster.cmdVariants.length} command variant{nodeCluster.cmdVariants.length !== 1 ? "s" : ""}</div>
@@ -9625,9 +9625,9 @@ export default function App() {
                           {/* Filter active indicator */}
                           {ptActiveFilterCount > 0 && (
                             <div style={{ padding: "4px 12px", display: "flex", alignItems: "center", gap: 8, borderBottom: `1px solid ${th.border}33`, borderLeft: `3px solid ${th.accent || "#58a6ff"}`, minWidth: totalPtW }}>
-                              <span style={{ fontSize: 10, fontWeight: 600, color: th.accent || "#58a6ff", fontFamily: "-apple-system, sans-serif" }}>Filter active ({ptActiveFilterCount} column{ptActiveFilterCount > 1 ? "s" : ""})</span>
+                              <span style={{ fontSize: 10, fontWeight: 600, color: th.accent || "#58a6ff", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Filter active ({ptActiveFilterCount} column{ptActiveFilterCount > 1 ? "s" : ""})</span>
                               <span style={{ fontSize: 10, color: th.textDim }}>{"\u2014"} {flatNodes.length} of {data.stats.totalProcesses} processes</span>
-                              <button onClick={() => setModal((p) => ({ ...p, ptColFilters: {} }))} style={{ padding: "1px 8px", fontSize: 9, background: th.accent || "#58a6ff", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>Clear All</button>
+                              <button onClick={() => setModal((p) => ({ ...p, ptColFilters: {} }))} style={{ padding: "1px 8px", fontSize: 9, background: th.accent || "#58a6ff", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Clear All</button>
                             </div>
                           )}
                           {/* Column header row */}
@@ -9639,7 +9639,7 @@ export default function App() {
                                 style={{ width: 13, height: 13, cursor: "pointer", accentColor: th.accent }} title="Select all" />
                             </div>
                             {ptHeaders.map((h) => (
-                              <div key={h} onClick={() => togglePtSort(h)} style={{ width: ptColWidths[h] || ptDefWidths[h], flexShrink: 0, padding: "9px 8px", fontSize: 11, fontFamily: "'SF Mono', Menlo, monospace", fontWeight: 700, color: (ptSortCol || "Timestamp") === h ? th.accent : `${th.accent}99`, textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap", overflow: "hidden", userSelect: "none", position: "relative", boxSizing: "border-box", cursor: "pointer" }}>
+                              <div key={h} onClick={() => togglePtSort(h)} style={{ width: ptColWidths[h] || ptDefWidths[h], flexShrink: 0, padding: "9px 8px", fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 700, color: (ptSortCol || "Timestamp") === h ? th.accent : `${th.accent}99`, textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap", overflow: "hidden", userSelect: "none", position: "relative", boxSizing: "border-box", cursor: "pointer" }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
                                   <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{h}</span>
                                   {(ptSortCol || "Timestamp") === h && <span style={{ fontSize: 7, color: th.accent || "#58a6ff" }}>{(ptSortDir || "asc") === "asc" ? "\u25B2" : "\u25BC"}</span>}
@@ -9650,7 +9650,7 @@ export default function App() {
                                 </div>
                               </div>
                             ))}
-                            <div style={{ width: 50, flexShrink: 0, padding: "6px 4px", fontSize: 9, fontFamily: "-apple-system, sans-serif", color: th.textDim, userSelect: "none" }} />
+                            <div style={{ width: 50, flexShrink: 0, padding: "6px 4px", fontSize: 9, fontFamily: "'Segoe UI', system-ui, sans-serif", color: th.textDim, userSelect: "none" }} />
                           </div>
                         </div>
                         {/* Scrollable rows — header stays fixed above */}
@@ -9694,7 +9694,7 @@ export default function App() {
                                   <div key={node.key + ":" + i}
                                     onClick={() => setModal((p) => p ? { ...p, selectedKey: p.selectedKey === node.key ? null : node.key } : p)}
                                     className={isSelected ? "pt-row pt-sel" : "pt-row"}
-                                    style={{ display: "flex", height: PT_ROW_H, fontSize: 12.5, fontFamily: "'SF Mono', Menlo, monospace", cursor: "pointer", background: isSelected ? (th.accent) + "10" : susColor && !inChain ? susColor + "06" : "transparent", borderBottom: `1px solid ${th.border}18`, borderLeft: isSelected ? `2px solid ${chainColor}` : susColor ? `2px solid ${susColor}55` : "2px solid transparent", alignItems: "center", minHeight: 34, contain: "layout style" }}>
+                                    style={{ display: "flex", height: PT_ROW_H, fontSize: 12.5, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", cursor: "pointer", background: isSelected ? (th.accent) + "10" : susColor && !inChain ? susColor + "06" : "transparent", borderBottom: `1px solid ${th.border}18`, borderLeft: isSelected ? `2px solid ${chainColor}` : susColor ? `2px solid ${susColor}55` : "2px solid transparent", alignItems: "center", minHeight: 34, contain: "layout style" }}>
 
                                     {/* Row checkbox */}
                                     <div style={{ width: PT_CHK_W, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", boxSizing: "border-box" }}>
@@ -9712,8 +9712,8 @@ export default function App() {
                                     {/* Detection column */}
                                     <div style={{ width: ptColWidths.Detection || ptDefWidths.Detection, flexShrink: 0, display: "flex", alignItems: "center", gap: 3, padding: "0 8px", overflow: "hidden", boxSizing: "border-box" }}>
                                       {susInfo.reason && <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 4, background: susColor + "22", color: susColor, border: `1px solid ${susColor}44`, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "70%" }} title={susInfo.reason}>{susInfo.reason}</span>}
-                                      {(() => { const cl = _ptNodeClusterMap.get(node.key); if (!cl || cl.count <= 1) return null; return <span style={{ fontSize: 9, padding: "1px 4px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontWeight: 600, flexShrink: 0, fontFamily: "SF Mono, monospace" }}>{cl.count}x</span>; })()}
-                                      {(() => { const cl = _ptNodeClusterMap.get(node.key); if (!cl || cl.users.length <= 1) return null; return <span style={{ fontSize: 9, padding: "1px 4px", borderRadius: 3, background: "#d2992215", color: "#d29922", fontWeight: 500, flexShrink: 0, fontFamily: "SF Mono, monospace" }}>{cl.users.length}u</span>; })()}
+                                      {(() => { const cl = _ptNodeClusterMap.get(node.key); if (!cl || cl.count <= 1) return null; return <span style={{ fontSize: 9, padding: "1px 4px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontWeight: 600, flexShrink: 0, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{cl.count}x</span>; })()}
+                                      {(() => { const cl = _ptNodeClusterMap.get(node.key); if (!cl || cl.users.length <= 1) return null; return <span style={{ fontSize: 9, padding: "1px 4px", borderRadius: 3, background: "#d2992215", color: "#d29922", fontWeight: 500, flexShrink: 0, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{cl.users.length}u</span>; })()}
                                     </div>
 
                                     {/* Provider column */}
@@ -9818,12 +9818,12 @@ export default function App() {
                             const onUp = () => { document.body.style.cursor = ""; document.body.style.userSelect = ""; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
                             window.addEventListener("mousemove", onMove); window.addEventListener("mouseup", onUp);
                           }}>
-                          <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "SF Mono, Menlo, monospace" }}>FILTER {"\u2014"} {(ptFilterOpen || "").toUpperCase()}</span>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>FILTER {"\u2014"} {(ptFilterOpen || "").toUpperCase()}</span>
                           <span style={{ cursor: "pointer", color: th.textDim, fontSize: 14, lineHeight: 1 }} onClick={() => setModal((p) => ({ ...p, ptFilterOpen: null }))}>{"\u00D7"}</span>
                         </div>
                         <div style={{ padding: "6px 10px", flexShrink: 0 }}>
                           <input type="text" placeholder="Search values..." value={ptFilterSearch} onChange={(e) => setModal((p) => ({ ...p, ptFilterSearch: e.target.value }))}
-                            style={{ width: "100%", boxSizing: "border-box", padding: "5px 8px", fontSize: 11, background: th.bgInput || th.panelBg, border: `1px solid ${th.border}55`, borderRadius: 4, color: th.text, outline: "none", fontFamily: "SF Mono, Menlo, monospace" }}
+                            style={{ width: "100%", boxSizing: "border-box", padding: "5px 8px", fontSize: 11, background: th.bgInput || th.panelBg, border: `1px solid ${th.border}55`, borderRadius: 4, color: th.text, outline: "none", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}
                             autoFocus />
                         </div>
                         <div style={{ padding: "2px 10px 6px", display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
@@ -9833,7 +9833,7 @@ export default function App() {
                         </div>
                         <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "0 4px" }}>
                           {ptFilterDisplay.map((val) => (
-                            <label key={val} style={{ display: "flex", alignItems: "center", gap: 6, padding: "2px 6px", cursor: "pointer", fontSize: 11, fontFamily: "SF Mono, Menlo, monospace", color: th.text, borderRadius: 3 }}
+                            <label key={val} style={{ display: "flex", alignItems: "center", gap: 6, padding: "2px 6px", cursor: "pointer", fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.text, borderRadius: 3 }}
                               onMouseEnter={(e) => e.currentTarget.style.background = th.bgHover || th.border + "22"}
                               onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
                               <input type="checkbox" checked={ptFilterSel.has(val)} onChange={() => setModal((p) => {
@@ -9907,8 +9907,8 @@ export default function App() {
                     if (!selNode) return (
                       <div style={{ width: detailW, position: "relative", borderLeft: `1px solid ${th.border}44`, background: `${th.modalBg}cc`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", flexShrink: 0, display: "flex", flexDirection: "column" }}>
                         {detailResizeHandle}
-                        <div style={{ padding: "10px 16px 8px", borderBottom: `1px solid ${th.border}44`, background: `${th.headerBg}88`, fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, fontFamily: "'SF Mono', Menlo, monospace" }}>Event Details</div>
-                        <div style={{ padding: 40, textAlign: "center", color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace", fontSize: 12 }}>Select a process node to view details</div>
+                        <div style={{ padding: "10px 16px 8px", borderBottom: `1px solid ${th.border}44`, background: `${th.headerBg}88`, fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>Event Details</div>
+                        <div style={{ padding: 40, textAlign: "center", color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 12 }}>Select a process node to view details</div>
                       </div>
                     );
                     const parentNode = byKeyMap.get(selNode.parentKey);
@@ -9962,8 +9962,8 @@ export default function App() {
                       ].filter(Boolean);
                       navigator.clipboard.writeText(lines.join("\n"));
                     };
-                    const gLbl = { fontFamily: "'SF Mono', Menlo, monospace", fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", paddingTop: 2 };
-                    const gVal = { fontFamily: "'SF Mono', Menlo, monospace", fontSize: 11.5, color: th.text, wordBreak: "break-all", lineHeight: 1.5 };
+                    const gLbl = { fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", paddingTop: 2 };
+                    const gVal = { fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 11.5, color: th.text, wordBreak: "break-all", lineHeight: 1.5 };
                     const fields = [
                       ["Timestamp", selNode.ts ? selNode.ts.replace("T", " ").substring(0, 19) : ""],
                       ["Process", selNode.processName],
@@ -9983,55 +9983,55 @@ export default function App() {
                       <div style={{ width: detailW, position: "relative", borderLeft: `1px solid ${th.border}44`, background: `${th.modalBg}cc`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", flexShrink: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
                         {detailResizeHandle}
                         {/* EVENT DETAILS header bar */}
-                        <div style={{ padding: "10px 16px 8px", borderBottom: `1px solid ${th.border}44`, background: `${th.headerBg}aa`, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, fontFamily: "'SF Mono', Menlo, monospace", flexShrink: 0 }}>Event Details</div>
+                        <div style={{ padding: "10px 16px 8px", borderBottom: `1px solid ${th.border}44`, background: `${th.headerBg}aa`, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flexShrink: 0 }}>Event Details</div>
                         {/* Process header + badges */}
                         <div style={{ padding: "12px 16px 8px", borderBottom: `1px solid ${th.border}33`, flexShrink: 0 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                             {ptIcon(selNode.processName)}
-                            <span style={{ fontFamily: "'SF Mono', Menlo, monospace", fontWeight: 700, fontSize: 15, color: selSusColor || th.text }}>{selNode.processName}</span>
-                            <span style={{ fontFamily: "'SF Mono', Menlo, monospace", fontSize: 11, color: th.textMuted, marginLeft: 4 }}>PID {selNode.pid}</span>
+                            <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 700, fontSize: 15, color: selSusColor || th.text }}>{selNode.processName}</span>
+                            <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 11, color: th.textMuted, marginLeft: 4 }}>PID {selNode.pid}</span>
                           </div>
                           {selSuppressed && (
                             <div style={{ marginBottom: 6, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                              <span style={{ fontSize: 8.5, padding: "1px 6px", borderRadius: 3, background: "#8b949e22", color: "#8b949e", fontFamily: "'SF Mono', Menlo, monospace", fontWeight: 600, border: "1px solid #8b949e44", textTransform: "uppercase", letterSpacing: "0.05em" }}>Suppressed</span>
-                              <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Analyst rule hid this detection from triage views.</span>
+                              <span style={{ fontSize: 8.5, padding: "1px 6px", borderRadius: 3, background: "#8b949e22", color: "#8b949e", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 600, border: "1px solid #8b949e44", textTransform: "uppercase", letterSpacing: "0.05em" }}>Suppressed</span>
+                              <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Analyst rule hid this detection from triage views.</span>
                             </div>
                           )}
                           {selSusInfo.reason && <div style={{ marginBottom: 6 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: `${selSusColor}22`, color: selSusColor, padding: "2px 8px", borderRadius: 3, fontSize: 10, fontFamily: "'SF Mono', Menlo, monospace", fontWeight: 600, border: `1px solid ${selSusColor}44`, letterSpacing: "0.02em" }}>{"\u26A0"} {selSusInfo.reason}</span>
-                              {selSusInfo.confidence && <span style={{ fontSize: 8.5, padding: "1px 6px", borderRadius: 3, background: selSusInfo.confidence === "confirmed" ? "#f8514922" : selSusInfo.confidence === "likely" ? "#f0883e22" : "#8b949e22", color: selSusInfo.confidence === "confirmed" ? "#f85149" : selSusInfo.confidence === "likely" ? "#f0883e" : "#8b949e", fontFamily: "'SF Mono', Menlo, monospace", fontWeight: 600, border: `1px solid ${selSusInfo.confidence === "confirmed" ? "#f8514944" : selSusInfo.confidence === "likely" ? "#f0883e44" : "#8b949e44"}`, textTransform: "uppercase", letterSpacing: "0.05em" }}>{selSusInfo.confidence}</span>}
-                              {selSusInfo.sanctioned && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontFamily: "'SF Mono', Menlo, monospace", fontWeight: 600, border: "1px solid #3fb95033", letterSpacing: "0.03em" }}>SANCTIONED {selSusInfo.sanctioned.cat.toUpperCase()}</span>}
-                              {selBaselined && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#58a6ff18", color: "#58a6ff", fontFamily: "'SF Mono', Menlo, monospace", fontWeight: 600, border: "1px solid #58a6ff33", letterSpacing: "0.03em" }}>BASELINED {selBaselined.hostname || "GLOBAL"}</span>}
-                              {(() => { const seqs = _ptSeqMap.get(selectedKey); if (!seqs?.length) return null; const best = seqs.reduce((a, b) => a.confidence === "high" ? a : b); const sc = best.confidence === "high" ? "#da3633" : "#f0883e"; return <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${sc}aa`, color: "#fff", fontFamily: "'SF Mono', Menlo, monospace", fontWeight: 700, letterSpacing: "0.03em" }}>SEQ {best.confidence === "high" ? "\u2191" : "\u2193"}</span>; })()}
-                              {(() => { const ev = selSusInfo.evidence; if (!ev || ev.length <= 1) return null; const pc = ev.filter(e => e.cat !== "context").length - 1; const cc = ev.filter(e => e.cat === "context").length; const parts = []; if (pc > 0) parts.push(`${pc} primary`); if (cc > 0) parts.push(`${cc} context`); return parts.length ? <span style={{ fontSize: 8.5, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace" }}>+{parts.join(" + ")}</span> : null; })()}
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: `${selSusColor}22`, color: selSusColor, padding: "2px 8px", borderRadius: 3, fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 600, border: `1px solid ${selSusColor}44`, letterSpacing: "0.02em" }}>{"\u26A0"} {selSusInfo.reason}</span>
+                              {selSusInfo.confidence && <span style={{ fontSize: 8.5, padding: "1px 6px", borderRadius: 3, background: selSusInfo.confidence === "confirmed" ? "#f8514922" : selSusInfo.confidence === "likely" ? "#f0883e22" : "#8b949e22", color: selSusInfo.confidence === "confirmed" ? "#f85149" : selSusInfo.confidence === "likely" ? "#f0883e" : "#8b949e", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 600, border: `1px solid ${selSusInfo.confidence === "confirmed" ? "#f8514944" : selSusInfo.confidence === "likely" ? "#f0883e44" : "#8b949e44"}`, textTransform: "uppercase", letterSpacing: "0.05em" }}>{selSusInfo.confidence}</span>}
+                              {selSusInfo.sanctioned && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 600, border: "1px solid #3fb95033", letterSpacing: "0.03em" }}>SANCTIONED {selSusInfo.sanctioned.cat.toUpperCase()}</span>}
+                              {selBaselined && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#58a6ff18", color: "#58a6ff", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 600, border: "1px solid #58a6ff33", letterSpacing: "0.03em" }}>BASELINED {selBaselined.hostname || "GLOBAL"}</span>}
+                              {(() => { const seqs = _ptSeqMap.get(selectedKey); if (!seqs?.length) return null; const best = seqs.reduce((a, b) => a.confidence === "high" ? a : b); const sc = best.confidence === "high" ? "#da3633" : "#f0883e"; return <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${sc}aa`, color: "#fff", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 700, letterSpacing: "0.03em" }}>SEQ {best.confidence === "high" ? "\u2191" : "\u2193"}</span>; })()}
+                              {(() => { const ev = selSusInfo.evidence; if (!ev || ev.length <= 1) return null; const pc = ev.filter(e => e.cat !== "context").length - 1; const cc = ev.filter(e => e.cat === "context").length; const parts = []; if (pc > 0) parts.push(`${pc} primary`); if (cc > 0) parts.push(`${cc} context`); return parts.length ? <span style={{ fontSize: 8.5, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>+{parts.join(" + ")}</span> : null; })()}
                             </div>
                             {selSusInfo.evidence?.length > 1 && (() => {
                               const rest = selSusInfo.evidence.filter(e => e.reason !== selSusInfo.reason);
                               const prim = rest.filter(e => e.cat !== "context");
                               const ctxs = rest.filter(e => e.cat === "context");
                               return <div style={{ marginTop: 4, display: "flex", flexWrap: "wrap", gap: 3, alignItems: "center" }}>
-                                {prim.map((e, i) => { const eColor = SUS_COLORS[e.level] || "#8b949e"; return <span key={`p${i}`} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${eColor}14`, color: eColor, fontFamily: "'SF Mono', Menlo, monospace", border: `1px solid ${eColor}22` }}>{e.cat === "chain" ? "chain: " : ""}{e.reason}{e.tid?.length ? ` [${e.tid.join(", ")}]` : ""}</span>; })}
+                                {prim.map((e, i) => { const eColor = SUS_COLORS[e.level] || "#8b949e"; return <span key={`p${i}`} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${eColor}14`, color: eColor, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", border: `1px solid ${eColor}22` }}>{e.cat === "chain" ? "chain: " : ""}{e.reason}{e.tid?.length ? ` [${e.tid.join(", ")}]` : ""}</span>; })}
                                 {prim.length > 0 && ctxs.length > 0 && <span style={{ color: th.border, fontSize: 10, margin: "0 2px" }}>{"\u00B7"}</span>}
-                                {ctxs.map((e, i) => { const eColor = e.dampen ? "#3fb950" : "#8b949e"; return <span key={`c${i}`} style={{ fontSize: 7.5, padding: "1px 4px", borderRadius: 3, background: `${eColor}0a`, color: eColor, fontFamily: "'SF Mono', Menlo, monospace", border: `1px solid ${eColor}18`, fontStyle: "italic" }}>{e.dampen ? "\u25BC " : ""}{e.reason}</span>; })}
+                                {ctxs.map((e, i) => { const eColor = e.dampen ? "#3fb950" : "#8b949e"; return <span key={`c${i}`} style={{ fontSize: 7.5, padding: "1px 4px", borderRadius: 3, background: `${eColor}0a`, color: eColor, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", border: `1px solid ${eColor}18`, fontStyle: "italic" }}>{e.dampen ? "\u25BC " : ""}{e.reason}</span>; })}
                               </div>;
                             })()}
                             {selSusInfo.techniques?.length > 0 && <div style={{ marginTop: 3, display: "flex", gap: 3, flexWrap: "wrap" }}>
-                              {selSusInfo.techniques.map(t => <span key={t} style={{ fontSize: 7.5, padding: "0px 4px", borderRadius: 2, background: `${th.accent}18`, color: th.accent, fontFamily: "'SF Mono', Menlo, monospace", border: `1px solid ${th.accent}22` }}>{t}</span>)}
+                              {selSusInfo.techniques.map(t => <span key={t} style={{ fontSize: 7.5, padding: "0px 4px", borderRadius: 2, background: `${th.accent}18`, color: th.accent, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", border: `1px solid ${th.accent}22` }}>{t}</span>)}
                             </div>}
                           </div>}
                           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                            <button onClick={copyDetails} style={{ padding: "3px 10px", borderRadius: 4, fontSize: 9, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}66`, fontFamily: "'SF Mono', Menlo, monospace" }}>Copy Details</button>
-                            <button onClick={() => openPiSourceEvent(selNode.rowid)} style={{ padding: "3px 10px", borderRadius: 4, fontSize: 9, cursor: "pointer", background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, fontFamily: "'SF Mono', Menlo, monospace" }}>Source Event</button>
+                            <button onClick={copyDetails} style={{ padding: "3px 10px", borderRadius: 4, fontSize: 9, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}66`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>Copy Details</button>
+                            <button onClick={() => openPiSourceEvent(selNode.rowid)} style={{ padding: "3px 10px", borderRadius: 4, fontSize: 9, cursor: "pointer", background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>Source Event</button>
                             {selSusInfo.reason && !selBaselined && <button onClick={() => {
                               const entry = makePiAnalystEntry("baselines", selNode, parentNode, selSusInfo);
                               if (entry) upsertPiAnalystEntry("baselines", entry);
-                            }} style={{ padding: "3px 10px", borderRadius: 4, fontSize: 9, cursor: "pointer", background: "#58a6ff15", color: "#58a6ff", border: "1px solid #58a6ff33", fontFamily: "'SF Mono', Menlo, monospace" }}>Baseline Host</button>}
-                            {selBaselined && <button onClick={() => removePiAnalystEntry("baselines", selBaselined.id)} style={{ padding: "3px 10px", borderRadius: 4, fontSize: 9, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}66`, fontFamily: "'SF Mono', Menlo, monospace" }}>Remove Baseline</button>}
+                            }} style={{ padding: "3px 10px", borderRadius: 4, fontSize: 9, cursor: "pointer", background: "#58a6ff15", color: "#58a6ff", border: "1px solid #58a6ff33", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>Baseline Host</button>}
+                            {selBaselined && <button onClick={() => removePiAnalystEntry("baselines", selBaselined.id)} style={{ padding: "3px 10px", borderRadius: 4, fontSize: 9, cursor: "pointer", background: th.btnBg, color: th.textDim, border: `1px solid ${th.border}66`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>Remove Baseline</button>}
                             {selSusInfo.reason && !selSuppressed && <button onClick={() => {
                               const entry = makePiAnalystEntry("suppressions", selNode, parentNode, selSusInfo);
                               if (entry) upsertPiAnalystEntry("suppressions", entry);
-                            }} style={{ padding: "3px 10px", borderRadius: 4, fontSize: 9, cursor: "pointer", background: "#8b949e15", color: "#8b949e", border: "1px solid #8b949e33", fontFamily: "'SF Mono', Menlo, monospace" }}>Suppress</button>}
+                            }} style={{ padding: "3px 10px", borderRadius: 4, fontSize: 9, cursor: "pointer", background: "#8b949e15", color: "#8b949e", border: "1px solid #8b949e33", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>Suppress</button>}
                           </div>
                         </div>
                         {/* Grid fields — matching prototype */}
@@ -10054,10 +10054,10 @@ export default function App() {
                             <div style={{ marginTop: 12, padding: "8px 10px", background: `${th.panelBg}66`, borderRadius: 6, border: `1px solid ${th.border}22` }}>
                               <div style={{ ...gLbl, marginBottom: 6 }}>Source Event</div>
                               {modal.ptSourceEventLoading ? (
-                                <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Loading raw event...</div>
+                                <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Loading raw event...</div>
                               ) : sourceEvent ? (
                                 <>
-                                  <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'SF Mono', Menlo, monospace", marginBottom: 6 }}>Row ID {sourceEvent.__idx}</div>
+                                  <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", marginBottom: 6 }}>Row ID {sourceEvent.__idx}</div>
                                   <div style={{ display: "flex", flexDirection: "column", gap: 1, maxHeight: 260, overflowY: "auto" }}>
                                     {sourceEventFields.slice(0, 40).map(([label, value]) => (
                                       <div key={label} style={{ display: "grid", gridTemplateColumns: "110px 1fr", padding: "4px 0", borderBottom: `1px solid ${th.border}18` }}>
@@ -10066,10 +10066,10 @@ export default function App() {
                                       </div>
                                     ))}
                                   </div>
-                                  {sourceEventFields.length > 40 && <div style={{ marginTop: 6, fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>{sourceEventFields.length - 40} more populated fields hidden.</div>}
+                                  {sourceEventFields.length > 40 && <div style={{ marginTop: 6, fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{sourceEventFields.length - 40} more populated fields hidden.</div>}
                                 </>
                               ) : (
-                                <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Source event not available.</div>
+                                <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Source event not available.</div>
                               )}
                             </div>
                           )}
@@ -10077,14 +10077,14 @@ export default function App() {
                             <div style={{ marginTop: 12, padding: "8px 10px", background: `${th.accent}08`, borderRadius: 6, border: `1px solid ${th.accent}22` }}>
                               <div style={{ ...gLbl, marginBottom: 6 }}>Related EVTX</div>
                               {modal.ptRelatedEventsLoading ? (
-                                <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Loading related events...</div>
+                                <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Loading related events...</div>
                               ) : modal.ptRelatedEventsError && !relatedCtx ? (
-                                <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>{modal.ptRelatedEventsError}</div>
+                                <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{modal.ptRelatedEventsError}</div>
                               ) : relatedCtx ? (
                                 <>
                                   <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 6 }}>
                                     {relatedGroups.map((group) => (
-                                      <span key={group.id} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.border}22`, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace" }}>
+                                      <span key={group.id} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.border}22`, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                         {group.label} {group.count}
                                       </span>
                                     ))}
@@ -10094,7 +10094,7 @@ export default function App() {
                                       {relatedChips.map((chip) => {
                                         const color = relatedTypeColor(chip.id);
                                         return (
-                                          <span key={chip.id} style={{ fontSize: 8, padding: "1px 6px", borderRadius: 3, background: `${color}18`, color, border: `1px solid ${color}33`, fontFamily: "'SF Mono', Menlo, monospace" }}>
+                                          <span key={chip.id} style={{ fontSize: 8, padding: "1px 6px", borderRadius: 3, background: `${color}18`, color, border: `1px solid ${color}33`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                             {chip.label} {chip.count}
                                           </span>
                                         );
@@ -10108,21 +10108,21 @@ export default function App() {
                                         return (
                                           <div key={evt.rowid} style={{ padding: "5px 6px", borderRadius: 5, background: evt.isSelected ? `${th.accent}12` : `${th.panelBg}55`, border: `1px solid ${evt.isSelected ? `${th.accent}33` : `${th.border}18`}` }}>
                                             <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", marginBottom: 3 }}>
-                                              <span style={{ fontSize: 8, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace" }}>{(evt.timestamp || "").slice(0, 19) || "Unknown time"}</span>
-                                              <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 3, background: `${th.border}22`, color: th.textDim, fontFamily: "'SF Mono', Menlo, monospace" }}>{evt.eventId || "?"}</span>
-                                              {evt.provider && <span style={{ fontSize: 8, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace" }}>{_providerShort(evt.provider) || evt.provider}</span>}
-                                              {evt.enrichmentType && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${eColor}18`, color: eColor, border: `1px solid ${eColor}33`, fontFamily: "'SF Mono', Menlo, monospace" }}>{evt.eventLabel}</span>}
-                                              {evt.isSelected && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}18`, color: th.accent, fontFamily: "'SF Mono', Menlo, monospace" }}>anchor</span>}
+                                              <span style={{ fontSize: 8, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{(evt.timestamp || "").slice(0, 19) || "Unknown time"}</span>
+                                              <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 3, background: `${th.border}22`, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{evt.eventId || "?"}</span>
+                                              {evt.provider && <span style={{ fontSize: 8, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{_providerShort(evt.provider) || evt.provider}</span>}
+                                              {evt.enrichmentType && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${eColor}18`, color: eColor, border: `1px solid ${eColor}33`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{evt.eventLabel}</span>}
+                                              {evt.isSelected && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}18`, color: th.accent, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>anchor</span>}
                                               {(evt.matchTypes || []).filter((m) => m !== "selected").slice(0, 4).map((m) => (
-                                                <span key={`${evt.rowid}-${m}`} style={{ fontSize: 7.5, padding: "1px 4px", borderRadius: 3, background: `${th.border}18`, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace" }}>
+                                                <span key={`${evt.rowid}-${m}`} style={{ fontSize: 7.5, padding: "1px 4px", borderRadius: 3, background: `${th.border}18`, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                                   {relatedMatchLabel[m] || m}
                                                 </span>
                                               ))}
                                               {!evt.isSelected && evt.rowid > 0 && (
-                                                <button onClick={() => openPiSourceEvent(evt.rowid)} style={{ marginLeft: "auto", padding: "1px 6px", borderRadius: 3, fontSize: 8, cursor: "pointer", background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, fontFamily: "'SF Mono', Menlo, monospace" }}>Open Raw</button>
+                                                <button onClick={() => openPiSourceEvent(evt.rowid)} style={{ marginLeft: "auto", padding: "1px 6px", borderRadius: 3, fontSize: 8, cursor: "pointer", background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>Open Raw</button>
                                               )}
                                             </div>
-                                            <div style={{ fontSize: 9.5, color: th.textDim, fontFamily: "-apple-system, sans-serif", lineHeight: 1.4 }}>
+                                            <div style={{ fontSize: 9.5, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1.4 }}>
                                               {evt.summary || `${evt.processName || "Event"}${evt.cmdLine ? ` — ${evt.cmdLine}` : ""}`}
                                             </div>
                                           </div>
@@ -10130,7 +10130,7 @@ export default function App() {
                                       })}
                                     </div>
                                   ) : (
-                                    <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>No related EVTX pivots matched this process in the current tab.</div>
+                                    <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>No related EVTX pivots matched this process in the current tab.</div>
                                   )}
                                 </>
                               ) : null}
@@ -10147,7 +10147,7 @@ export default function App() {
                                 {seqs.map((s, i) => {
                                   const sc = seqConfColor[s.confidence] || "#8b949e";
                                   return (
-                                  <div key={i} style={{ fontSize: 10, color: th.textDim, fontFamily: "'SF Mono', Menlo, monospace", marginBottom: i < seqs.length - 1 ? 6 : 0 }}>
+                                  <div key={i} style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", marginBottom: i < seqs.length - 1 ? 6 : 0 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
                                       <span style={{ color: sc, fontWeight: 600 }}>{s.seqName}</span>
                                       <span style={{ fontSize: 8, padding: "0px 4px", borderRadius: 2, background: `${sc}18`, color: sc, border: `1px solid ${sc}33` }}>{s.stageName}</span>
@@ -10165,14 +10165,14 @@ export default function App() {
                             return (
                               <div style={{ marginTop: 12, padding: "8px 10px", background: `${th.accent}08`, borderRadius: 6, border: `1px solid ${th.accent}22` }}>
                                 <div style={{ ...gLbl, marginBottom: 4 }}>Investigation Story</div>
-                                <div style={{ fontSize: 10, color: th.textDim, fontFamily: "-apple-system, sans-serif", lineHeight: 1.45, marginBottom: 6 }}>
+                                <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1.45, marginBottom: 6 }}>
                                   {nodeStory.narrative}
                                 </div>
                                 <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 6 }}>
-                                  <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontFamily: "'SF Mono', Menlo, monospace" }}>{nodeStory.eventCount} events</span>
-                                  {nodeStory.contextOnlyCount > 0 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.border}22`, color: th.textMuted, fontFamily: "'SF Mono', Menlo, monospace" }}>{nodeStory.contextEventCount} with context</span>}
-                                  <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontFamily: "'SF Mono', Menlo, monospace" }}>{nodeStory.chainCount} chains</span>
-                                  {nodeStory.sequenceCount > 0 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#f8514918", color: "#f85149", fontFamily: "'SF Mono', Menlo, monospace" }}>{nodeStory.sequenceCount} seq</span>}
+                                  <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{nodeStory.eventCount} events</span>
+                                  {nodeStory.contextOnlyCount > 0 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.border}22`, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{nodeStory.contextEventCount} with context</span>}
+                                  <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{nodeStory.chainCount} chains</span>
+                                  {nodeStory.sequenceCount > 0 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#f8514918", color: "#f85149", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{nodeStory.sequenceCount} seq</span>}
                                 </div>
                                 <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                                   <button onClick={() => setModal((p) => ({ ...p, ptViewMode: "story", _ptExpandedIncident: nodeStory.id, selectedKey: nodeStory.anchorKey || selectedKey, ptClusterKeys: null, ptClusterContext: false, searchText: "", ptColFilters: {} }))} style={_ptPivotBtn}>View Story</button>
@@ -10189,7 +10189,7 @@ export default function App() {
                                 const cSusInfo = _ptDetMap.get(c.key) || { level: 0, reason: null };
                                 const cColor = SUS_COLORS[cSusInfo.level];
                                 return <span key={c.key} onClick={() => { const en = { ...(modal.expandedNodes || {}), [selectedKey]: true }; setModal((p) => p ? { ...p, selectedKey: c.key, expandedNodes: en } : p); }}
-                                  style={{ padding: "2px 8px", borderRadius: 4, background: (cColor || th.accent) + "14", color: cColor || th.textDim, fontSize: 10, cursor: "pointer", border: `1px solid ${(cColor || th.border)}33`, fontFamily: "'SF Mono', Menlo, monospace" }}>{c.processName} ({c.pid})</span>;
+                                  style={{ padding: "2px 8px", borderRadius: 4, background: (cColor || th.accent) + "14", color: cColor || th.textDim, fontSize: 10, cursor: "pointer", border: `1px solid ${(cColor || th.border)}33`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{c.processName} ({c.pid})</span>;
                               })}
                               {children.length > 20 && <span style={{ fontSize: 9, color: th.textDim }}>+{children.length - 20} more</span>}
                             </div>
@@ -10201,12 +10201,12 @@ export default function App() {
                             return (
                               <div style={{ marginTop: 12, padding: "8px 10px", background: `${th.accent}08`, borderRadius: 6, border: `1px solid ${th.accent}22` }}>
                                 <div style={{ ...gLbl, marginBottom: 4 }}>Chain Context</div>
-                                <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'SF Mono', Menlo, monospace", display: "flex", flexDirection: "column", gap: 3 }}>
+                                <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", display: "flex", flexDirection: "column", gap: 3 }}>
                                   <div>Repeated <strong style={{ color: th.accent }}>{nodeCluster.count}x</strong> across {nodeCluster.users.length} user{nodeCluster.users.length !== 1 ? "s" : ""}</div>
                                   <div>First: {(nodeCluster.firstSeen || "").slice(0, 19)} {"\u2014"} Last: {(nodeCluster.lastSeen || "").slice(0, 19)}</div>
                                   <div>{nodeCluster.cmdVariants.length} command variant{nodeCluster.cmdVariants.length !== 1 ? "s" : ""}</div>
                                 </div>
-                                <button onClick={() => setModal(p => ({ ...p, ptViewMode: "triage", _ptExpandedCluster: nodeCluster.id, ptClusterKeys: null, ptClusterContext: false, searchText: "", ptColFilters: {} }))} style={{ marginTop: 6, padding: "2px 8px", background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>View Cluster</button>
+                                <button onClick={() => setModal(p => ({ ...p, ptViewMode: "triage", _ptExpandedCluster: nodeCluster.id, ptClusterKeys: null, ptClusterContext: false, searchText: "", ptColFilters: {} }))} style={{ marginTop: 6, padding: "2px 8px", background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>View Cluster</button>
                               </div>
                             );
                           })()}
@@ -10225,7 +10225,7 @@ export default function App() {
                     const fProviders = [...new Set((data?.processes || []).map(p => _providerShort(p.provider)).filter(Boolean))].join(", ");
                     const fEids = [...new Set((data?.processes || []).map(p => p.eventId).filter(Boolean))].sort().join(", ");
                     return (
-                  <div style={{ padding: "8px 20px", borderTop: `1px solid ${th.border}44`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, fontSize: 10, color: th.textDim, background: `${th.headerBg}cc`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", fontFamily: "'SF Mono', Menlo, monospace" }}>
+                  <div style={{ padding: "8px 20px", borderTop: `1px solid ${th.border}44`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, fontSize: 10, color: th.textDim, background: `${th.headerBg}cc`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                     <span>
                       {ptMode.incident
                         ? `${filteredStories.length} stor${filteredStories.length !== 1 ? "ies" : "y"} · ${filteredStoryStats.susProcesses} suspicious of ${(data?.stats?.totalProcesses || 0).toLocaleString()} total`
@@ -10651,7 +10651,7 @@ export default function App() {
         const lmEdge = (cursor, pos) => ({ position: "absolute", ...pos, zIndex: 2, cursor });
 
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div style={{ WebkitAppRegion: "no-drag", position: "absolute", left: lmX, top: lmY, width: lmW, height: lmH, background: th.modalBg, border: `1px solid ${th.modalBorder}`, borderRadius: 12, padding: 0, display: "flex", flexDirection: "column", boxShadow: "0 24px 48px rgba(0,0,0,0.5)", overflow: "hidden" }}>
               {/* Resize handles */}
               <div onMouseDown={(e) => startLmResize(e, "t")} style={lmEdge("ns-resize", { top: 0, left: 8, right: 8, height: 5 })} />
@@ -10669,11 +10669,11 @@ export default function App() {
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={th.danger || "#f85149"} strokeWidth="1.5" strokeLinecap="round"><circle cx="5" cy="12" r="2.5" fill={`${th.danger || "#f85149"}33`}/><circle cx="19" cy="5" r="2.5" fill={`${th.danger || "#f85149"}33`}/><circle cx="19" cy="19" r="2.5" fill={`${th.danger || "#f85149"}33`}/><line x1="7.5" y1="11" x2="16.5" y2="6"/><line x1="7.5" y1="13" x2="16.5" y2="18"/></svg>
                   </div>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.3px" }}>Lateral Movement Tracker</h3>
-                    <p style={{ margin: "2px 0 0", color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>Network graph of host-to-host logon events</p>
+                    <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.3px" }}>Lateral Movement Tracker</h3>
+                    <p style={{ margin: "2px 0 0", color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Network graph of host-to-host logon events</p>
                   </div>
                 </div>
-                <button onClick={() => setModal(null)} style={{ width: 24, height: 24, borderRadius: 12, background: th.textMuted + "15", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 13, fontFamily: "-apple-system, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}
+                <button onClick={() => setModal(null)} style={{ width: 24, height: 24, borderRadius: 12, background: th.textMuted + "15", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 13, fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}
                   onMouseEnter={(ev) => { ev.currentTarget.style.background = th.danger + "33"; ev.currentTarget.style.color = th.danger || "#f85149"; }}
                   onMouseLeave={(ev) => { ev.currentTarget.style.background = th.textMuted + "15"; ev.currentTarget.style.color = th.textMuted; }}>{"\u2715"}</button>
               </div>
@@ -10695,10 +10695,10 @@ export default function App() {
                           {cov.level === "high" ? <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></> : cov.level === "medium" ? <><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></> : <><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></>}
                         </svg>
                         <div>
-                          <div style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                             {cov.level === "high" ? "All columns mapped" : cov.level === "medium" ? "Core columns mapped" : "Missing required columns"}
                           </div>
-                          <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", marginTop: 1 }}>
+                          <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", marginTop: 1 }}>
                             {cov.reqOk}/4 required{cov.recOk > 0 ? ` \u00B7 ${cov.recOk}/2 recommended` : ""}{cols.domain ? " \u00B7 domain" : ""}
                           </div>
                         </div>
@@ -10725,7 +10725,7 @@ export default function App() {
                             ["domain", "Domain", false],
                           ].map(([key, label, req]) => (
                             <div key={key}>
-                              <label style={{ fontSize: 9, color: cols[key] ? th.textDim : req ? "#f85149" : th.textMuted, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase", letterSpacing: "0.04em", display: "flex", alignItems: "center", gap: 3, marginBottom: 2 }}>
+                              <label style={{ fontSize: 9, color: cols[key] ? th.textDim : req ? "#f85149" : th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: "0.04em", display: "flex", alignItems: "center", gap: 3, marginBottom: 2 }}>
                                 {cols[key] ? <span style={{ color: "#3fb950" }}>{"\u2713"}</span> : req ? <span style={{ color: "#f85149" }}>{"\u2717"}</span> : <span style={{ color: th.textMuted }}>{"\u25CB"}</span>}
                                 {label}
                               </label>
@@ -10746,14 +10746,14 @@ export default function App() {
                           const active = modal.lmIntent === intent.id;
                           return (
                             <button key={intent.id} onClick={() => applyLmIntent(intent)} title={intent.desc}
-                              style={{ padding: "4px 10px", fontSize: 10, fontWeight: active ? 600 : 400, fontFamily: "-apple-system, sans-serif", background: active ? `${th.accent}18` : "transparent", color: active ? th.accent : th.textDim, border: `1px solid ${active ? th.accent + "44" : th.border + "22"}`, borderRadius: 6, cursor: "pointer", transition: "all 0.15s" }}>
+                              style={{ padding: "4px 10px", fontSize: 10, fontWeight: active ? 600 : 400, fontFamily: "'Segoe UI', system-ui, sans-serif", background: active ? `${th.accent}18` : "transparent", color: active ? th.accent : th.textDim, border: `1px solid ${active ? th.accent + "44" : th.border + "22"}`, borderRadius: 6, cursor: "pointer", transition: "all 0.15s" }}>
                               {intent.label}
                             </button>
                           );
                         })}
                       </div>
                       <button onClick={resetLmRules} title="Reset all rules to recommended defaults"
-                        style={{ padding: "3px 8px", fontSize: 9, fontFamily: "-apple-system, sans-serif", background: "transparent", color: th.textMuted, border: `1px solid ${th.border}22`, borderRadius: 4, cursor: "pointer", display: "flex", alignItems: "center", gap: 3, transition: "all 0.15s" }}
+                        style={{ padding: "3px 8px", fontSize: 9, fontFamily: "'Segoe UI', system-ui, sans-serif", background: "transparent", color: th.textMuted, border: `1px solid ${th.border}22`, borderRadius: 4, cursor: "pointer", display: "flex", alignItems: "center", gap: 3, transition: "all 0.15s" }}
                         onMouseEnter={(e) => { e.currentTarget.style.color = th.accent; e.currentTarget.style.borderColor = th.accent + "44"; }}
                         onMouseLeave={(e) => { e.currentTarget.style.color = th.textMuted; e.currentTarget.style.borderColor = th.border + "22"; }}>
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
@@ -10763,7 +10763,7 @@ export default function App() {
 
                     {/* Technique Presets */}
                     <div style={{ marginBottom: 12 }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8, fontFamily: "-apple-system, sans-serif" }}>Detection Techniques</div>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Detection Techniques</div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                         {LM_PRESETS.map((preset) => {
                           const state = lmPresetState(preset.rules, lmDisabledSet);
@@ -10778,12 +10778,12 @@ export default function App() {
                                     {preset.icon}
                                   </div>
                                   <div>
-                                    <div style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{preset.name}</div>
-                                    <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", marginTop: 1, maxWidth: 320 }}>{preset.desc}</div>
+                                    <div style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{preset.name}</div>
+                                    <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", marginTop: 1, maxWidth: 320 }}>{preset.desc}</div>
                                   </div>
                                 </div>
                                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                  <span style={{ fontSize: 10, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{activeRuleCount}/{preset.rules.length}</span>
+                                  <span style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{activeRuleCount}/{preset.rules.length}</span>
                                   <div style={{ width: 32, height: 18, borderRadius: 9, background: isOn ? th.accent : th.textMuted + "33", transition: "background 0.2s", position: "relative" }}>
                                     <div style={{ width: 14, height: 14, borderRadius: 7, background: "#fff", position: "absolute", top: 2, left: isOn ? 16 : 2, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
                                   </div>
@@ -10795,7 +10795,7 @@ export default function App() {
                                   {preset.rules.map(i => {
                                     const r = LM_RULES[i]; const off = lmDisabledSet.has(`lm-${i}`);
                                     return <span key={i} onClick={(e) => { e.stopPropagation(); toggleLmRule(`lm-${i}`); }}
-                                      style={{ fontSize: 9, padding: "1px 6px", borderRadius: 3, background: off ? `${th.textMuted}11` : `${LM_SEV_COLORS[r.sev]}15`, color: off ? th.textMuted : LM_SEV_COLORS[r.sev], border: `1px solid ${off ? th.border + "22" : LM_SEV_COLORS[r.sev] + "33"}`, fontFamily: "-apple-system, sans-serif", cursor: "pointer", textDecoration: off ? "line-through" : "none", opacity: off ? 0.5 : 1, transition: "all 0.15s" }}>{r.name}</span>;
+                                      style={{ fontSize: 9, padding: "1px 6px", borderRadius: 3, background: off ? `${th.textMuted}11` : `${LM_SEV_COLORS[r.sev]}15`, color: off ? th.textMuted : LM_SEV_COLORS[r.sev], border: `1px solid ${off ? th.border + "22" : LM_SEV_COLORS[r.sev] + "33"}`, fontFamily: "'Segoe UI', system-ui, sans-serif", cursor: "pointer", textDecoration: off ? "line-through" : "none", opacity: off ? 0.5 : 1, transition: "all 0.15s" }}>{r.name}</span>;
                                   })}
                                 </div>
                               )}
@@ -10808,18 +10808,18 @@ export default function App() {
                     {/* Exclusion toggles + rule count */}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                       <div style={{ display: "flex", gap: 14 }}>
-                        <label style={{ fontSize: 11, color: th.textDim, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontFamily: "-apple-system, sans-serif" }}>
+                        <label style={{ fontSize: 11, color: th.textDim, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                           <input type="checkbox" checked={excludeLocal} onChange={() => { setModal((p) => ({ ...p, excludeLocal: !p.excludeLocal })); setTimeout(() => refreshLmPreview(), 0); }} style={{ accentColor: th.accent }} /> Exclude local logons
                         </label>
-                        <label style={{ fontSize: 11, color: th.textDim, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontFamily: "-apple-system, sans-serif" }}>
+                        <label style={{ fontSize: 11, color: th.textDim, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                           <input type="checkbox" checked={excludeService} onChange={() => { setModal((p) => ({ ...p, excludeService: !p.excludeService })); setTimeout(() => refreshLmPreview(), 0); }} style={{ accentColor: th.accent }} /> Exclude service accounts
                         </label>
                       </div>
-                      <span style={{ fontSize: 10, color: th.textDim, fontFamily: "-apple-system, sans-serif" }}>{lmActiveCount}/{LM_RULES.length} rules{lmCustomCount > 0 ? ` + ${lmCustomCount} custom` : ""}</span>
+                      <span style={{ fontSize: 10, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{lmActiveCount}/{LM_RULES.length} rules{lmCustomCount > 0 ? ` + ${lmCustomCount} custom` : ""}</span>
                     </div>
                     {modal.chainsawSyntheticTarget && (
-                      <div style={{ marginBottom: 12, padding: "8px 10px", background: `${th.warning || "#d29922"}12`, border: `1px solid ${(th.warning || "#d29922")}30`, borderRadius: 8, color: th.warning || "#d29922", fontSize: 10, fontFamily: "-apple-system, sans-serif", lineHeight: 1.5 }}>
-                        Chainsaw logon export has no destination host column. Tracker will treat these events as inbound activity to <span style={{ fontFamily: "SF Mono, monospace" }}>{modal.chainsawSyntheticTarget}</span>.
+                      <div style={{ marginBottom: 12, padding: "8px 10px", background: `${th.warning || "#d29922"}12`, border: `1px solid ${(th.warning || "#d29922")}30`, borderRadius: 8, color: th.warning || "#d29922", fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1.5 }}>
+                        Chainsaw logon export has no destination host column. Tracker will treat these events as inbound activity to <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{modal.chainsawSyntheticTarget}</span>.
                       </div>
                     )}
 
@@ -10839,13 +10839,13 @@ export default function App() {
                       <div style={{ padding: "10px 14px", background: `${th.panelBg}44`, border: `1px solid ${th.border}22`, borderRadius: 10, marginBottom: 12 }}>
                         {/* Event availability strip */}
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system, sans-serif" }}>Event Availability</div>
-                          {prev && <span style={{ fontSize: 9, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{(prev.trackedEvents || 0).toLocaleString()} tracked events</span>}
+                          <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Event Availability</div>
+                          {prev && <span style={{ fontSize: 9, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{(prev.trackedEvents || 0).toLocaleString()} tracked events</span>}
                         </div>
                         {modal.lmPreviewLoading ? (
-                          <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", padding: "6px 0" }}>Scanning dataset...</div>
+                          <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", padding: "6px 0" }}>Scanning dataset...</div>
                         ) : !prev ? (
-                          <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", padding: "6px 0" }}>Preview unavailable</div>
+                          <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", padding: "6px 0" }}>Preview unavailable</div>
                         ) : (
                           <>
                             <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: hasAnyEvents ? 8 : 0 }}>
@@ -10856,8 +10856,8 @@ export default function App() {
                                   <div key={g.label} title={`${g.detector}\nEIDs: ${g.eids.join(", ")}\n${present ? total.toLocaleString() + " events" : "Not found"}`}
                                     style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 8px", borderRadius: 5, background: present ? "#3fb95010" : `${th.textMuted}08`, border: `1px solid ${present ? "#3fb95022" : th.border + "15"}`, transition: "all 0.15s" }}>
                                     <span style={{ width: 5, height: 5, borderRadius: 3, background: present ? "#3fb950" : g.required ? "#f85149" : th.textMuted + "44" }} />
-                                    <span style={{ fontSize: 9, color: present ? th.text : th.textMuted, fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>{g.label}</span>
-                                    {present && <span style={{ fontSize: 8, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{total >= 1000 ? (total / 1000).toFixed(1) + "k" : total}</span>}
+                                    <span style={{ fontSize: 9, color: present ? th.text : th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>{g.label}</span>
+                                    {present && <span style={{ fontSize: 8, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{total >= 1000 ? (total / 1000).toFixed(1) + "k" : total}</span>}
                                   </div>
                                 );
                               })}
@@ -10871,7 +10871,7 @@ export default function App() {
                                     <span style={{ fontSize: 10, flexShrink: 0, marginTop: 1, color: w.level === "error" ? "#f85149" : w.level === "warn" ? "#d29922" : th.textMuted }}>
                                       {w.level === "error" ? "\u2717" : w.level === "warn" ? "\u26A0" : "\u25CB"}
                                     </span>
-                                    <span style={{ fontSize: 10, color: w.level === "error" ? "#f85149" : w.level === "warn" ? "#d29922" : th.textMuted, fontFamily: "-apple-system, sans-serif", lineHeight: 1.4 }}>{w.text}</span>
+                                    <span style={{ fontSize: 10, color: w.level === "error" ? "#f85149" : w.level === "warn" ? "#d29922" : th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1.4 }}>{w.text}</span>
                                   </div>
                                 ))}
                               </div>
@@ -10883,7 +10883,7 @@ export default function App() {
                                 {sanityWarns.map((w, i) => (
                                   <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 6, padding: "2px 0" }}>
                                     <span style={{ fontSize: 10, flexShrink: 0, marginTop: 1, color: "#d29922" }}>{"\u26A0"}</span>
-                                    <span style={{ fontSize: 10, color: "#d29922", fontFamily: "-apple-system, sans-serif", lineHeight: 1.4 }}>{w}</span>
+                                    <span style={{ fontSize: 10, color: "#d29922", fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1.4 }}>{w}</span>
                                   </div>
                                 ))}
                               </div>
@@ -10898,7 +10898,7 @@ export default function App() {
                     <div>
                       <button onClick={() => setModal((p) => ({ ...p, showLmRules: !p.showLmRules }))}
                         style={{ width: "100%", padding: "8px 14px", background: "transparent", border: `1px solid ${th.border}22`, borderRadius: modal.showLmRules ? "10px 10px 0 0" : 10, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.15s" }}>
-                        <span style={{ fontSize: 11, fontWeight: 600, color: th.textDim, fontFamily: "-apple-system, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={th.textMuted} strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                           Advanced
                         </span>
@@ -10908,7 +10908,7 @@ export default function App() {
                       {modal.showLmRules && (
                         <div style={{ padding: "10px 14px", borderLeft: `1px solid ${th.border}22`, borderRight: `1px solid ${th.border}22`, borderBottom: `1px solid ${th.border}22`, borderRadius: "0 0 10px 10px", background: `${th.panelBg}33` }}>
                           {/* Individual rule toggles */}
-                          <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                             Individual Rules ({lmActiveCount}/{LM_RULES.length})
                           </div>
                           {[...LM_RULES.map((r, i) => ({ ...r, _i: i }))].sort((a, b) => {
@@ -10925,13 +10925,13 @@ export default function App() {
                               <div key={key} style={{ padding: "3px 0", opacity: off ? 0.4 : 1, transition: "opacity 0.15s" }}>
                                 <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}>
                                   <input type="checkbox" checked={!off} onChange={() => toggleLmRule(key)} style={{ accentColor: th.accent, margin: 0, flexShrink: 0 }} />
-                                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: LM_SEV_COLORS[r.sev] + "22", color: LM_SEV_COLORS[r.sev], fontWeight: 600, fontFamily: "-apple-system, sans-serif", minWidth: 42, textAlign: "center", textTransform: "uppercase" }}>{r.sev}</span>
-                                  <span style={{ fontSize: 10, color: th.text, fontFamily: "-apple-system, sans-serif", flex: 1 }}>{r.name}</span>
-                                  <span style={{ fontSize: 9, color: th.textDim, fontFamily: "SF Mono, monospace" }}>EID {r.eids.join(",")}</span>
-                                  {ruleEvCount > 0 && <span style={{ fontSize: 8, padding: "0 4px", borderRadius: 3, background: "#3fb95015", color: "#3fb950", fontFamily: "SF Mono, monospace", fontWeight: 600 }}>{ruleEvCount >= 1000 ? (ruleEvCount / 1000).toFixed(1) + "k" : ruleEvCount}</span>}
-                                  {ruleEvCount === 0 && modal.lmPreview && <span style={{ fontSize: 8, padding: "0 4px", borderRadius: 3, background: `${th.textMuted}11`, color: th.textMuted, fontFamily: "SF Mono, monospace" }}>0</span>}
+                                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: LM_SEV_COLORS[r.sev] + "22", color: LM_SEV_COLORS[r.sev], fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", minWidth: 42, textAlign: "center", textTransform: "uppercase" }}>{r.sev}</span>
+                                  <span style={{ fontSize: 10, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", flex: 1 }}>{r.name}</span>
+                                  <span style={{ fontSize: 9, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>EID {r.eids.join(",")}</span>
+                                  {ruleEvCount > 0 && <span style={{ fontSize: 8, padding: "0 4px", borderRadius: 3, background: "#3fb95015", color: "#3fb950", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 600 }}>{ruleEvCount >= 1000 ? (ruleEvCount / 1000).toFixed(1) + "k" : ruleEvCount}</span>}
+                                  {ruleEvCount === 0 && modal.lmPreview && <span style={{ fontSize: 8, padding: "0 4px", borderRadius: 3, background: `${th.textMuted}11`, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>0</span>}
                                 </label>
-                                {blurb && <div style={{ marginLeft: 22, fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif", fontStyle: "italic", lineHeight: 1.3, marginTop: 1 }}>{blurb}</div>}
+                                {blurb && <div style={{ marginLeft: 22, fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", fontStyle: "italic", lineHeight: 1.3, marginTop: 1 }}>{blurb}</div>}
                               </div>
                             );
                           })}
@@ -10939,12 +10939,12 @@ export default function App() {
                           {/* Custom rules */}
                           {(modal.lmCustomRules || []).length > 0 && (
                             <div style={{ marginTop: 8 }}>
-                              <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4, fontFamily: "-apple-system, sans-serif" }}>Custom Rules</div>
+                              <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Custom Rules</div>
                               {(modal.lmCustomRules || []).map((cr, i) => (
                                 <div key={`custom-${i}`} style={{ display: "flex", alignItems: "center", gap: 6, padding: "2px 0" }}>
-                                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: LM_SEV_COLORS[cr.severity || "medium"] + "22", color: LM_SEV_COLORS[cr.severity || "medium"], fontWeight: 600, fontFamily: "-apple-system, sans-serif", minWidth: 42, textAlign: "center", textTransform: "uppercase" }}>{cr.severity || "med"}</span>
-                                  <span style={{ fontSize: 10, color: th.text, fontFamily: "-apple-system, sans-serif", flex: 1 }}>{cr.category || "Custom"} {"\u2014"} {cr.name || "Custom Rule"}</span>
-                                  <span style={{ fontSize: 9, color: th.textDim, fontFamily: "SF Mono, monospace" }}>EID {cr.eventIds || ""}</span>
+                                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: LM_SEV_COLORS[cr.severity || "medium"] + "22", color: LM_SEV_COLORS[cr.severity || "medium"], fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", minWidth: 42, textAlign: "center", textTransform: "uppercase" }}>{cr.severity || "med"}</span>
+                                  <span style={{ fontSize: 10, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", flex: 1 }}>{cr.category || "Custom"} {"\u2014"} {cr.name || "Custom Rule"}</span>
+                                  <span style={{ fontSize: 9, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>EID {cr.eventIds || ""}</span>
                                   <button onClick={() => deleteLmCustomRule(i)} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 13, padding: "0 4px", lineHeight: 1 }} onMouseEnter={(e) => e.currentTarget.style.color = th.danger || "#f85149"} onMouseLeave={(e) => e.currentTarget.style.color = th.textMuted}>{"\u00D7"}</button>
                                 </div>
                               ))}
@@ -11002,12 +11002,12 @@ export default function App() {
                           <line x1="7.5" y1="13" x2="16.5" y2="18" stroke={th.accent} strokeDasharray="3 3" />
                         </svg>
                       </div>
-                      <div style={{ color: th.text, fontSize: 13, fontWeight: 500, marginBottom: 6, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.2px" }}>{plabels[pi]}</div>
-                      <div style={{ color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif", marginBottom: 24 }}>This may take a moment for large datasets</div>
+                      <div style={{ color: th.text, fontSize: 13, fontWeight: 500, marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.2px" }}>{plabels[pi]}</div>
+                      <div style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 24 }}>This may take a moment for large datasets</div>
                       <div style={{ position: "relative", height: 4, background: th.border + "22", borderRadius: 2, overflow: "hidden", maxWidth: 360, margin: "0 auto 12px" }}>
                         <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${prog}%`, background: `linear-gradient(90deg, ${th.accent}, ${th.danger || "#f85149"})`, borderRadius: 2, transition: "width 0.25s ease-out", boxShadow: `0 0 12px ${th.accent}44` }} />
                       </div>
-                      <div style={{ color: th.textDim, fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>{Math.round(prog)}%</div>
+                      <div style={{ color: th.textDim, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{Math.round(prog)}%</div>
                     </div>
                   );
                 })()}
@@ -11044,17 +11044,17 @@ export default function App() {
                           onMouseLeave={isClickable ? (e) => e.currentTarget.style.borderColor = c.color + "20" : undefined}>
                           <div style={{ position: "absolute", top: -8, right: -8, width: 40, height: 40, borderRadius: 20, background: `radial-gradient(circle, ${c.color}12, transparent)` }} />
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={c.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5, marginBottom: 2 }}><path d={c.icon}/></svg>
-                          <div style={{ fontSize: 22, fontWeight: 700, color: c.color, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.5px", lineHeight: 1 }}>{c.val}</div>
-                          <div style={{ fontSize: 9, color: th.textMuted, marginTop: 3, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 500 }}>{c.label}{isClickable && " \u25b8"}</div>
+                          <div style={{ fontSize: 22, fontWeight: 700, color: c.color, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.5px", lineHeight: 1 }}>{c.val}</div>
+                          <div style={{ fontSize: 9, color: th.textMuted, marginTop: 3, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 500 }}>{c.label}{isClickable && " \u25b8"}</div>
                         </div>
                         );
                       })}
                     </div>
 
-                    {modal.truncatedGraph && <div style={{ padding: "6px 10px", background: th.warning + "15", border: `1px solid ${th.warning}33`, borderRadius: 6, color: th.warning, fontSize: 10, marginBottom: 10, fontFamily: "-apple-system, sans-serif" }}>Graph showing top 500 hosts by activity. {data.nodes.length} total hosts detected.</div>}
+                    {modal.truncatedGraph && <div style={{ padding: "6px 10px", background: th.warning + "15", border: `1px solid ${th.warning}33`, borderRadius: 6, color: th.warning, fontSize: 10, marginBottom: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Graph showing top 500 hosts by activity. {data.nodes.length} total hosts detected.</div>}
 
                     {/* Analysis warnings (partial coverage, detector failures) */}
-                    {(data.warnings || []).length > 0 && <div style={{ padding: "6px 10px", background: th.warning + "12", border: `1px solid ${th.warning}30`, borderRadius: 6, color: th.warning, fontSize: 10, marginBottom: 10, fontFamily: "-apple-system, sans-serif", lineHeight: 1.5 }}>
+                    {(data.warnings || []).length > 0 && <div style={{ padding: "6px 10px", background: th.warning + "12", border: `1px solid ${th.warning}30`, borderRadius: 6, color: th.warning, fontSize: 10, marginBottom: 10, fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1.5 }}>
                       <span style={{ fontWeight: 600 }}>Partial analysis:</span> {data.warnings.map((w, i) => <span key={i}>{i > 0 && " | "}{w}</span>)}
                       {data.scanStats && Object.keys(data.scanStats).length > 0 && <span style={{ opacity: 0.7 }}> — Scanned: {Object.entries(data.scanStats).map(([k, v]) => `${k}: ${v.toLocaleString()}`).join(", ")}</span>}
                     </div>}
@@ -11069,7 +11069,7 @@ export default function App() {
                         ...((data.findings || []).length > 0 ? [{ id: "findings", label: `Findings (${data.findings.length})${(data.incidents || []).length > 0 ? ` / ${data.incidents.length} incidents` : ""}`, icon: "M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01" }] : []),
                       ].map((tab) => (
                         <button key={tab.id} onClick={() => setModal((p) => ({ ...p, viewTab: tab.id, selectedNode: null, selectedEdge: null }))}
-                          style={{ padding: "5px 12px", background: viewTab === tab.id ? `linear-gradient(180deg, ${th.accent}ee, ${th.accent})` : "transparent", color: viewTab === tab.id ? "#fff" : th.textDim, border: "none", borderRadius: 6, fontSize: 11, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: viewTab === tab.id ? 600 : 400, transition: "all 0.15s", display: "flex", alignItems: "center", gap: 5, boxShadow: viewTab === tab.id ? `0 1px 4px ${th.accent}44` : "none" }}
+                          style={{ padding: "5px 12px", background: viewTab === tab.id ? `linear-gradient(180deg, ${th.accent}ee, ${th.accent})` : "transparent", color: viewTab === tab.id ? "#fff" : th.textDim, border: "none", borderRadius: 6, fontSize: 11, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: viewTab === tab.id ? 600 : 400, transition: "all 0.15s", display: "flex", alignItems: "center", gap: 5, boxShadow: viewTab === tab.id ? `0 1px 4px ${th.accent}44` : "none" }}
                           onMouseEnter={(ev) => { if (viewTab !== tab.id) ev.currentTarget.style.background = th.textMuted + "11"; }}
                           onMouseLeave={(ev) => { if (viewTab !== tab.id) ev.currentTarget.style.background = "transparent"; }}>
                           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={tab.icon}/></svg>
@@ -11168,7 +11168,7 @@ export default function App() {
                       };
 
                       // Button style helper
-                      const _btnS = { padding: "2px 8px", background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: 500 };
+                      const _btnS = { padding: "2px 8px", background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 };
                       const _btnActive = (active) => active ? { ..._btnS, background: th.accent, color: "#fff" } : _btnS;
 
                       // Render a finding card (collapsed or expanded)
@@ -11183,20 +11183,20 @@ export default function App() {
                             onMouseLeave={(e) => { if (!isExpanded) e.currentTarget.style.borderColor = LM_SEV_COLORS[f.severity] + "22"; }}>
                             {/* Collapsed row */}
                             <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", minHeight: 28 }}>
-                              <span style={{ padding: "1px 6px", background: LM_SEV_COLORS[f.severity] + "22", color: LM_SEV_COLORS[f.severity], borderRadius: 3, fontSize: 8, fontWeight: 700, textTransform: "uppercase", fontFamily: "-apple-system, sans-serif", letterSpacing: "0.03em", flexShrink: 0 }}>{f.severity}</span>
+                              <span style={{ padding: "1px 6px", background: LM_SEV_COLORS[f.severity] + "22", color: LM_SEV_COLORS[f.severity], borderRadius: 3, fontSize: 8, fontWeight: 700, textTransform: "uppercase", fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "0.03em", flexShrink: 0 }}>{f.severity}</span>
                               <span style={{ fontFamily: "monospace", fontSize: 9, color: th.accent, background: `${th.accent}15`, padding: "1px 4px", borderRadius: 3, fontWeight: 600, flexShrink: 0, minWidth: 20, textAlign: "center" }}>{f.triageScore || 0}</span>
                               <MitreBadge id={f.mitre} />
-                              <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.title}</span>
-                              {rec && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, fontWeight: 600, fontFamily: "-apple-system, sans-serif", flexShrink: 0, background: rec.active ? "#3fb95022" : `${th.textMuted}15`, color: rec.active ? "#3fb950" : th.textMuted }}>{rec.active ? "ACTIVE " : ""}{rec.label}</span>}
+                              <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.title}</span>
+                              {rec && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0, background: rec.active ? "#3fb95022" : `${th.textMuted}15`, color: rec.active ? "#3fb950" : th.textMuted }}>{rec.active ? "ACTIVE " : ""}{rec.label}</span>}
                               {pills.slice(0, 3).map((p, i) => (
-                                <span key={i} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: (_pillColors[p.type] || "#8b949e") + "18", color: _pillColors[p.type] || "#8b949e", fontWeight: 500, fontFamily: "-apple-system, sans-serif", flexShrink: 0, whiteSpace: "nowrap" }}>{p.text}</span>
+                                <span key={i} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: (_pillColors[p.type] || "#8b949e") + "18", color: _pillColors[p.type] || "#8b949e", fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0, whiteSpace: "nowrap" }}>{p.text}</span>
                               ))}
-                              {(f.relatedFindingIds || []).length > 0 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontWeight: 500, fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>+{f.relatedFindingIds.length} related</span>}
+                              {(f.relatedFindingIds || []).length > 0 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>+{f.relatedFindingIds.length} related</span>}
                             </div>
                             {/* Expanded detail */}
                             {isExpanded && (
                               <div style={{ padding: "8px 10px 10px", borderTop: `1px solid ${LM_SEV_COLORS[f.severity]}22` }} onClick={(e) => e.stopPropagation()}>
-                                <div style={{ fontSize: 11, color: th.textDim, fontFamily: "-apple-system, sans-serif", marginBottom: 8, lineHeight: 1.5 }}>{f.description}</div>
+                                <div style={{ fontSize: 11, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 8, lineHeight: 1.5 }}>{f.description}</div>
                                 <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "monospace", marginBottom: 6 }}>
                                   {f.source}{f.target && f.target !== f.source ? ` \u2192 ${f.target}` : ""}
                                   {f.timeRange?.from && <span style={{ marginLeft: 12 }}>{(f.timeRange.from || "").slice(0, 19)}{f.timeRange.to && f.timeRange.to !== f.timeRange.from ? ` \u2014 ${f.timeRange.to.slice(0, 19)}` : ""}</span>}
@@ -11206,20 +11206,20 @@ export default function App() {
                                 {pills.length > 0 && (
                                   <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 8 }}>
                                     {pills.map((p, i) => (
-                                      <span key={i} style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, background: (_pillColors[p.type] || "#8b949e") + "18", color: _pillColors[p.type] || "#8b949e", fontWeight: 500, fontFamily: "-apple-system, sans-serif" }}>{p.text}</span>
+                                      <span key={i} style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, background: (_pillColors[p.type] || "#8b949e") + "18", color: _pillColors[p.type] || "#8b949e", fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{p.text}</span>
                                     ))}
                                   </div>
                                 )}
                                 {/* Related findings */}
                                 {(f.relatedFindingIds || []).length > 0 && (
                                   <div style={{ marginBottom: 8 }}>
-                                    <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase", letterSpacing: "0.04em" }}>Related Findings</div>
+                                    <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: "0.04em" }}>Related Findings</div>
                                     <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                                       {f.relatedFindingIds.slice(0, 4).map(rid => {
                                         const rf = findings.find(x => x.id === rid);
                                         if (!rf) return null;
                                         return (
-                                          <span key={rid} style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 7px", background: `${LM_SEV_COLORS[rf.severity]}10`, border: `1px solid ${LM_SEV_COLORS[rf.severity]}22`, borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}
+                                          <span key={rid} style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 7px", background: `${LM_SEV_COLORS[rf.severity]}10`, border: `1px solid ${LM_SEV_COLORS[rf.severity]}22`, borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}
                                             onClick={(e) => { e.stopPropagation(); setModal((p) => ({ ...p, expandedFinding: rid, findingsView: "alerts" })); }}>
                                             <span style={{ color: LM_SEV_COLORS[rf.severity], fontWeight: 600, textTransform: "uppercase", fontSize: 8 }}>{rf.severity}</span>
                                             <span style={{ color: th.text, maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{rf.title}</span>
@@ -11257,20 +11257,20 @@ export default function App() {
                             {allIncidents.length > 0 && <button onClick={() => setModal((p) => ({ ...p, findingsView: "incidents" }))} style={_btnActive(findingsView === "incidents")}>Incidents ({allIncidents.length})</button>}
                             <span style={{ width: 1, height: 16, background: th.border, margin: "0 4px" }} />
                             {/* Sort dropdown */}
-                            <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Sort:</span>
-                            <select value={sortBy} onChange={(e) => setModal((p) => ({ ...p, findingsSortBy: e.target.value }))} style={{ fontSize: 9, padding: "2px 4px", background: th.bg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 3, fontFamily: "-apple-system, sans-serif" }}>
+                            <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Sort:</span>
+                            <select value={sortBy} onChange={(e) => setModal((p) => ({ ...p, findingsSortBy: e.target.value }))} style={{ fontSize: 9, padding: "2px 4px", background: th.bg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 3, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                               <option value="triage">Priority</option><option value="severity">Severity</option><option value="recency">Recency</option><option value="events">Events</option>
                             </select>
                             {findingsView === "alerts" && <>
-                              <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Group:</span>
-                              <select value={groupBy} onChange={(e) => setModal((p) => ({ ...p, findingsGroupBy: e.target.value }))} style={{ fontSize: 9, padding: "2px 4px", background: th.bg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 3, fontFamily: "-apple-system, sans-serif" }}>
+                              <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Group:</span>
+                              <select value={groupBy} onChange={(e) => setModal((p) => ({ ...p, findingsGroupBy: e.target.value }))} style={{ fontSize: 9, padding: "2px 4px", background: th.bg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 3, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                 <option value="default">None</option><option value="target">Target</option><option value="source">Source</option><option value="user">User</option><option value="technique">Technique</option>
                               </select>
                             </>}
                             <span style={{ width: 1, height: 16, background: th.border, margin: "0 4px" }} />
                             {/* Severity summary pills */}
                             {Object.entries(sevCounts).filter(([, v]) => v > 0).map(([sev, cnt]) => (
-                              <span key={sev} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "2px 7px", background: LM_SEV_COLORS[sev] + "15", color: LM_SEV_COLORS[sev], borderRadius: 4, fontSize: 9, fontWeight: 600, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase" }}>
+                              <span key={sev} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "2px 7px", background: LM_SEV_COLORS[sev] + "15", color: LM_SEV_COLORS[sev], borderRadius: 4, fontSize: 9, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase" }}>
                                 {cnt} {sev}
                               </span>
                             ))}
@@ -11281,7 +11281,7 @@ export default function App() {
                             <div style={{ maxHeight: lmH - 250, overflowY: "auto", display: "flex", flexDirection: "column", gap: 4 }}>
                               {groupedEntries ? groupedEntries.map(([gKey, gFindings]) => (
                                 <div key={gKey}>
-                                  <div style={{ fontSize: 10, fontWeight: 600, color: th.textDim, padding: "6px 0 4px", fontFamily: "-apple-system, sans-serif", borderBottom: `1px solid ${th.border}`, marginBottom: 4 }}>
+                                  <div style={{ fontSize: 10, fontWeight: 600, color: th.textDim, padding: "6px 0 4px", fontFamily: "'Segoe UI', system-ui, sans-serif", borderBottom: `1px solid ${th.border}`, marginBottom: 4 }}>
                                     {gKey} <span style={{ fontWeight: 400, color: th.textMuted }}>({gFindings.length} findings) | Top score: {Math.max(...gFindings.map(f => f.triageScore || 0))}</span>
                                   </div>
                                   {gFindings.map(f => _renderCard(f))}
@@ -11304,13 +11304,13 @@ export default function App() {
                                   <div key={inc.id} style={{ padding: "10px 12px", background: `${LM_SEV_COLORS[inc.severity]}08`, border: `1px solid ${LM_SEV_COLORS[inc.severity]}30`, borderRadius: 8 }}>
                                     {/* Header */}
                                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6, flexWrap: "wrap" }}>
-                                      <span style={{ padding: "1px 6px", background: LM_SEV_COLORS[inc.severity] + "22", color: LM_SEV_COLORS[inc.severity], borderRadius: 3, fontSize: 8, fontWeight: 700, textTransform: "uppercase", fontFamily: "-apple-system, sans-serif" }}>{inc.severity}</span>
+                                      <span style={{ padding: "1px 6px", background: LM_SEV_COLORS[inc.severity] + "22", color: LM_SEV_COLORS[inc.severity], borderRadius: 3, fontSize: 8, fontWeight: 700, textTransform: "uppercase", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{inc.severity}</span>
                                       <span style={{ fontFamily: "monospace", fontSize: 9, color: th.accent, background: `${th.accent}15`, padding: "1px 4px", borderRadius: 3, fontWeight: 600 }}>{inc.triageScore}</span>
-                                      {techPills.map((tp, i) => <span key={i} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: tp.color + "18", color: tp.color, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>{tp.text}</span>)}
-                                      {rec && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, fontWeight: 600, fontFamily: "-apple-system, sans-serif", marginLeft: "auto", background: rec.active ? "#3fb95022" : `${th.textMuted}15`, color: rec.active ? "#3fb950" : th.textMuted }}>{rec.active ? "ACTIVE " : ""}{rec.label}</span>}
+                                      {techPills.map((tp, i) => <span key={i} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: tp.color + "18", color: tp.color, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{tp.text}</span>)}
+                                      {rec && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", marginLeft: "auto", background: rec.active ? "#3fb95022" : `${th.textMuted}15`, color: rec.active ? "#3fb950" : th.textMuted }}>{rec.active ? "ACTIVE " : ""}{rec.label}</span>}
                                     </div>
                                     {/* Narrative */}
-                                    <div style={{ fontSize: 11, color: th.text, fontFamily: "-apple-system, sans-serif", marginBottom: 6, lineHeight: 1.5 }}>{inc.narrative}</div>
+                                    <div style={{ fontSize: 11, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 6, lineHeight: 1.5 }}>{inc.narrative}</div>
                                     {/* Source → Target + users */}
                                     <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "monospace", marginBottom: 6 }}>
                                       {inc.source} \u2192 {inc.target}
@@ -11320,7 +11320,7 @@ export default function App() {
                                     {/* Contributing findings */}
                                     <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 8 }}>
                                       {memberFindings.map(mf => (
-                                        <span key={mf.id} style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 7px", background: `${LM_SEV_COLORS[mf.severity]}10`, border: `1px solid ${LM_SEV_COLORS[mf.severity]}22`, borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}
+                                        <span key={mf.id} style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 7px", background: `${LM_SEV_COLORS[mf.severity]}10`, border: `1px solid ${LM_SEV_COLORS[mf.severity]}22`, borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}
                                           onClick={() => setModal((p) => ({ ...p, findingsView: "alerts", expandedFinding: mf.id }))}>
                                           <span style={{ color: LM_SEV_COLORS[mf.severity], fontWeight: 600, textTransform: "uppercase", fontSize: 8 }}>{mf.severity}</span>
                                           <span style={{ color: th.text, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{mf.category}</span>
@@ -11360,7 +11360,7 @@ export default function App() {
                                   </div>
                                 );
                               })}
-                              {allIncidents.length === 0 && <div style={{ fontSize: 11, color: th.textMuted, fontFamily: "-apple-system, sans-serif", padding: 20, textAlign: "center" }}>No incidents — findings are not clustered into multi-detection groups.</div>}
+                              {allIncidents.length === 0 && <div style={{ fontSize: 11, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", padding: 20, textAlign: "center" }}>No incidents — findings are not clustered into multi-detection groups.</div>}
                             </div>
                           )}
                         </div>
@@ -11386,7 +11386,7 @@ export default function App() {
                       const isIP = (s) => /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(s);
                       const isDC = (s) => /DC\d*$/i.test(s) || /domain.controller/i.test(s);
                       const logonLabel = (types) => { const t = types.map(String); if (t.includes("10")) return "RDP"; if (t.includes("12")) return "Cached RDP"; if (t.includes("8")) return "Cleartext"; if (t.includes("3")) return "Net"; if (t.includes("4")) return "Batch"; if (t.includes("5")) return "Service"; if (t.includes("2")) return "Local"; if (t.includes("7")) return "Unlock"; if (t.includes("9")) return "RunAs"; if (t.includes("11")) return "Cached"; if (t.includes("13")) return "Cached Unlock"; return t.join(","); };
-                      const tbtn = { padding: "4px 10px", background: `${th.panelBg}cc`, color: th.textDim, border: `1px solid ${th.border}44`, borderRadius: 6, fontSize: 10, cursor: "pointer", fontFamily: "-apple-system, sans-serif", display: "flex", alignItems: "center", gap: 4, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", transition: "all 0.15s", fontWeight: 500 };
+                      const tbtn = { padding: "4px 10px", background: `${th.panelBg}cc`, color: th.textDim, border: `1px solid ${th.border}44`, borderRadius: 6, fontSize: 10, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", alignItems: "center", gap: 4, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", transition: "all 0.15s", fontWeight: 500 };
 
                       const svgToWorld = (clientX, clientY, svgEl) => {
                         if (!svgEl) return { x: 0, y: 0 };
@@ -11538,7 +11538,7 @@ export default function App() {
                               );
                             })()}
                             <div style={{ flex: 1 }} />
-                            <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>{selectedNode || selectedEdge ? "Zoom locked \u00B7 Click background to deselect & unlock" : "Scroll to zoom \u00B7 Drag background to pan \u00B7 Drag nodes to reposition"}</span>
+                            <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{selectedNode || selectedEdge ? "Zoom locked \u00B7 Click background to deselect & unlock" : "Scroll to zoom \u00B7 Drag background to pan \u00B7 Drag nodes to reposition"}</span>
                           </div>
 
                           <svg data-lm-graph="1" width="100%" height={480} viewBox={`${vb.x} ${vb.y} ${vb.w} ${vb.h}`}
@@ -11591,7 +11591,7 @@ export default function App() {
                                   {/* Edge label */}
                                   <g transform={`translate(${mx + perpX}, ${my + perpY})`}>
                                     <rect x={-14} y={-7} width={28} height={14} rx={7} fill={th.panelBg} fillOpacity={0.9} stroke={col} strokeWidth={0.4} strokeOpacity={0.3} />
-                                    <text textAnchor="middle" dy="3.5" fill={col} fontSize={7.5} fontWeight={600} fontFamily="-apple-system,sans-serif" fillOpacity={0.9}>
+                                    <text textAnchor="middle" dy="3.5" fill={col} fontSize={7.5} fontWeight={600} fontFamily="'Segoe UI',system-ui,sans-serif" fillOpacity={0.9}>
                                       {e.count > 999 ? Math.round(e.count / 1000) + "k" : e.count}
                                     </text>
                                   </g>
@@ -11650,14 +11650,14 @@ export default function App() {
                                   {isSusHost(n.id) && <g transform={`translate(${p.x + r - 2}, ${p.y - r - 2})`}><polygon points="0,-6 5.2,3 -5.2,3" fill="#f0883e" stroke={th.modalBg} strokeWidth={1} /><text x={0} y={1.5} textAnchor="middle" fill={th.modalBg} fontSize={6} fontWeight={700}>!</text><title>Suspicious hostname pattern — possible threat actor workstation</title></g>}
                                   {/* Inner icon text */}
                                   {ip ? (
-                                    <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="middle" fill={col} fontSize={r * 0.6} fontWeight={600} fontFamily="-apple-system,sans-serif" fillOpacity={0.7}>IP</text>
+                                    <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="middle" fill={col} fontSize={r * 0.6} fontWeight={600} fontFamily="'Segoe UI',system-ui,sans-serif" fillOpacity={0.7}>IP</text>
                                   ) : dc ? (
-                                    <text x={p.x} y={p.y + r * 0.7} textAnchor="middle" fill={col} fontSize={r * 0.5} fontWeight={600} fontFamily="-apple-system,sans-serif" fillOpacity={0.7}>DC</text>
+                                    <text x={p.x} y={p.y + r * 0.7} textAnchor="middle" fill={col} fontSize={r * 0.5} fontWeight={600} fontFamily="'Segoe UI',system-ui,sans-serif" fillOpacity={0.7}>DC</text>
                                   ) : null}
                                   {/* Label with glass pill */}
                                   <g transform={`translate(${p.x}, ${p.y + r + 14})`}>
                                     <rect x={-labelW / 2} y={-8} width={labelW} height={15} rx={7} fill={th.panelBg} fillOpacity={0.85} stroke={col} strokeWidth={0.4} strokeOpacity={0.3} />
-                                    <text textAnchor="middle" dy="3" fill={th.text} fontSize={8.5} fontWeight={500} fontFamily="-apple-system,sans-serif">{labelText}</text>
+                                    <text textAnchor="middle" dy="3" fill={th.text} fontSize={8.5} fontWeight={500} fontFamily="'Segoe UI',system-ui,sans-serif">{labelText}</text>
                                   </g>
                                 </g>
                               );
@@ -11681,7 +11681,7 @@ export default function App() {
                                 document.addEventListener("mousemove", onMove); document.addEventListener("mouseup", onUp);
                               }}>
                               <rect x={-6} y={-6} width={155} height={180} rx={8} fill={th.panelBg} fillOpacity={0.88} stroke={th.border} strokeWidth={0.5} strokeOpacity={0.3} />
-                              <text x={0} y={6} fill={th.textMuted} fontSize={7.5} fontWeight={600} fontFamily="-apple-system,sans-serif" letterSpacing="0.08em" textTransform="uppercase">CONNECTIONS</text>
+                              <text x={0} y={6} fill={th.textMuted} fontSize={7.5} fontWeight={600} fontFamily="'Segoe UI',system-ui,sans-serif" letterSpacing="0.08em" textTransform="uppercase">CONNECTIONS</text>
                               {[
                                 { color: "#58a6ff", label: "RDP (type 10/12)" },
                                 { color: "#3fb950", label: "Network (type 3)" },
@@ -11694,30 +11694,30 @@ export default function App() {
                                 <g key={i} transform={`translate(4, ${i * 14 + 18})`}>
                                   <line x1={0} y1={0} x2={14} y2={0} stroke={item.color} strokeWidth={2} strokeLinecap="round" strokeDasharray={item.dashed ? "3,2" : "none"} />
                                   <circle cx={14} cy={0} r={1.5} fill={item.color} />
-                                  <text x={20} y={3} fill={th.textMuted} fontSize={7} fontFamily="-apple-system,sans-serif">{item.label}</text>
+                                  <text x={20} y={3} fill={th.textMuted} fontSize={7} fontFamily="'Segoe UI',system-ui,sans-serif">{item.label}</text>
                                 </g>
                               ))}
                               <line x1={0} y1={118} x2={140} y2={118} stroke={th.border} strokeWidth={0.3} strokeOpacity={0.5} />
-                              <text x={0} y={130} fill={th.textMuted} fontSize={7.5} fontWeight={600} fontFamily="-apple-system,sans-serif" letterSpacing="0.08em">NODES</text>
+                              <text x={0} y={130} fill={th.textMuted} fontSize={7.5} fontWeight={600} fontFamily="'Segoe UI',system-ui,sans-serif" letterSpacing="0.08em">NODES</text>
                               <g transform="translate(4, 140)">
                                 <circle cx={4} cy={0} r={3.5} fill="url(#lm-grad-green)" stroke="#3fb950" strokeWidth={0.8} strokeDasharray="2.5,1.5" />
-                                <text x={14} y={3} fill={th.textMuted} fontSize={7.5} fontFamily="-apple-system,sans-serif">IP</text>
+                                <text x={14} y={3} fill={th.textMuted} fontSize={7.5} fontFamily="'Segoe UI',system-ui,sans-serif">IP</text>
                               </g>
                               <g transform="translate(38, 140)">
                                 <rect x={0} y={-4} width={8} height={8} rx={2} fill="url(#lm-grad-blue)" stroke="#58a6ff" strokeWidth={0.8} />
-                                <text x={14} y={3} fill={th.textMuted} fontSize={7.5} fontFamily="-apple-system,sans-serif">DC</text>
+                                <text x={14} y={3} fill={th.textMuted} fontSize={7.5} fontFamily="'Segoe UI',system-ui,sans-serif">DC</text>
                               </g>
                               <g transform="translate(68, 140)">
                                 <rect x={0} y={-3} width={9} height={6} rx={2} fill="url(#lm-grad-purple)" stroke="#d2a8ff" strokeWidth={0.8} />
-                                <text x={15} y={3} fill={th.textMuted} fontSize={7.5} fontFamily="-apple-system,sans-serif">Host</text>
+                                <text x={15} y={3} fill={th.textMuted} fontSize={7.5} fontFamily="'Segoe UI',system-ui,sans-serif">Host</text>
                               </g>
                               <g transform="translate(4, 155)">
                                 <rect x={0} y={-3} width={9} height={6} rx={2} fill="url(#lm-grad-red)" stroke={th.danger || "#f85149"} strokeWidth={0.8} strokeDasharray="2,1.5" />
-                                <text x={15} y={3} fill={th.danger || "#f85149"} fontSize={7.5} fontWeight={600} fontFamily="-apple-system,sans-serif">Outlier</text>
+                                <text x={15} y={3} fill={th.danger || "#f85149"} fontSize={7.5} fontWeight={600} fontFamily="'Segoe UI',system-ui,sans-serif">Outlier</text>
                               </g>
                               <g transform="translate(68, 155)">
                                 <polygon points="4,-5 8.2,2 -0.2,2" fill="#f0883e" />
-                                <text x={14} y={3} fill="#f0883e" fontSize={7.5} fontWeight={500} fontFamily="-apple-system,sans-serif">Sus Host</text>
+                                <text x={14} y={3} fill="#f0883e" fontSize={7.5} fontWeight={500} fontFamily="'Segoe UI',system-ui,sans-serif">Sus Host</text>
                               </g>
                             </g>
                           </svg>
@@ -11791,9 +11791,9 @@ export default function App() {
                               <div style={{ marginTop: 10, padding: 14, background: `linear-gradient(135deg, ${nc}08, ${th.panelBg}ee)`, borderRadius: 10, border: `1px solid ${nc}22`, backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}>
                                 {/* Header */}
                                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                                  <span style={{ padding: "3px 10px", background: `linear-gradient(135deg, ${nc}33, ${nc}15)`, color: nc, borderRadius: 6, fontSize: 10, fontWeight: 600, fontFamily: "-apple-system, sans-serif", letterSpacing: "0.03em" }}>{role}</span>
-                                  <span style={{ fontWeight: 600, fontSize: 13, color: th.text, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.2px" }}>{selectedNode}</span>
-                                  {node?.isOutlier && <span style={{ padding: "2px 6px", background: "#f8514918", color: "#f85149", borderRadius: 4, fontSize: 8, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>OUTLIER: {node.outlierReason}</span>}
+                                  <span style={{ padding: "3px 10px", background: `linear-gradient(135deg, ${nc}33, ${nc}15)`, color: nc, borderRadius: 6, fontSize: 10, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "0.03em" }}>{role}</span>
+                                  <span style={{ fontWeight: 600, fontSize: 13, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.2px" }}>{selectedNode}</span>
+                                  {node?.isOutlier && <span style={{ padding: "2px 6px", background: "#f8514918", color: "#f85149", borderRadius: 4, fontSize: 8, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>OUTLIER: {node.outlierReason}</span>}
                                   <button onClick={() => {
                                     const cols = modal.columns || {};
                                     const srcCol = cols.source || cols.workstation;
@@ -11805,7 +11805,7 @@ export default function App() {
                                       up("columnFilters", cf);
                                     }
                                     setModal(null);
-                                  }} style={{ marginLeft: "auto", padding: "4px 12px", fontSize: 10, background: `linear-gradient(135deg, ${th.accent}33, ${th.accent}18)`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 6, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: 600, transition: "all 0.15s" }}
+                                  }} style={{ marginLeft: "auto", padding: "4px 12px", fontSize: 10, background: `linear-gradient(135deg, ${th.accent}33, ${th.accent}18)`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 6, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 600, transition: "all 0.15s" }}
                                     onMouseEnter={(ev) => { ev.currentTarget.style.background = th.accent + "44"; ev.currentTarget.style.boxShadow = `0 2px 8px ${th.accent}22`; }}
                                     onMouseLeave={(ev) => { ev.currentTarget.style.background = `linear-gradient(135deg, ${th.accent}33, ${th.accent}18)`; ev.currentTarget.style.boxShadow = "none"; }}>
                                     Filter Grid
@@ -11814,7 +11814,7 @@ export default function App() {
                                 {/* Two-column layout */}
                                 <div style={{ display: "flex", gap: 18 }}>
                                   {/* Left: Host Summary + Narrative + Technique Counts */}
-                                  <div style={{ width: 240, flexShrink: 0, fontSize: 9, fontFamily: "-apple-system, sans-serif", color: th.textDim }}>
+                                  <div style={{ width: 240, flexShrink: 0, fontSize: 9, fontFamily: "'Segoe UI', system-ui, sans-serif", color: th.textDim }}>
                                     {/* Host Summary */}
                                     <div style={{ fontSize: 8, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 600, marginBottom: 5 }}>Host Summary</div>
                                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3px 12px", marginBottom: 8 }}>
@@ -11849,7 +11849,7 @@ export default function App() {
                                     )}
                                   </div>
                                   {/* Right: Top Risk Edges (split by direction) */}
-                                  <div style={{ flex: 1, minWidth: 0, fontSize: 9, fontFamily: "-apple-system, sans-serif" }}>
+                                  <div style={{ flex: 1, minWidth: 0, fontSize: 9, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                     {/* Outbound */}
                                     {outHigh.length > 0 && (
                                       <div style={{ marginBottom: 6 }}>
@@ -11873,7 +11873,7 @@ export default function App() {
                                     {/* Low-confidence collapsed */}
                                     {lowConf.length > 0 && (
                                       <details style={{ marginTop: 2 }}>
-                                        <summary style={{ fontSize: 8, color: th.textMuted, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>Low-confidence / unresolved peers ({lowConf.length})</summary>
+                                        <summary style={{ fontSize: 8, color: th.textMuted, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>Low-confidence / unresolved peers ({lowConf.length})</summary>
                                         <div style={{ maxHeight: 60, overflowY: "auto", marginTop: 3 }}>
                                           {lowConf.map((e, i) => (
                                             <div key={i} style={{ fontSize: 9, padding: "2px 0", color: th.textMuted, fontFamily: "monospace", display: "flex", gap: 5, alignItems: "center" }}>
@@ -11911,21 +11911,21 @@ export default function App() {
                               <div style={{ marginTop: 10, padding: 14, background: `linear-gradient(135deg, ${ec}06, ${th.panelBg}ee)`, borderRadius: 10, border: `1px solid ${ec}22`, backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}>
                                 {/* Header */}
                                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
-                                  <span style={{ fontWeight: 600, fontSize: 12, color: th.text, fontFamily: "-apple-system, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
+                                  <span style={{ fontWeight: 600, fontSize: 12, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
                                     <span style={{ padding: "2px 8px", background: isSusHost(selectedEdge.source) ? "#f0883e18" : "#3fb95018", color: isSusHost(selectedEdge.source) ? "#f0883e" : "#3fb950", borderRadius: 5, fontSize: 10 }}>{selectedEdge.source}{isSusHost(selectedEdge.source) && " \u26a0"}</span>
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={ec} strokeWidth="2" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                                     <span style={{ padding: "2px 8px", background: isSusHost(selectedEdge.target) ? "#f0883e18" : "#58a6ff18", color: isSusHost(selectedEdge.target) ? "#f0883e" : "#58a6ff", borderRadius: 5, fontSize: 10 }}>{selectedEdge.target}{isSusHost(selectedEdge.target) && " \u26a0"}</span>
                                   </span>
-                                  {selectedEdge.hasFailures && <span style={{ padding: "2px 8px", background: (th.danger || "#f85149") + "18", color: th.danger || "#f85149", borderRadius: 5, fontSize: 9, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>FAILED</span>}
-                                  {selectedEdge.technique && <span style={{ padding: "2px 8px", background: _techColor(selectedEdge.technique) + "18", color: _techColor(selectedEdge.technique), borderRadius: 5, fontSize: 9, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>{selectedEdge.technique}</span>}
-                                  {(selectedEdge.otherTechniques || []).length > 0 && <span style={{ padding: "2px 6px", background: `${th.textMuted}12`, color: th.textMuted, borderRadius: 5, fontSize: 8, fontFamily: "-apple-system, sans-serif" }}>+{selectedEdge.otherTechniques.join(", ")}</span>}
+                                  {selectedEdge.hasFailures && <span style={{ padding: "2px 8px", background: (th.danger || "#f85149") + "18", color: th.danger || "#f85149", borderRadius: 5, fontSize: 9, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>FAILED</span>}
+                                  {selectedEdge.technique && <span style={{ padding: "2px 8px", background: _techColor(selectedEdge.technique) + "18", color: _techColor(selectedEdge.technique), borderRadius: 5, fontSize: 9, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{selectedEdge.technique}</span>}
+                                  {(selectedEdge.otherTechniques || []).length > 0 && <span style={{ padding: "2px 6px", background: `${th.textMuted}12`, color: th.textMuted, borderRadius: 5, fontSize: 8, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>+{selectedEdge.otherTechniques.join(", ")}</span>}
                                   {(selectedEdge.riskScore || 0) > 0 && <span style={{ padding: "2px 8px", background: (selectedEdge.riskScore >= 30 ? "#f85149" : selectedEdge.riskScore >= 15 ? "#f0883e" : th.textMuted) + "18", color: selectedEdge.riskScore >= 30 ? "#f85149" : selectedEdge.riskScore >= 15 ? "#f0883e" : th.textMuted, borderRadius: 5, fontSize: 9, fontWeight: 700, fontFamily: "monospace" }}>Score {selectedEdge.riskScore}</span>}
-                                  {selectedEdge.isFirstSeen && <span style={{ padding: "2px 6px", background: "#d2a8ff18", color: "#d2a8ff", borderRadius: 5, fontSize: 8, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>FIRST SEEN</span>}
+                                  {selectedEdge.isFirstSeen && <span style={{ padding: "2px 6px", background: "#d2a8ff18", color: "#d2a8ff", borderRadius: 5, fontSize: 8, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>FIRST SEEN</span>}
                                 </div>
                                 {/* Two-column body */}
                                 <div style={{ display: "flex", gap: 18 }}>
                                   {/* Left: stats + flags + findings */}
-                                  <div style={{ width: 240, flexShrink: 0, fontSize: 9, fontFamily: "-apple-system, sans-serif", color: th.textDim }}>
+                                  <div style={{ width: 240, flexShrink: 0, fontSize: 9, fontFamily: "'Segoe UI', system-ui, sans-serif", color: th.textDim }}>
                                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 10px", marginBottom: 8 }}>
                                       <div><span style={_lbl}>Events</span><div style={{ fontWeight: 700, color: th.text, fontSize: 14, marginTop: 1 }}>{selectedEdge.count}{selectedEdge.shareAccessCount > 0 ? <span style={{ fontSize: 9, fontWeight: 400, color: th.textMuted }}> +{selectedEdge.shareAccessCount} share</span> : ""}</div></div>
                                       <div><span style={_lbl}>Users</span><div style={{ marginTop: 2, color: th.text }}>{selectedEdge.users.join(", ")}</div></div>
@@ -12026,7 +12026,7 @@ export default function App() {
                     {/* Chains tab */}
                     {viewTab === "chains" && (() => {
                       const chs = data.chains || [];
-                      if (chs.length === 0) return <div style={{ textAlign: "center", padding: 30, color: th.textMuted, fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>No multi-hop lateral movement chains detected</div>;
+                      if (chs.length === 0) return <div style={{ textAlign: "center", padding: 30, color: th.textMuted, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>No multi-hop lateral movement chains detected</div>;
                       // Pivot summaries
                       const pivotMap = new Map();
                       for (const ch of chs) {
@@ -12050,7 +12050,7 @@ export default function App() {
                           {pivots.length > 0 && (
                             <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
                               {pivots.map(([host, info]) => (
-                                <div key={host} style={{ padding: "6px 10px", background: `${th.accent}08`, border: `1px solid ${th.border}`, borderRadius: 6, fontSize: 9, fontFamily: "-apple-system, sans-serif" }}>
+                                <div key={host} style={{ padding: "6px 10px", background: `${th.accent}08`, border: `1px solid ${th.border}`, borderRadius: 6, fontSize: 9, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                   <div style={{ fontWeight: 700, color: th.text, fontSize: 10, marginBottom: 2 }}>{host}</div>
                                   <div style={{ color: th.textDim }}>Pivot in {info.count} chains</div>
                                   <div style={{ color: th.textMuted, fontSize: 8 }}>Origins: {[...info.origins].slice(0, 3).join(", ")}{info.origins.size > 3 ? ` +${info.origins.size - 3}` : ""}</div>
@@ -12069,13 +12069,13 @@ export default function App() {
                                   {/* Header row: confidence, hops, user, techniques, why */}
                                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6, flexWrap: "wrap" }}>
                                     <span style={{ padding: "2px 6px", background: confBg(chain.confidence), color: cc, borderRadius: 3, fontSize: 9, fontWeight: 700, fontFamily: "monospace", minWidth: 24, textAlign: "center" }}>{chain.confidenceScore || 0}</span>
-                                    <span style={{ padding: "2px 6px", background: confBg(chain.confidence), color: cc, borderRadius: 3, fontSize: 8, fontWeight: 600, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase" }}>{chain.confidence || "low"}</span>
-                                    <span style={{ padding: "2px 6px", background: (th.danger || "#f85149") + "18", color: th.danger || "#f85149", borderRadius: 3, fontSize: 9, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>{chain.hops} hop{chain.hops !== 1 ? "s" : ""}</span>
-                                    <span style={{ fontSize: 10, color: th.text, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>{chain.users.join(", ") || "(unknown)"}</span>
+                                    <span style={{ padding: "2px 6px", background: confBg(chain.confidence), color: cc, borderRadius: 3, fontSize: 8, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase" }}>{chain.confidence || "low"}</span>
+                                    <span style={{ padding: "2px 6px", background: (th.danger || "#f85149") + "18", color: th.danger || "#f85149", borderRadius: 3, fontSize: 9, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{chain.hops} hop{chain.hops !== 1 ? "s" : ""}</span>
+                                    <span style={{ fontSize: 10, color: th.text, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{chain.users.join(", ") || "(unknown)"}</span>
                                     {(chain.techniques || []).map((t, ti) => (
-                                      <span key={ti} style={{ padding: "1px 5px", background: t.includes("RDP") ? "#58a6ff15" : t.includes("Service") || t.includes("PsExec") || t.includes("Impacket") ? "#f8514915" : t.includes("Admin Share") || t.includes("Scheduled Task") || t.includes("WMI") || t.includes("WinRM") ? "#f0883e18" : `${th.textMuted}12`, color: t.includes("RDP") ? "#58a6ff" : t.includes("Service") || t.includes("PsExec") || t.includes("Impacket") ? "#f85149" : t.includes("Admin Share") || t.includes("Scheduled Task") || t.includes("WMI") || t.includes("WinRM") ? "#f0883e" : th.textDim, borderRadius: 3, fontSize: 7, fontFamily: "-apple-system, sans-serif" }}>{t}</span>
+                                      <span key={ti} style={{ padding: "1px 5px", background: t.includes("RDP") ? "#58a6ff15" : t.includes("Service") || t.includes("PsExec") || t.includes("Impacket") ? "#f8514915" : t.includes("Admin Share") || t.includes("Scheduled Task") || t.includes("WMI") || t.includes("WinRM") ? "#f0883e18" : `${th.textMuted}12`, color: t.includes("RDP") ? "#58a6ff" : t.includes("Service") || t.includes("PsExec") || t.includes("Impacket") ? "#f85149" : t.includes("Admin Share") || t.includes("Scheduled Task") || t.includes("WMI") || t.includes("WinRM") ? "#f0883e" : th.textDim, borderRadius: 3, fontSize: 7, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{t}</span>
                                     ))}
-                                    {(chain.occurrences || 1) > 1 && <span style={{ fontSize: 8, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>{"\u00D7"}{chain.occurrences}</span>}
+                                    {(chain.occurrences || 1) > 1 && <span style={{ fontSize: 8, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{"\u00D7"}{chain.occurrences}</span>}
                                   </div>
                                   {/* Path visualization */}
                                   <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
@@ -12092,7 +12092,7 @@ export default function App() {
                                       <div style={{ display: "flex", gap: 20 }}>
                                         {/* Left: hop-by-hop detail */}
                                         <div style={{ flex: 1, minWidth: 0 }}>
-                                          <div style={{ fontWeight: 600, fontSize: 9, color: th.text, fontFamily: "-apple-system, sans-serif", marginBottom: 6 }}>Hop Detail</div>
+                                          <div style={{ fontWeight: 600, fontSize: 9, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 6 }}>Hop Detail</div>
                                           {(chain.hopDetails || []).map((hop, hi) => (
                                             <div key={hi} style={{ padding: "5px 0", fontSize: 9, fontFamily: "monospace", color: th.textDim, borderBottom: hi < chain.hopDetails.length - 1 ? `1px solid ${th.border}15` : "none" }}>
                                               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -12111,7 +12111,7 @@ export default function App() {
                                           ))}
                                         </div>
                                         {/* Right: confidence flags + metadata */}
-                                        <div style={{ width: 200, flexShrink: 0, fontSize: 9, fontFamily: "-apple-system, sans-serif", color: th.textDim }}>
+                                        <div style={{ width: 200, flexShrink: 0, fontSize: 9, fontFamily: "'Segoe UI', system-ui, sans-serif", color: th.textDim }}>
                                           <div style={{ fontWeight: 600, fontSize: 9, color: th.text, marginBottom: 6 }}>Why This Chain</div>
                                           {(chain.confidenceFlags || []).map((f, fi) => (
                                             <div key={fi} style={{ padding: "2px 0", display: "flex", alignItems: "center", gap: 4 }}>
@@ -12146,7 +12146,7 @@ export default function App() {
                     {viewTab === "rdp" && (() => {
                       const sessions = data.rdpSessions || [];
                       if (sessions.length === 0) {
-                        return <div style={{ textAlign: "center", padding: 30, color: th.textMuted, fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>No RDP sessions detected. Ensure TerminalServices event logs (LocalSessionManager, RemoteConnectionManager) are included in your data.</div>;
+                        return <div style={{ textAlign: "center", padding: 30, color: th.textMuted, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>No RDP sessions detected. Ensure TerminalServices event logs (LocalSessionManager, RemoteConnectionManager) are included in your data.</div>;
                       }
                       const rdpHeaders = ["Score", "Status", "Technique", "Source", "Target", "User", "Confidence", "Attempts", "Start Time", "End Time", "Duration", "Why Flagged"];
                       const rdpDefWidths = { Score: 48, Status: 90, Technique: 115, Source: 130, Target: 130, User: 120, Confidence: 72, Attempts: 55, "Start Time": 140, "End Time": 140, Duration: 70, "Why Flagged": 200 };
@@ -12323,7 +12323,7 @@ export default function App() {
                         <div>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 6, marginBottom: 6 }}>
                             {rdpActiveFilterCount > 0 && (
-                              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 8px", background: `${th.accent}11`, borderRadius: 6, fontSize: 10, color: th.accent, fontFamily: "-apple-system, sans-serif" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 8px", background: `${th.accent}11`, borderRadius: 6, fontSize: 10, color: th.accent, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                 <span style={{ fontWeight: 600 }}>Filter active ({rdpActiveFilterCount} column{rdpActiveFilterCount > 1 ? "s" : ""})</span>
                                 <span style={{ fontSize: 10, color: th.textMuted }}>{"\u2014"} {filteredSessions.length} of {sessions.length} sessions</span>
                                 <button onClick={() => setModal((p) => ({ ...p, rdpColFilters: {} }))} style={{ padding: "1px 8px", fontSize: 9, background: th.accent, color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontWeight: 600 }}>Clear All</button>
@@ -12334,11 +12334,11 @@ export default function App() {
                               {gSessions.length > 0 && (
                                 <div style={{ display: "inline-flex", background: th.panelBg, borderRadius: 6, padding: 2, border: `1px solid ${th.border}44`, gap: 1 }}>
                                   {[{ id: "grouped", label: "Grouped" }, { id: "individual", label: "Individual" }].map((m) => (
-                                    <button key={m.id} onClick={() => setModal((p) => ({ ...p, rdpViewMode: m.id }))} style={{ padding: "2px 10px", background: rdpViewMode === m.id ? `${th.accent}` : "transparent", color: rdpViewMode === m.id ? "#fff" : th.textDim, border: "none", borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: rdpViewMode === m.id ? 600 : 400, transition: "all 0.15s" }}>{m.label}</button>
+                                    <button key={m.id} onClick={() => setModal((p) => ({ ...p, rdpViewMode: m.id }))} style={{ padding: "2px 10px", background: rdpViewMode === m.id ? `${th.accent}` : "transparent", color: rdpViewMode === m.id ? "#fff" : th.textDim, border: "none", borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: rdpViewMode === m.id ? 600 : 400, transition: "all 0.15s" }}>{m.label}</button>
                                   ))}
                                 </div>
                               )}
-                              <button onClick={copyRdp} style={{ padding: "3px 10px", fontSize: 10, background: th.btnBg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 4, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}
+                              <button onClick={copyRdp} style={{ padding: "3px 10px", fontSize: 10, background: th.btnBg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 4, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}
                                 onMouseEnter={(ev) => { ev.currentTarget.style.background = th.accent + "22"; }} onMouseLeave={(ev) => { ev.currentTarget.style.background = th.btnBg; }}>
                                 {rdpCheckedCount > 0 ? `Copy Selected (${rdpCheckedCount})` : `Copy All (${sortedSessions.length})`}
                               </button>
@@ -12363,13 +12363,13 @@ export default function App() {
                                       onMouseLeave={(e) => { if (!isExpanded) e.currentTarget.style.background = "transparent"; }}>
                                       <span style={{ fontSize: 8, color: th.textMuted, width: 12, flexShrink: 0 }}>{isExpanded ? "\u25BC" : "\u25B6"}</span>
                                       {gMaxScore > 0 && <span style={{ fontSize: 10, fontWeight: 700, color: gMaxScore >= 30 ? "#f85149" : gMaxScore >= 15 ? "#f0883e" : th.textMuted, minWidth: 20, textAlign: "center", flexShrink: 0 }}>{gMaxScore}</span>}
-                                      <span style={{ padding: "1px 6px", background: ss.bg, color: ss.color, borderRadius: 3, fontSize: 8, fontWeight: 700, fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>{ss.label}</span>
-                                      <span style={{ padding: "1px 5px", background: gts.bg, color: gts.color, borderRadius: 3, fontSize: 8, fontWeight: 600, fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>{gTech}</span>
+                                      <span style={{ padding: "1px 6px", background: ss.bg, color: ss.color, borderRadius: 3, fontSize: 8, fontWeight: 700, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>{ss.label}</span>
+                                      <span style={{ padding: "1px 5px", background: gts.bg, color: gts.color, borderRadius: 3, fontSize: 8, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>{gTech}</span>
                                       <span style={{ fontSize: 10, fontFamily: "monospace", color: th.text }}>{g.source || "\u2014"}</span>
                                       <span style={{ fontSize: 10, color: th.textMuted }}>{"\u2192"}</span>
                                       <span style={{ fontSize: 10, fontFamily: "monospace", color: th.text }}>{g.target || "\u2014"}</span>
-                                      <span style={{ fontSize: 10, color: th.textDim, fontFamily: "-apple-system, sans-serif" }}>{g.user || "(unknown)"}</span>
-                                      <span style={{ padding: "1px 6px", background: g.count > 5 ? "#f0883e22" : `${th.accent}11`, color: g.count > 5 ? "#f0883e" : th.accent, borderRadius: 4, fontSize: 9, fontWeight: 600, fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>{isFailed ? `${gTotalAttempts} attempt${gTotalAttempts !== 1 ? "s" : ""}` : `${g.count} session${g.count !== 1 ? "s" : ""}`}</span>
+                                      <span style={{ fontSize: 10, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{g.user || "(unknown)"}</span>
+                                      <span style={{ padding: "1px 6px", background: g.count > 5 ? "#f0883e22" : `${th.accent}11`, color: g.count > 5 ? "#f0883e" : th.accent, borderRadius: 4, fontSize: 9, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>{isFailed ? `${gTotalAttempts} attempt${gTotalAttempts !== 1 ? "s" : ""}` : `${g.count} session${g.count !== 1 ? "s" : ""}`}</span>
                                       <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "monospace", marginLeft: "auto" }}>{(g.timeRange.from || "").slice(0, 19)}{g.timeRange.to && g.timeRange.to !== g.timeRange.from ? ` \u2014 ${(g.timeRange.to || "").slice(0, 19)}` : ""}</span>
                                     </div>
                                     {isExpanded && (
@@ -12408,7 +12408,7 @@ export default function App() {
                                     <input type="checkbox" checked={rdpAllChecked} onChange={toggleAllRdp} style={{ width: 13, height: 13, cursor: "pointer", accentColor: th.accent }} />
                                   </th>
                                   {rdpHeaders.map((h) => (
-                                    <th key={h} style={{ position: "sticky", top: 0, width: rdpColWidths[h] || rdpDefWidths[h], minWidth: 40, background: th.headerBg || th.panelBg, color: rdpSortCol === h ? th.text : th.accent, padding: "6px 8px", textAlign: "left", fontSize: 9, borderBottom: `1px solid ${th.border}`, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", overflow: "hidden", boxSizing: "border-box", userSelect: "none", zIndex: 2 }}>
+                                    <th key={h} style={{ position: "sticky", top: 0, width: rdpColWidths[h] || rdpDefWidths[h], minWidth: 40, background: th.headerBg || th.panelBg, color: rdpSortCol === h ? th.text : th.accent, padding: "6px 8px", textAlign: "left", fontSize: 9, borderBottom: `1px solid ${th.border}`, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", overflow: "hidden", boxSizing: "border-box", userSelect: "none", zIndex: 2 }}>
                                       <div style={{ display: "flex", alignItems: "center", gap: 3, position: "relative" }}>
                                         <span onClick={() => toggleRdpSort(h)} style={{ cursor: "pointer", overflow: "hidden", textOverflow: "ellipsis" }}>{h}</span>
                                         {rdpSortCol === h && <span style={{ fontSize: 7, color: th.accent }}>{rdpSortDir === "asc" ? "\u25B2" : "\u25BC"}</span>}
@@ -12441,19 +12441,19 @@ export default function App() {
                                         <td style={{ padding: "4px 8px", textAlign: "center", fontWeight: 700, fontSize: 11, color: sc >= 30 ? "#f85149" : sc >= 15 ? "#f0883e" : th.textMuted }}>{sc}</td>
                                         {/* Status */}
                                         <td style={{ padding: "4px 8px" }}>
-                                          <span style={{ padding: "2px 7px", background: st.bg, color: st.color, borderRadius: 4, fontSize: 8, fontWeight: 700, fontFamily: "-apple-system, sans-serif" }}>{st.label}</span>
+                                          <span style={{ padding: "2px 7px", background: st.bg, color: st.color, borderRadius: 4, fontSize: 8, fontWeight: 700, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{st.label}</span>
                                         </td>
                                         {/* Technique */}
                                         <td style={{ padding: "4px 8px" }}>
-                                          <span style={{ padding: "2px 6px", background: ts0.bg, color: ts0.color, borderRadius: 4, fontSize: 8, fontWeight: 600, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap" }}>{s.technique || "RDP"}</span>
-                                          {s.isConcurrent && <span style={{ padding: "1px 4px", background: "#f0883e22", color: "#f0883e", borderRadius: 3, fontSize: 7, fontWeight: 700, fontFamily: "-apple-system, sans-serif", marginLeft: 3 }} title={`Concurrent with session on ${(s._concurrentTargets || []).join(", ")}`}>CONCURRENT</span>}
+                                          <span style={{ padding: "2px 6px", background: ts0.bg, color: ts0.color, borderRadius: 4, fontSize: 8, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap" }}>{s.technique || "RDP"}</span>
+                                          {s.isConcurrent && <span style={{ padding: "1px 4px", background: "#f0883e22", color: "#f0883e", borderRadius: 3, fontSize: 7, fontWeight: 700, fontFamily: "'Segoe UI', system-ui, sans-serif", marginLeft: 3 }} title={`Concurrent with session on ${(s._concurrentTargets || []).join(", ")}`}>CONCURRENT</span>}
                                         </td>
                                         <td style={{ padding: "4px 8px", color: th.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.source || "\u2014"}</td>
                                         <td style={{ padding: "4px 8px", color: th.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.target || "\u2014"}</td>
                                         <td style={{ padding: "4px 8px", color: th.textDim, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.user || "(unknown)"}</td>
                                         {/* Confidence */}
                                         <td style={{ padding: "4px 8px", textAlign: "center" }}>
-                                          <span style={{ fontSize: 8, fontWeight: 600, fontFamily: "-apple-system, sans-serif", color: confStyle(s.confidence) }}>{(s.confidence || "low").toUpperCase()}</span>
+                                          <span style={{ fontSize: 8, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", color: confStyle(s.confidence) }}>{(s.confidence || "low").toUpperCase()}</span>
                                         </td>
                                         {/* Attempts */}
                                         <td style={{ padding: "4px 8px", textAlign: "center", fontWeight: att > 1 ? 600 : 400, color: att > 5 ? "#f85149" : att > 1 ? "#f0883e" : th.textDim }}>{att}</td>
@@ -12464,7 +12464,7 @@ export default function App() {
                                         <td style={{ padding: "4px 6px" }}>
                                           <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
                                             {(s.flags || []).slice(0, 4).map((f, fi) => (
-                                              <span key={fi} style={{ padding: "1px 5px", background: f.startsWith("Finding:") ? "#f8514912" : `${th.accent}11`, color: f.startsWith("Finding:") ? "#f85149" : th.textDim, borderRadius: 3, fontSize: 7, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap" }}>{f}</span>
+                                              <span key={fi} style={{ padding: "1px 5px", background: f.startsWith("Finding:") ? "#f8514912" : `${th.accent}11`, color: f.startsWith("Finding:") ? "#f85149" : th.textDim, borderRadius: 3, fontSize: 7, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap" }}>{f}</span>
                                             ))}
                                             {(s.flags || []).length > 4 && <span style={{ fontSize: 7, color: th.textMuted }}>+{s.flags.length - 4}</span>}
                                           </div>
@@ -12483,14 +12483,14 @@ export default function App() {
                                                     <div key={ei} style={{ position: "relative", paddingLeft: 18, paddingBottom: 6, fontSize: 10, display: "flex", alignItems: "center", gap: 8 }}>
                                                       <div style={{ position: "absolute", left: 0, top: 4, width: 9, height: 9, borderRadius: "50%", background: dotColor, border: `2px solid ${th.panelBg}`, boxShadow: `0 0 0 1px ${dotColor}44` }} />
                                                       <span style={{ padding: "1px 5px", background: th.panelBg, border: `1px solid ${th.border}44`, borderRadius: 3, fontSize: 9, fontFamily: "monospace", color: th.accent, minWidth: 32, textAlign: "center", fontWeight: 600 }}>{evt.eventId}</span>
-                                                      <span style={{ color: th.textDim, fontFamily: "-apple-system, sans-serif" }}>{evt.description}</span>
+                                                      <span style={{ color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{evt.description}</span>
                                                       <span style={{ marginLeft: "auto", color: th.textMuted, fontFamily: "monospace", fontSize: 9 }}>{evt.ts?.slice(11, 23) || ""}</span>
                                                     </div>
                                                   );
                                                 })}
                                               </div>
                                               {/* Right: Session details */}
-                                              <div style={{ width: 220, flexShrink: 0, fontSize: 9, fontFamily: "-apple-system, sans-serif", color: th.textDim }}>
+                                              <div style={{ width: 220, flexShrink: 0, fontSize: 9, fontFamily: "'Segoe UI', system-ui, sans-serif", color: th.textDim }}>
                                                 <div style={{ marginBottom: 8 }}>
                                                   <div style={{ fontWeight: 600, color: th.text, marginBottom: 4, fontSize: 10 }}>Session Details</div>
                                                   <div style={{ display: "flex", gap: 4, marginBottom: 2 }}><span style={{ color: th.textMuted, width: 80 }}>Session ID</span><span>{s.sessionId || "\u2014"}</span></div>
@@ -12561,12 +12561,12 @@ export default function App() {
                                     const onUp = () => { document.body.style.cursor = ""; document.body.style.userSelect = ""; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
                                     window.addEventListener("mousemove", onMove); window.addEventListener("mouseup", onUp);
                                   }}>
-                                  <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "SF Mono, Menlo, monospace" }}>FILTER {"\u2014"} {rdpFilterOpen.toUpperCase()}</span>
+                                  <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>FILTER {"\u2014"} {rdpFilterOpen.toUpperCase()}</span>
                                   <span style={{ cursor: "pointer", color: th.textMuted, fontSize: 14, lineHeight: 1 }} onClick={() => setModal((p) => ({ ...p, rdpFilterOpen: null }))}>{"\u00D7"}</span>
                                 </div>
                                 <div style={{ padding: "6px 10px", flexShrink: 0 }}>
                                   <input type="text" placeholder="Search values..." value={rdpFilterSearch} onChange={(e) => setModal((p) => ({ ...p, rdpFilterSearch: e.target.value }))}
-                                    style={{ width: "100%", boxSizing: "border-box", padding: "5px 8px", fontSize: 11, background: th.panelBg, border: `1px solid ${th.border}55`, borderRadius: 4, color: th.text, outline: "none", fontFamily: "SF Mono, Menlo, monospace" }}
+                                    style={{ width: "100%", boxSizing: "border-box", padding: "5px 8px", fontSize: 11, background: th.panelBg, border: `1px solid ${th.border}55`, borderRadius: 4, color: th.text, outline: "none", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}
                                     autoFocus />
                                 </div>
                                 <div style={{ padding: "2px 10px 6px", display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
@@ -12581,7 +12581,7 @@ export default function App() {
                                       onMouseEnter={(e) => e.currentTarget.style.background = `${th.accent}0a`}
                                       onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
                                       <input type="checkbox" checked={rdpFilterSel.has(v)} readOnly style={{ width: 13, height: 13, accentColor: th.accent, cursor: "pointer", flexShrink: 0 }} />
-                                      <span style={{ fontSize: 11, color: th.text, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "SF Mono, Menlo, monospace" }}>{v || "(empty)"}</span>
+                                      <span style={{ fontSize: 11, color: th.text, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{v || "(empty)"}</span>
                                       <span style={{ fontSize: 10, color: th.textMuted, flexShrink: 0 }}>{rdpFilterCounts[v]}</span>
                                     </div>
                                   ))}
@@ -12773,14 +12773,14 @@ export default function App() {
                         <div>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 6, marginBottom: 6 }}>
                             {activeFilterCount > 0 && (
-                              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 8px", background: `${th.accent}11`, borderRadius: 6, fontSize: 10, color: th.accent, fontFamily: "-apple-system, sans-serif" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 8px", background: `${th.accent}11`, borderRadius: 6, fontSize: 10, color: th.accent, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                 <span style={{ fontWeight: 600 }}>Filter active ({activeFilterCount} column{activeFilterCount > 1 ? "s" : ""})</span>
                                 <span style={{ fontSize: 10, color: th.textMuted }}>{"\u2014"} {filteredEdges.length} of {data.edges.length} connections</span>
                                 <button onClick={() => setModal((p) => ({ ...p, lmColFilters: {} }))} style={{ padding: "1px 8px", fontSize: 9, background: th.accent, color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontWeight: 600 }}>Clear All</button>
                               </div>
                             )}
                             <div style={{ display: "flex", gap: 6, marginLeft: "auto" }}>
-                              <button onClick={copyAll} style={{ padding: "3px 10px", fontSize: 10, background: th.btnBg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 4, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}
+                              <button onClick={copyAll} style={{ padding: "3px 10px", fontSize: 10, background: th.btnBg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 4, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}
                                 onMouseEnter={(ev) => { ev.currentTarget.style.background = th.accent + "22"; }} onMouseLeave={(ev) => { ev.currentTarget.style.background = th.btnBg; }}>
                                 {checkedCount > 0 ? `Copy Selected (${checkedCount})` : `Copy All (${sortedEdges.length})`}
                               </button>
@@ -12794,7 +12794,7 @@ export default function App() {
                                     <input type="checkbox" checked={allChecked} onChange={toggleAllLm} style={{ width: 13, height: 13, cursor: "pointer", accentColor: th.accent }} />
                                   </th>
                                   {lmHeaders.map((h) => (
-                                    <th key={h} style={{ position: "sticky", top: 0, width: lmColWidths[h] || lmDefWidths[h], minWidth: 40, background: th.headerBg || th.panelBg, color: lmSortCol === h ? th.text : th.accent, padding: "6px 8px", textAlign: "left", fontSize: 9, borderBottom: `1px solid ${th.border}`, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", overflow: "hidden", boxSizing: "border-box", userSelect: "none", zIndex: 2 }}>
+                                    <th key={h} style={{ position: "sticky", top: 0, width: lmColWidths[h] || lmDefWidths[h], minWidth: 40, background: th.headerBg || th.panelBg, color: lmSortCol === h ? th.text : th.accent, padding: "6px 8px", textAlign: "left", fontSize: 9, borderBottom: `1px solid ${th.border}`, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", overflow: "hidden", boxSizing: "border-box", userSelect: "none", zIndex: 2 }}>
                                       <div style={{ display: "flex", alignItems: "center", gap: 3, position: "relative" }}>
                                         <span onClick={() => toggleSort(h)} style={{ cursor: "pointer", overflow: "hidden", textOverflow: "ellipsis" }}>{h}</span>
                                         {lmSortCol === h && <span style={{ fontSize: 7, color: th.accent }}>{lmSortDir === "asc" ? "\u25B2" : "\u25BC"}</span>}
@@ -12822,13 +12822,13 @@ export default function App() {
                                         {/* Score */}
                                         <td style={{ padding: "4px 8px", textAlign: "center", fontWeight: 700, fontSize: 11, color: eSc >= 30 ? "#f85149" : eSc >= 15 ? "#f0883e" : th.textMuted }}>{eSc}</td>
                                         {/* Source */}
-                                        <td style={{ padding: "4px 8px", color: isSusHost(e.source) ? "#f0883e" : th.text, fontWeight: isSusHost(e.source) ? 600 : 400, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.source}{isSusHost(e.source) && <span title="Suspicious hostname" style={{ marginLeft: 4, fontSize: 9 }}>&#9888;</span>}{e.sourceLabel && e.sourceLabel !== "host" && <span style={{ marginLeft: 4, fontSize: 7, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>{e.sourceLabel}</span>}</td>
+                                        <td style={{ padding: "4px 8px", color: isSusHost(e.source) ? "#f0883e" : th.text, fontWeight: isSusHost(e.source) ? 600 : 400, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.source}{isSusHost(e.source) && <span title="Suspicious hostname" style={{ marginLeft: 4, fontSize: 9 }}>&#9888;</span>}{e.sourceLabel && e.sourceLabel !== "host" && <span style={{ marginLeft: 4, fontSize: 7, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{e.sourceLabel}</span>}</td>
                                         {/* Target */}
                                         <td style={{ padding: "4px 8px", color: isSusHost(e.target) ? "#f0883e" : th.text, fontWeight: isSusHost(e.target) ? 600 : 400, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.target}{isSusHost(e.target) && <span title="Suspicious hostname" style={{ marginLeft: 4, fontSize: 9 }}>&#9888;</span>}</td>
                                         {/* Technique */}
                                         <td style={{ padding: "4px 8px" }}>
-                                          <span style={{ padding: "2px 6px", background: eTc.bg, color: eTc.color, borderRadius: 4, fontSize: 8, fontWeight: 600, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap" }}>{e.technique || "Unknown"}</span>
-                                          {(e.otherTechniques || []).length > 0 && <span title={(e.otherTechniques || []).join(", ")} style={{ marginLeft: 3, fontSize: 7, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>+{e.otherTechniques.length}</span>}
+                                          <span style={{ padding: "2px 6px", background: eTc.bg, color: eTc.color, borderRadius: 4, fontSize: 8, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap" }}>{e.technique || "Unknown"}</span>
+                                          {(e.otherTechniques || []).length > 0 && <span title={(e.otherTechniques || []).join(", ")} style={{ marginLeft: 3, fontSize: 7, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>+{e.otherTechniques.length}</span>}
                                         </td>
                                         {/* Users */}
                                         <td style={{ padding: "4px 8px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: th.textDim }}>{e.users.join(", ")}</td>
@@ -12842,7 +12842,7 @@ export default function App() {
                                         <td style={{ padding: "4px 6px" }}>
                                           <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
                                             {(e.flags || []).slice(0, 4).map((f, fi) => (
-                                              <span key={fi} style={{ padding: "1px 5px", background: f.startsWith("Finding:") ? "#f8514912" : `${th.accent}11`, color: f.startsWith("Finding:") ? "#f85149" : th.textDim, borderRadius: 3, fontSize: 7, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap" }}>{f}</span>
+                                              <span key={fi} style={{ padding: "1px 5px", background: f.startsWith("Finding:") ? "#f8514912" : `${th.accent}11`, color: f.startsWith("Finding:") ? "#f85149" : th.textDim, borderRadius: 3, fontSize: 7, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap" }}>{f}</span>
                                             ))}
                                             {(e.flags || []).length > 4 && <span style={{ fontSize: 7, color: th.textMuted }}>+{e.flags.length - 4}</span>}
                                           </div>
@@ -12854,9 +12854,9 @@ export default function App() {
                                             <div style={{ display: "flex", gap: 24, marginTop: 8 }}>
                                               {/* Left: Episodes */}
                                               <div style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{ fontWeight: 600, color: th.text, fontSize: 10, fontFamily: "-apple-system, sans-serif", marginBottom: 6 }}>Episodes ({(e.episodes || []).length})</div>
+                                                <div style={{ fontWeight: 600, color: th.text, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 6 }}>Episodes ({(e.episodes || []).length})</div>
                                                 {(e.episodes || []).length === 0 ? (
-                                                  <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>No episode data</div>
+                                                  <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>No episode data</div>
                                                 ) : (
                                                   <div style={{ maxHeight: 180, overflowY: "auto" }}>
                                                     {(e.episodes || []).map((ep, epi) => {
@@ -12868,9 +12868,9 @@ export default function App() {
                                                       return (
                                                         <div key={epi} style={{ display: "flex", alignItems: "center", gap: 6, padding: "3px 0", fontSize: 9, fontFamily: "monospace", color: th.textDim, borderBottom: epi < e.episodes.length - 1 ? `1px solid ${th.border}15` : "none" }}>
                                                           <span style={{ color: th.textMuted, fontSize: 8, minWidth: 16 }}>#{epi + 1}</span>
-                                                          <span style={{ padding: "0 4px", background: phaseBg, color: phaseColor, borderRadius: 2, fontSize: 7, fontWeight: 700, fontFamily: "-apple-system, sans-serif", minWidth: 32, textAlign: "center" }}>{phaseLabel}</span>
+                                                          <span style={{ padding: "0 4px", background: phaseBg, color: phaseColor, borderRadius: 2, fontSize: 7, fontWeight: 700, fontFamily: "'Segoe UI', system-ui, sans-serif", minWidth: 32, textAlign: "center" }}>{phaseLabel}</span>
                                                           <span style={{ fontWeight: 600, color: th.text }}>{ep.user}</span>
-                                                          <span style={{ padding: "0 4px", background: tfColor + "15", color: tfColor, borderRadius: 2, fontSize: 7, fontFamily: "-apple-system, sans-serif" }}>{techFam}</span>
+                                                          <span style={{ padding: "0 4px", background: tfColor + "15", color: tfColor, borderRadius: 2, fontSize: 7, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{techFam}</span>
                                                           <span>{ep.count} evt{ep.count !== 1 ? "s" : ""}</span>
                                                           <span style={{ color: th.textMuted }}>{(ep.firstTs || "").slice(11, 19)}{ep.lastTs && ep.lastTs !== ep.firstTs ? `\u2013${(ep.lastTs || "").slice(11, 19)}` : ""}</span>
                                                         </div>
@@ -12880,7 +12880,7 @@ export default function App() {
                                                 )}
                                               </div>
                                               {/* Right: Edge Summary */}
-                                              <div style={{ width: 240, flexShrink: 0, fontSize: 9, fontFamily: "-apple-system, sans-serif", color: th.textDim }}>
+                                              <div style={{ width: 240, flexShrink: 0, fontSize: 9, fontFamily: "'Segoe UI', system-ui, sans-serif", color: th.textDim }}>
                                                 <div style={{ fontWeight: 600, color: th.text, fontSize: 10, marginBottom: 6 }}>Edge Details</div>
                                                 <div style={{ display: "flex", gap: 4, marginBottom: 2 }}><span style={{ color: th.textMuted, width: 90 }}>Source type</span><span>{e.sourceLabel || "host"}</span></div>
                                                 {(e.otherTechniques || []).length > 0 && <div style={{ display: "flex", gap: 4, marginBottom: 2 }}><span style={{ color: th.textMuted, width: 90 }}>Also seen</span><span>{e.otherTechniques.join(", ")}</span></div>}
@@ -12939,12 +12939,12 @@ export default function App() {
                                     const onUp = () => { document.body.style.cursor = ""; document.body.style.userSelect = ""; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
                                     window.addEventListener("mousemove", onMove); window.addEventListener("mouseup", onUp);
                                   }}>
-                                  <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "SF Mono, Menlo, monospace" }}>FILTER {"\u2014"} {filterOpen.toUpperCase()}</span>
+                                  <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>FILTER {"\u2014"} {filterOpen.toUpperCase()}</span>
                                   <span style={{ cursor: "pointer", color: th.textMuted, fontSize: 14, lineHeight: 1 }} onClick={() => setModal((p) => ({ ...p, lmFilterOpen: null }))}>{"\u00D7"}</span>
                                 </div>
                                 <div style={{ padding: "6px 10px", flexShrink: 0 }}>
                                   <input type="text" placeholder="Search values..." value={filterSearch} onChange={(e) => setModal((p) => ({ ...p, lmFilterSearch: e.target.value }))}
-                                    style={{ width: "100%", boxSizing: "border-box", padding: "5px 8px", fontSize: 11, background: th.panelBg, border: `1px solid ${th.border}55`, borderRadius: 4, color: th.text, outline: "none", fontFamily: "SF Mono, Menlo, monospace" }}
+                                    style={{ width: "100%", boxSizing: "border-box", padding: "5px 8px", fontSize: 11, background: th.panelBg, border: `1px solid ${th.border}55`, borderRadius: 4, color: th.text, outline: "none", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}
                                     autoFocus />
                                 </div>
                                 <div style={{ padding: "2px 10px 6px", display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
@@ -12959,7 +12959,7 @@ export default function App() {
                                       onMouseEnter={(e) => e.currentTarget.style.background = `${th.accent}0a`}
                                       onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
                                       <input type="checkbox" checked={filterSel.has(v)} readOnly style={{ width: 13, height: 13, accentColor: th.accent, cursor: "pointer", flexShrink: 0 }} />
-                                      <span style={{ fontSize: 11, color: th.text, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "SF Mono, Menlo, monospace" }}>{v || "(empty)"}</span>
+                                      <span style={{ fontSize: 11, color: th.text, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{v || "(empty)"}</span>
                                       <span style={{ fontSize: 10, color: th.textMuted, flexShrink: 0 }}>{filterCounts[v]}</span>
                                     </div>
                                   ))}
@@ -13004,7 +13004,7 @@ export default function App() {
                 )}
                 {phase === "loading" && (
                   <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center" }}>
-                    <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>{Math.round(modal.lmProgress || 0)}% complete</span>
+                    <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{Math.round(modal.lmProgress || 0)}% complete</span>
                     <button onClick={() => setModal((p) => ({ ...p, phase: "config", loading: false, lmProgress: 0, _cancelled: true }))} style={{ ...ms.bs, borderRadius: 8 }}>Cancel</button>
                   </div>
                 )}
@@ -13407,7 +13407,7 @@ export default function App() {
         }
 
         // --- Pivot handlers ---
-        const _paBtnS = { padding: "2px 8px", background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: 500 };
+        const _paBtnS = { padding: "2px 8px", background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 4, fontSize: 9, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 };
         const _paBtnActive = (a) => a ? { ..._paBtnS, background: th.accent, color: "#fff" } : _paBtnS;
         // Artifact search term: use the shortest unique identifier so it actually matches payload text
         const _artSearchTerm = (inc) => {
@@ -13517,7 +13517,7 @@ export default function App() {
         const paEdge = (cursor, pos) => ({ position: "absolute", ...pos, zIndex: 10, cursor });
 
         return (
-          <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", WebkitAppRegion: "no-drag" }}>
             <div style={{ WebkitAppRegion: "no-drag", position: "absolute", left: paX, top: paY, width: paW, height: paH, display: "flex", flexDirection: "column", background: `linear-gradient(160deg, ${th.modalBg}, ${th.panelBg})`, borderRadius: 16, border: `1px solid ${th.modalBorder}44`, boxShadow: `0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px ${th.border}22`, overflow: "hidden" }}>
               {/* Resize handles */}
               <div onMouseDown={(e) => startPaResize(e, "t")} style={paEdge("ns-resize", { top: 0, left: 8, right: 8, height: 5 })} />
@@ -13534,8 +13534,8 @@ export default function App() {
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill={(th.danger||"#f85149")+"22"} stroke={th.danger||"#f85149"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01"/></svg>
                   <div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: th.text, letterSpacing: "-0.3px", fontFamily: "-apple-system, sans-serif" }}>Persistence Analyzer</div>
-                    <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", marginTop: 1 }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: th.text, letterSpacing: "-0.3px", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Persistence Analyzer</div>
+                    <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", marginTop: 1 }}>
                       {phase === "results" && data ? (modal.paFindingsView === "alerts" && viewTab === "grouped"
                         ? `${data.stats.incidentCount || 0} incidents (${data.stats.total} items) | ${data.stats.byIncidentSeverity?.critical || 0} critical | ${data.detectedMode?.toUpperCase()} mode`
                         : `${data.stats.total} mechanisms found | ${data.stats.bySeverity?.critical || 0} critical | ${data.detectedMode?.toUpperCase()} mode`) : "Automated persistence mechanism detection"}
@@ -13551,7 +13551,7 @@ export default function App() {
                 {/* Config phase */}
                 {phase === "config" && (
                   <div>
-                    {modal.error && <div style={{ padding: "10px 14px", marginBottom: 14, background: `${(th.danger||"#f85149")}15`, border: `1px solid ${(th.danger||"#f85149")}33`, borderRadius: 8, color: th.danger||"#f85149", fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>{modal.error}</div>}
+                    {modal.error && <div style={{ padding: "10px 14px", marginBottom: 14, background: `${(th.danger||"#f85149")}15`, border: `1px solid ${(th.danger||"#f85149")}33`, borderRadius: 8, color: th.danger||"#f85149", fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{modal.error}</div>}
 
                     {/* Auto-detect summary card */}
                     {(() => {
@@ -13563,20 +13563,20 @@ export default function App() {
                         <div style={{ padding: "12px 14px", background: `${th.panelBg}44`, border: `1px solid ${th.border}22`, borderRadius: 10, marginBottom: 14 }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                              <span style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system, sans-serif" }}>Data Source</span>
-                              {dm && <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: `${th.accent}15`, color: th.accent, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>{modeLabel}</span>}
-                              {dm && <span style={{ fontSize: 9, color: th.textDim, fontFamily: "-apple-system, sans-serif" }}>{modeHint}</span>}
+                              <span style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Data Source</span>
+                              {dm && <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: `${th.accent}15`, color: th.accent, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{modeLabel}</span>}
+                              {dm && <span style={{ fontSize: 9, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{modeHint}</span>}
                             </div>
                             <div style={{ display: "flex", gap: 4 }}>
                               {["auto", "evtx", "registry"].map((m) => (
                                 <button key={m} onClick={() => { setModal((p) => ({ ...p, mode: m, _paNeedsPreview: true })); }}
-                                  style={{ padding: "3px 10px", borderRadius: 5, border: `1px solid ${pMode === m ? th.accent : th.border}44`, background: pMode === m ? `${th.accent}15` : "transparent", color: pMode === m ? th.accent : th.textMuted, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, sans-serif", transition: "all 0.15s" }}>
+                                  style={{ padding: "3px 10px", borderRadius: 5, border: `1px solid ${pMode === m ? th.accent : th.border}44`, background: pMode === m ? `${th.accent}15` : "transparent", color: pMode === m ? th.accent : th.textMuted, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", transition: "all 0.15s" }}>
                                   {m === "auto" ? "Auto" : m.toUpperCase()}
                                 </button>
                               ))}
                             </div>
                           </div>
-                          {prev?.trackedEvents != null && <span style={{ fontSize: 9, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{(prev.trackedEvents || 0).toLocaleString()} tracked events</span>}
+                          {prev?.trackedEvents != null && <span style={{ fontSize: 9, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{(prev.trackedEvents || 0).toLocaleString()} tracked events</span>}
                         </div>
                       );
                     })()}
@@ -13590,9 +13590,9 @@ export default function App() {
                       <div style={{ marginBottom: 14 }}>
                         <button onClick={() => setModal((p) => ({ ...p, paShowMapping: !p.paShowMapping }))}
                           style={{ width: "100%", padding: "8px 14px", background: `${th.panelBg}44`, border: `1px solid ${th.border}22`, borderRadius: 10, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.15s" }}>
-                          <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Column Mapping ({mappingMode === "evtx" ? "EVTX" : "Registry"})</span>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Column Mapping ({mappingMode === "evtx" ? "EVTX" : "Registry"})</span>
                           <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>
+                            <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                               {(() => {
                                 const cq = modal.paPreview?.columnQuality;
                                 if (!cq) return "auto-detected";
@@ -13614,7 +13614,7 @@ export default function App() {
                                 const cq = modal.paPreview?.columnQuality?.[key];
                                 return (
                                   <div key={key}>
-                                    <div style={{ fontSize: 10, color: th.textMuted, marginBottom: 3, fontFamily: "-apple-system, sans-serif", display: "flex", alignItems: "center", gap: 4 }}>
+                                    <div style={{ fontSize: 10, color: th.textMuted, marginBottom: 3, fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", alignItems: "center", gap: 4 }}>
                                       {label}
                                       {cq && cq.mapped && <span style={{ fontSize: 8, color: cq.nullRate > 50 ? (th.danger || "#f85149") : "#3fb950" }}>{cq.nullRate > 0 ? `${cq.nullRate}% null` : "OK"}</span>}
                                     </div>
@@ -13638,12 +13638,12 @@ export default function App() {
                       {PA_INTENTS.map((intent) => (
                         <button key={intent.id} onClick={() => applyPaIntent(intent)}
                           style={{ flex: 1, padding: "8px 10px", borderRadius: 8, border: `1px solid ${modal.paIntent === intent.id ? th.accent : th.border}44`, background: modal.paIntent === intent.id ? `${th.accent}12` : "transparent", cursor: "pointer", transition: "all 0.15s", textAlign: "center" }}>
-                          <div style={{ fontSize: 11, fontWeight: 600, color: modal.paIntent === intent.id ? th.accent : th.text, fontFamily: "-apple-system, sans-serif" }}>{intent.label}</div>
-                          <div style={{ fontSize: 9, color: th.textMuted, marginTop: 1, fontFamily: "-apple-system, sans-serif" }}>{intent.desc}</div>
+                          <div style={{ fontSize: 11, fontWeight: 600, color: modal.paIntent === intent.id ? th.accent : th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{intent.label}</div>
+                          <div style={{ fontSize: 9, color: th.textMuted, marginTop: 1, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{intent.desc}</div>
                         </button>
                       ))}
                       <button onClick={resetPaRules} title="Reset to recommended"
-                        style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${th.border}44`, background: "transparent", cursor: "pointer", color: th.textMuted, fontSize: 10, fontWeight: 600, fontFamily: "-apple-system, sans-serif", transition: "all 0.15s", flexShrink: 0 }}
+                        style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${th.border}44`, background: "transparent", cursor: "pointer", color: th.textMuted, fontSize: 10, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", transition: "all 0.15s", flexShrink: 0 }}
                         onMouseEnter={(e) => e.currentTarget.style.color = th.accent} onMouseLeave={(e) => e.currentTarget.style.color = th.textMuted}>
                         Reset
                       </button>
@@ -13651,7 +13651,7 @@ export default function App() {
 
                     {/* Technique Preset Cards */}
                     <div style={{ marginBottom: 14 }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8, fontFamily: "-apple-system, sans-serif" }}>Detection Techniques</div>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Detection Techniques</div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                         {((pMode === "registry") ? PA_REG_PRESETS : PA_EVTX_PRESETS).map((preset) => {
                           const prefix = pMode === "registry" ? "reg" : "evtx";
@@ -13664,14 +13664,14 @@ export default function App() {
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                   <span style={{ color: isOn ? th.accent : th.textMuted, transition: "color 0.15s" }}>{preset.icon}</span>
-                                  <span style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{preset.name}</span>
-                                  <span style={{ fontSize: 9, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{activeCount}/{preset.rules.length}</span>
+                                  <span style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{preset.name}</span>
+                                  <span style={{ fontSize: 9, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{activeCount}/{preset.rules.length}</span>
                                 </div>
                                 <div style={{ width: 28, height: 16, borderRadius: 8, background: isOn ? th.accent : th.border, position: "relative", transition: "background 0.2s" }}>
                                   <div style={{ width: 12, height: 12, borderRadius: 6, background: "#fff", position: "absolute", top: 2, left: isOn ? 14 : 2, transition: "left 0.2s" }} />
                                 </div>
                               </div>
-                              <div style={{ fontSize: 10, color: th.textMuted, marginTop: 4, fontFamily: "-apple-system, sans-serif", lineHeight: 1.4 }}>{preset.desc}</div>
+                              <div style={{ fontSize: 10, color: th.textMuted, marginTop: 4, fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1.4 }}>{preset.desc}</div>
                             </div>
                           );
                         })}
@@ -13681,13 +13681,13 @@ export default function App() {
                     {/* Event/Coverage Availability Strip */}
                     <div style={{ padding: "10px 14px", background: `${th.panelBg}44`, border: `1px solid ${th.border}22`, borderRadius: 10, marginBottom: 12 }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system, sans-serif" }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                           {pMode === "registry" ? "Registry Coverage" : "Event Availability"}
                         </div>
-                        {modal.paPreview && <span style={{ fontSize: 9, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{(modal.paPreview.trackedEvents || 0).toLocaleString()} tracked events</span>}
+                        {modal.paPreview && <span style={{ fontSize: 9, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{(modal.paPreview.trackedEvents || 0).toLocaleString()} tracked events</span>}
                       </div>
                       {modal.paPreviewLoading ? (
-                        <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", padding: "6px 0" }}>Scanning dataset...</div>
+                        <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", padding: "6px 0" }}>Scanning dataset...</div>
                       ) : (
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                           {(pMode === "registry" ? PA_REG_GROUPS : PA_EVTX_GROUPS).map((g, gi) => {
@@ -13699,9 +13699,9 @@ export default function App() {
                             }
                             const hasData = count > 0;
                             return (
-                              <div key={gi} title={g.detector || g.label} style={{ padding: "3px 8px", borderRadius: 5, fontSize: 9, fontWeight: 600, fontFamily: "-apple-system, sans-serif",
+                              <div key={gi} title={g.detector || g.label} style={{ padding: "3px 8px", borderRadius: 5, fontSize: 9, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif",
                                 background: hasData ? `${th.accent}15` : `${th.border}22`, color: hasData ? th.accent : th.textMuted, border: `1px solid ${hasData ? th.accent + "33" : th.border + "22"}`, transition: "all 0.15s" }}>
-                                {g.label} {hasData && <span style={{ fontFamily: "SF Mono, monospace", fontSize: 8 }}>({count.toLocaleString()})</span>}
+                                {g.label} {hasData && <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 8 }}>({count.toLocaleString()})</span>}
                               </div>
                             );
                           })}
@@ -13719,7 +13719,7 @@ export default function App() {
                         return (
                           <div style={{ marginTop: 8 }}>
                             {allW.map((w, wi) => (
-                              <div key={wi} style={{ fontSize: 10, color: wColors[w.level] || th.textMuted, fontFamily: "-apple-system, sans-serif", padding: "2px 0", lineHeight: 1.4 }}>
+                              <div key={wi} style={{ fontSize: 10, color: wColors[w.level] || th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", padding: "2px 0", lineHeight: 1.4 }}>
                                 {w.level === "error" ? "\u2718" : w.level === "warn" ? "\u26A0" : "\u2139"} {w.text}
                               </div>
                             ))}
@@ -13732,11 +13732,11 @@ export default function App() {
                     <div>
                       <button onClick={() => setModal((p) => ({ ...p, showRules: !p.showRules }))}
                         style={{ width: "100%", padding: "10px 14px", background: `${th.accent}08`, border: `1px solid ${th.border}33`, borderRadius: 10, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.15s" }}>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={th.textMuted} strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                           Advanced
                         </span>
-                        <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
                           <span>{evtxActive}/{EVTX_SUMMARIES.length} EVTX, {regActive}/{REG_SUMMARIES.length} Reg{customCount > 0 ? `, ${customCount} custom` : ""}</span>
                           <span style={{ transform: modal.showRules ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", fontSize: 12 }}>&#9662;</span>
                         </span>
@@ -13746,7 +13746,7 @@ export default function App() {
                         <div style={{ marginTop: 8, padding: "10px 12px", background: `${th.panelBg}88`, border: `1px solid ${th.border}22`, borderRadius: 10, maxHeight: 320, overflowY: "auto" }}>
                           {(pMode === "evtx" || pMode === "auto") && (
                             <div style={{ marginBottom: 10 }}>
-                              <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>
+                              <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                 EVTX Rules ({evtxActive}/{EVTX_SUMMARIES.length})
                               </div>
                               {EVTX_SUMMARIES.map((r, i) => {
@@ -13759,12 +13759,12 @@ export default function App() {
                                   <div key={key} style={{ padding: "3px 0" }}>
                                     <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", opacity: off ? 0.45 : 1, transition: "opacity 0.15s" }}>
                                       <input type="checkbox" checked={!off} onChange={() => toggleRule(key)} style={{ accentColor: th.accent, margin: 0, flexShrink: 0 }} />
-                                      <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: SEVERITY_COLORS[r.sev] + "22", color: SEVERITY_COLORS[r.sev], fontWeight: 600, fontFamily: "-apple-system, sans-serif", minWidth: 42, textAlign: "center", textTransform: "uppercase" }}>{r.sev}</span>
-                                      <span style={{ fontSize: 11, color: th.text, fontFamily: "-apple-system, sans-serif", flex: 1 }}>{r.cat} — {r.name}</span>
-                                      <span style={{ fontSize: 9, color: evCount > 0 ? th.accent : th.textDim, fontFamily: "SF Mono, monospace" }}>{evCount > 0 ? evCount.toLocaleString() : "0"}</span>
-                                      <span style={{ fontSize: 10, color: th.textDim, fontFamily: "SF Mono, monospace", minWidth: 30, textAlign: "right" }}>EID {r.hint}</span>
+                                      <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: SEVERITY_COLORS[r.sev] + "22", color: SEVERITY_COLORS[r.sev], fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", minWidth: 42, textAlign: "center", textTransform: "uppercase" }}>{r.sev}</span>
+                                      <span style={{ fontSize: 11, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", flex: 1 }}>{r.cat} — {r.name}</span>
+                                      <span style={{ fontSize: 9, color: evCount > 0 ? th.accent : th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{evCount > 0 ? evCount.toLocaleString() : "0"}</span>
+                                      <span style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", minWidth: 30, textAlign: "right" }}>EID {r.hint}</span>
                                     </label>
-                                    {blurb && <div style={{ fontSize: 9, color: th.textDim, fontFamily: "-apple-system, sans-serif", marginLeft: 22, marginTop: 1 }}>{blurb}</div>}
+                                    {blurb && <div style={{ fontSize: 9, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif", marginLeft: 22, marginTop: 1 }}>{blurb}</div>}
                                   </div>
                                 );
                               })}
@@ -13773,7 +13773,7 @@ export default function App() {
 
                           {(pMode === "registry" || pMode === "auto") && (
                             <div style={{ marginBottom: 10 }}>
-                              <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>
+                              <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                 Registry Rules ({regActive}/{REG_SUMMARIES.length})
                               </div>
                               {REG_SUMMARIES.map((r, i) => {
@@ -13782,9 +13782,9 @@ export default function App() {
                                 return (
                                   <label key={key} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 0", cursor: "pointer", opacity: off ? 0.45 : 1, transition: "opacity 0.15s" }}>
                                     <input type="checkbox" checked={!off} onChange={() => toggleRule(key)} style={{ accentColor: th.accent, margin: 0, flexShrink: 0 }} />
-                                    <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: SEVERITY_COLORS[r.sev] + "22", color: SEVERITY_COLORS[r.sev], fontWeight: 600, fontFamily: "-apple-system, sans-serif", minWidth: 42, textAlign: "center", textTransform: "uppercase" }}>{r.sev}</span>
-                                    <span style={{ fontSize: 11, color: th.text, fontFamily: "-apple-system, sans-serif", flex: 1 }}>{r.cat} — {r.name}</span>
-                                    <span style={{ fontSize: 10, color: th.textDim, fontFamily: "SF Mono, monospace" }}>{r.hint}</span>
+                                    <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: SEVERITY_COLORS[r.sev] + "22", color: SEVERITY_COLORS[r.sev], fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", minWidth: 42, textAlign: "center", textTransform: "uppercase" }}>{r.sev}</span>
+                                    <span style={{ fontSize: 11, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", flex: 1 }}>{r.cat} — {r.name}</span>
+                                    <span style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{r.hint}</span>
                                   </label>
                                 );
                               })}
@@ -13793,12 +13793,12 @@ export default function App() {
 
                           {(modal.customRules || []).length > 0 && (
                             <div style={{ marginBottom: 10 }}>
-                              <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>Custom Rules</div>
+                              <div style={{ fontSize: 10, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Custom Rules</div>
                               {(modal.customRules || []).map((cr, i) => (
                                 <div key={`custom-${i}`} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 0" }}>
-                                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: SEVERITY_COLORS[cr.severity || "medium"] + "22", color: SEVERITY_COLORS[cr.severity || "medium"], fontWeight: 600, fontFamily: "-apple-system, sans-serif", minWidth: 42, textAlign: "center", textTransform: "uppercase" }}>{cr.severity || "med"}</span>
-                                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: `${th.accent}22`, color: th.accent, fontWeight: 600, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase" }}>{cr.type}</span>
-                                  <span style={{ fontSize: 11, color: th.text, fontFamily: "-apple-system, sans-serif", flex: 1 }}>{cr.category || "Custom"} — {cr.name || "Custom Rule"}</span>
+                                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: SEVERITY_COLORS[cr.severity || "medium"] + "22", color: SEVERITY_COLORS[cr.severity || "medium"], fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", minWidth: 42, textAlign: "center", textTransform: "uppercase" }}>{cr.severity || "med"}</span>
+                                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: `${th.accent}22`, color: th.accent, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase" }}>{cr.type}</span>
+                                  <span style={{ fontSize: 11, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", flex: 1 }}>{cr.category || "Custom"} — {cr.name || "Custom Rule"}</span>
                                   <button onClick={() => deleteCustomRule(i)} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 14, padding: "0 4px", lineHeight: 1 }} onMouseEnter={(e) => e.currentTarget.style.color = th.danger || "#f85149"} onMouseLeave={(e) => e.currentTarget.style.color = th.textMuted}>&times;</button>
                                 </div>
                               ))}
@@ -13815,7 +13815,7 @@ export default function App() {
                               <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
                                 {["evtx", "registry"].map((t) => (
                                   <button key={t} onClick={() => setModal((p) => ({ ...p, addingRule: t, newRule: { ...(p.newRule || {}), type: t } }))}
-                                    style={{ padding: "3px 10px", borderRadius: 4, border: `1px solid ${modal.addingRule === t ? th.accent : th.border}44`, background: modal.addingRule === t ? `${th.accent}15` : "transparent", color: modal.addingRule === t ? th.accent : th.textMuted, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>
+                                    style={{ padding: "3px 10px", borderRadius: 4, border: `1px solid ${modal.addingRule === t ? th.accent : th.border}44`, background: modal.addingRule === t ? `${th.accent}15` : "transparent", color: modal.addingRule === t ? th.accent : th.textMuted, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                     {t.toUpperCase()}
                                   </button>
                                 ))}
@@ -13870,12 +13870,12 @@ export default function App() {
                           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01"/>
                         </svg>
                       </div>
-                      <div style={{ color: th.text, fontSize: 13, fontWeight: 500, marginBottom: 6, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.2px" }}>{plabels[pi]}</div>
-                      <div style={{ color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif", marginBottom: 24 }}>This may take a moment for large datasets</div>
+                      <div style={{ color: th.text, fontSize: 13, fontWeight: 500, marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.2px" }}>{plabels[pi]}</div>
+                      <div style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 24 }}>This may take a moment for large datasets</div>
                       <div style={{ position: "relative", height: 4, background: th.border + "22", borderRadius: 2, overflow: "hidden", maxWidth: 360, margin: "0 auto 12px" }}>
                         <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${prog}%`, background: `linear-gradient(90deg, ${th.accent}, ${th.danger || "#f85149"})`, borderRadius: 2, transition: "width 0.25s ease-out", boxShadow: `0 0 12px ${th.accent}44` }} />
                       </div>
-                      <div style={{ color: th.textDim, fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>{Math.round(prog)}%</div>
+                      <div style={{ color: th.textDim, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{Math.round(prog)}%</div>
                     </div>
                   );
                 })()}
@@ -13883,7 +13883,7 @@ export default function App() {
                 {/* Results phase */}
                 {phase === "results" && data && (
                   <div>
-                    {(data.warnings || []).length > 0 && <div style={{ padding: "6px 10px", background: (th.warning || "#d29922") + "12", border: `1px solid ${(th.warning || "#d29922")}30`, borderRadius: 6, color: th.warning || "#d29922", fontSize: 10, marginBottom: 10, fontFamily: "-apple-system, sans-serif", lineHeight: 1.5 }}>
+                    {(data.warnings || []).length > 0 && <div style={{ padding: "6px 10px", background: (th.warning || "#d29922") + "12", border: `1px solid ${(th.warning || "#d29922")}30`, borderRadius: 6, color: th.warning || "#d29922", fontSize: 10, marginBottom: 10, fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1.5 }}>
                       <span style={{ fontWeight: 600 }}>Data quality:</span> {data.warnings.map((w, i) => <span key={i}>{i > 0 && " | "}{w}</span>)}
                     </div>}
                     {/* Stats cards — uniform glass */}
@@ -13902,8 +13902,8 @@ export default function App() {
                         { val: data.stats.categoriesFound || 0, label: "categories" },
                       ]).map((c, i) => (
                         <div key={i} style={{ flex: 1, textAlign: "center", padding: "10px 6px 8px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderRadius: 10, border: `1px solid ${th.border}33` }}>
-                          <div style={{ fontSize: 22, fontWeight: 700, color: c.danger && c.val > 0 ? (th.danger || "#f85149") : th.text, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.5px", lineHeight: 1 }}>{c.val}</div>
-                          <div style={{ fontSize: 9, color: c.danger && c.val > 0 ? (th.danger || "#f85149") + "bb" : th.textMuted, marginTop: 3, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 500 }}>{c.label}</div>
+                          <div style={{ fontSize: 22, fontWeight: 700, color: c.danger && c.val > 0 ? (th.danger || "#f85149") : th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.5px", lineHeight: 1 }}>{c.val}</div>
+                          <div style={{ fontSize: 9, color: c.danger && c.val > 0 ? (th.danger || "#f85149") + "bb" : th.textMuted, marginTop: 3, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 500 }}>{c.label}</div>
                         </div>
                       ))}
                     </div>
@@ -13932,7 +13932,7 @@ export default function App() {
                       <div style={{ display: "flex", gap: 0, background: th.border + "22", borderRadius: 8, padding: 2, width: "fit-content" }}>
                         {["grouped", "timeline", "table"].map((tab) => (
                           <button key={tab} onClick={() => setModal((p) => ({ ...p, viewTab: tab }))}
-                            style={{ padding: "5px 16px", fontSize: 11, fontWeight: viewTab === tab ? 600 : 400, fontFamily: "-apple-system, sans-serif", background: viewTab === tab ? th.accent + "20" : "transparent", color: viewTab === tab ? th.accent : th.textMuted, border: "none", borderRadius: 6, cursor: "pointer", textTransform: "capitalize", transition: "all 0.15s" }}>{tab}</button>
+                            style={{ padding: "5px 16px", fontSize: 11, fontWeight: viewTab === tab ? 600 : 400, fontFamily: "'Segoe UI', system-ui, sans-serif", background: viewTab === tab ? th.accent + "20" : "transparent", color: viewTab === tab ? th.accent : th.textMuted, border: "none", borderRadius: 6, cursor: "pointer", textTransform: "capitalize", transition: "all 0.15s" }}>{tab}</button>
                         ))}
                       </div>
                       <div style={{ display: "flex", gap: 4, marginLeft: "auto", alignItems: "center" }}>
@@ -13942,13 +13942,13 @@ export default function App() {
                             filteredItems.forEach((i) => s.add(persistItemKey(i)));
                             return { ...p, checkedItems: s };
                           });
-                        }} style={{ padding: "3px 8px", fontSize: 10, background: "transparent", color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 5, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>Select All ({filteredItems.length})</button>
-                        {checkedItems.size > 0 && <button onClick={() => setModal((p) => ({ ...p, checkedItems: new Set() }))} style={{ padding: "3px 8px", fontSize: 10, background: "transparent", color: th.textMuted, border: `1px solid ${th.border}`, borderRadius: 5, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Clear ({checkedItems.size})</button>}
+                        }} style={{ padding: "3px 8px", fontSize: 10, background: "transparent", color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 5, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>Select All ({filteredItems.length})</button>
+                        {checkedItems.size > 0 && <button onClick={() => setModal((p) => ({ ...p, checkedItems: new Set() }))} style={{ padding: "3px 8px", fontSize: 10, background: "transparent", color: th.textMuted, border: `1px solid ${th.border}`, borderRadius: 5, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Clear ({checkedItems.size})</button>}
                       </div>
                     </div>
 
                     {filteredItems.length === 0 && (
-                      <div style={{ textAlign: "center", padding: "40px 20px", color: th.textMuted, fontSize: 13, fontFamily: "-apple-system, sans-serif" }}>
+                      <div style={{ textAlign: "center", padding: "40px 20px", color: th.textMuted, fontSize: 13, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                         No persistence mechanisms found{searchText || severityFilter !== "all" || categoryFilter !== "all" ? " matching filters" : ""}
                       </div>
                     )}
@@ -13965,16 +13965,16 @@ export default function App() {
                             onMouseLeave={(e) => { if (!isExp) e.currentTarget.style.borderColor = SEVERITY_COLORS[inc.severity] + "22"; }}>
                             {/* Collapsed row */}
                             <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", minHeight: 28 }}>
-                              <span style={{ padding: "1px 6px", background: SEVERITY_COLORS[inc.severity] + "22", color: SEVERITY_COLORS[inc.severity], borderRadius: 3, fontSize: 8, fontWeight: 700, textTransform: "uppercase", fontFamily: "-apple-system, sans-serif", letterSpacing: "0.03em", flexShrink: 0 }}>{inc.severity}</span>
+                              <span style={{ padding: "1px 6px", background: SEVERITY_COLORS[inc.severity] + "22", color: SEVERITY_COLORS[inc.severity], borderRadius: 3, fontSize: 8, fontWeight: 700, textTransform: "uppercase", fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "0.03em", flexShrink: 0 }}>{inc.severity}</span>
                               <span style={{ fontFamily: "monospace", fontSize: 9, color: th.accent, background: `${th.accent}15`, padding: "1px 4px", borderRadius: 3, fontWeight: 600, flexShrink: 0, minWidth: 20, textAlign: "center" }}>{inc.triageScore}</span>
                               <PaMitreBadge category={inc.category} />
-                              <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{inc.title}</span>
-                              {inc.computer && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontWeight: 500, fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>{inc.computer}</span>}
-                              {inc.occurrenceCount > 1 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontWeight: 500, fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>{inc.occurrenceCount}x</span>}
+                              <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{inc.title}</span>
+                              {inc.computer && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>{inc.computer}</span>}
+                              {inc.occurrenceCount > 1 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>{inc.occurrenceCount}x</span>}
                               {pills.slice(0, 3).map((p, i) => (
-                                <span key={i} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: (PA_PILL_COLORS[p.type] || "#8b949e") + "18", color: PA_PILL_COLORS[p.type] || "#8b949e", fontWeight: 500, fontFamily: "-apple-system, sans-serif", flexShrink: 0, whiteSpace: "nowrap" }}>{p.text}</span>
+                                <span key={i} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: (PA_PILL_COLORS[p.type] || "#8b949e") + "18", color: PA_PILL_COLORS[p.type] || "#8b949e", fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0, whiteSpace: "nowrap" }}>{p.text}</span>
                               ))}
-                              {inc.rmmTool && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#f0883e22", color: "#f0883e", fontWeight: 700, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase", flexShrink: 0 }}>RMM</span>}
+                              {inc.rmmTool && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#f0883e22", color: "#f0883e", fontWeight: 700, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase", flexShrink: 0 }}>RMM</span>}
                             </div>
                             {/* Expanded detail */}
                             {isExp && (
@@ -13982,8 +13982,8 @@ export default function App() {
                                 {/* Artifact + Command */}
                                 {(inc.artifact || inc.command) && (
                                   <div style={{ marginBottom: 6, display: "flex", flexDirection: "column", gap: 2 }}>
-                                    {inc.artifact && <div style={{ fontSize: 10, fontFamily: "SF Mono, Menlo, monospace" }}><span style={{ color: th.accent, fontWeight: 600 }}>artifact: </span><span style={{ color: inc.isSuspicious ? (th.danger || "#f85149") : th.text, fontWeight: inc.isSuspicious ? 600 : 400 }}>{inc.artifact}</span></div>}
-                                    {inc.command && <div style={{ fontSize: 10, fontFamily: "SF Mono, Menlo, monospace" }}><span style={{ color: th.accent, fontWeight: 600 }}>command: </span><span style={{ color: th.textMuted }}>{inc.command}</span></div>}
+                                    {inc.artifact && <div style={{ fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}><span style={{ color: th.accent, fontWeight: 600 }}>artifact: </span><span style={{ color: inc.isSuspicious ? (th.danger || "#f85149") : th.text, fontWeight: inc.isSuspicious ? 600 : 400 }}>{inc.artifact}</span></div>}
+                                    {inc.command && <div style={{ fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}><span style={{ color: th.accent, fontWeight: 600 }}>command: </span><span style={{ color: th.textMuted }}>{inc.command}</span></div>}
                                   </div>
                                 )}
                                 {/* Time range + host + user */}
@@ -13996,7 +13996,7 @@ export default function App() {
                                 {inc.suspiciousReasons.length > 0 && (
                                   <div style={{ marginBottom: 6, display: "flex", gap: 4, flexWrap: "wrap" }}>
                                     {inc.suspiciousReasons.map((r, i) => (
-                                      <span key={i} style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, background: `${th.danger || "#f85149"}15`, color: th.danger || "#f85149", fontWeight: 500, fontFamily: "-apple-system, sans-serif" }}>{r}</span>
+                                      <span key={i} style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, background: `${th.danger || "#f85149"}15`, color: th.danger || "#f85149", fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{r}</span>
                                     ))}
                                   </div>
                                 )}
@@ -14004,17 +14004,17 @@ export default function App() {
                                 {pills.length > 0 && (
                                   <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 8 }}>
                                     {pills.map((p, i) => (
-                                      <span key={i} style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, background: (PA_PILL_COLORS[p.type] || "#8b949e") + "18", color: PA_PILL_COLORS[p.type] || "#8b949e", fontWeight: 500, fontFamily: "-apple-system, sans-serif" }}>{p.text}</span>
+                                      <span key={i} style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, background: (PA_PILL_COLORS[p.type] || "#8b949e") + "18", color: PA_PILL_COLORS[p.type] || "#8b949e", fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{p.text}</span>
                                     ))}
                                   </div>
                                 )}
                                 {/* All occurrences when multiple */}
                                 {inc.occurrenceCount > 1 && (
                                   <div style={{ marginBottom: 8 }}>
-                                    <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase", letterSpacing: "0.04em" }}>All Occurrences</div>
+                                    <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: "0.04em" }}>All Occurrences</div>
                                     <div style={{ display: "flex", flexDirection: "column", gap: 2, maxHeight: 120, overflowY: "auto" }}>
                                       {inc.items.slice(0, 50).map((it, i) => (
-                                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 9, fontFamily: "SF Mono, Menlo, monospace", color: th.textDim, padding: "2px 4px", borderRadius: 3, background: i % 2 === 0 ? "transparent" : `${th.border}11` }}>
+                                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 9, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.textDim, padding: "2px 4px", borderRadius: 3, background: i % 2 === 0 ? "transparent" : `${th.border}11` }}>
                                           <span style={{ color: th.textMuted, minWidth: 130 }}>{(it.timestamp || "").slice(0, 19)}</span>
                                           <span style={{ color: SEVERITY_COLORS[it.severity], fontWeight: 600, textTransform: "uppercase", fontSize: 8, minWidth: 45 }}>{it.severity}</span>
                                           <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{it.detailsSummary}</span>
@@ -14028,10 +14028,10 @@ export default function App() {
                                 {/* Raw fields */}
                                 {inc.details && Object.keys(inc.details).length > 0 && (
                                   <div style={{ marginBottom: 8 }}>
-                                    <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase", letterSpacing: "0.04em" }}>Raw Fields</div>
+                                    <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, marginBottom: 4, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: "0.04em" }}>Raw Fields</div>
                                     <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 12px" }}>
                                       {Object.entries(inc.details).filter(([k]) => !k.startsWith("_")).map(([k, v]) => v ? (
-                                        <div key={k} style={{ fontSize: 9, fontFamily: "SF Mono, Menlo, monospace" }}>
+                                        <div key={k} style={{ fontSize: 9, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                           <span style={{ color: th.accent + "aa", fontWeight: 500 }}>{k}: </span>
                                           <span style={{ color: th.textDim }}>{String(v).substring(0, 200)}</span>
                                         </div>
@@ -14059,16 +14059,16 @@ export default function App() {
                             <button onClick={() => setModal((p) => ({ ...p, paFindingsView: "alerts" }))} style={_paBtnActive(paFindingsView === "alerts")}>Alerts ({sortedIncidents.length})</button>
                             <button onClick={() => setModal((p) => ({ ...p, paFindingsView: "items" }))} style={_paBtnActive(paFindingsView === "items")}>Items ({filteredItems.length})</button>
                             <span style={{ width: 1, height: 16, background: th.border, margin: "0 4px" }} />
-                            <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Sort:</span>
-                            <select value={paSortBy} onChange={(e) => setModal((p) => ({ ...p, paSortBy: e.target.value }))} style={{ fontSize: 9, padding: "2px 4px", background: th.bg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 3, fontFamily: "-apple-system, sans-serif" }}>
+                            <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Sort:</span>
+                            <select value={paSortBy} onChange={(e) => setModal((p) => ({ ...p, paSortBy: e.target.value }))} style={{ fontSize: 9, padding: "2px 4px", background: th.bg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 3, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                               <option value="triage">Priority</option>
                               <option value="severity">Severity</option>
                               <option value="recency">Recency</option>
                               <option value="events">Events</option>
                             </select>
                             {paFindingsView === "alerts" && <>
-                              <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Group:</span>
-                              <select value={paGroupBy} onChange={(e) => setModal((p) => ({ ...p, paGroupBy: e.target.value }))} style={{ fontSize: 9, padding: "2px 4px", background: th.bg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 3, fontFamily: "-apple-system, sans-serif" }}>
+                              <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Group:</span>
+                              <select value={paGroupBy} onChange={(e) => setModal((p) => ({ ...p, paGroupBy: e.target.value }))} style={{ fontSize: 9, padding: "2px 4px", background: th.bg, color: th.text, border: `1px solid ${th.border}`, borderRadius: 3, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                 <option value="incident">By Incident</option>
                                 <option value="host">By Host</option>
                                 <option value="technique">By Technique</option>
@@ -14077,7 +14077,7 @@ export default function App() {
                             </>}
                             <span style={{ width: 1, height: 16, background: th.border, margin: "0 4px" }} />
                             {Object.entries((paFindingsView === "alerts" ? data.stats.byIncidentSeverity : data.stats.bySeverity) || {}).filter(([, v]) => v > 0).map(([sev, cnt]) => (
-                              <span key={sev} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "2px 7px", background: SEVERITY_COLORS[sev] + "15", color: SEVERITY_COLORS[sev], borderRadius: 4, fontSize: 9, fontWeight: 600, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase" }}>
+                              <span key={sev} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "2px 7px", background: SEVERITY_COLORS[sev] + "15", color: SEVERITY_COLORS[sev], borderRadius: 4, fontSize: 9, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase" }}>
                                 {cnt} {sev}
                               </span>
                             ))}
@@ -14088,13 +14088,13 @@ export default function App() {
                             <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                               {paGroupedEntries ? paGroupedEntries.map(([gKey, gIncs]) => (
                                 <div key={gKey}>
-                                  <div style={{ fontSize: 10, fontWeight: 600, color: th.textDim, padding: "6px 0 4px", fontFamily: "-apple-system, sans-serif", borderBottom: `1px solid ${th.border}`, marginBottom: 4 }}>
+                                  <div style={{ fontSize: 10, fontWeight: 600, color: th.textDim, padding: "6px 0 4px", fontFamily: "'Segoe UI', system-ui, sans-serif", borderBottom: `1px solid ${th.border}`, marginBottom: 4 }}>
                                     {gKey} <span style={{ fontWeight: 400, color: th.textMuted }}>({gIncs.length} incidents) | Top score: {Math.max(...gIncs.map(i => i.triageScore || 0))}</span>
                                   </div>
                                   {gIncs.map(inc => _renderIncCard(inc))}
                                 </div>
                               )) : sortedIncidents.map(inc => _renderIncCard(inc))}
-                              {sortedIncidents.length === 0 && <div style={{ fontSize: 11, color: th.textMuted, fontFamily: "-apple-system, sans-serif", padding: 20, textAlign: "center" }}>No persistence incidents found matching filters.</div>}
+                              {sortedIncidents.length === 0 && <div style={{ fontSize: 11, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", padding: 20, textAlign: "center" }}>No persistence incidents found matching filters.</div>}
                             </div>
                           )}
 
@@ -14106,19 +14106,19 @@ export default function App() {
                                   onClick={() => _paOpenInTimeline({ ...item, firstSeen: item.timestamp, lastSeen: item.timestamp, mode: item.mode, source: item.source, artifact: item.artifact, computer: item.computer })}>
                                   <span style={{ padding: "1px 5px", background: SEVERITY_COLORS[item.severity] + "22", color: SEVERITY_COLORS[item.severity], borderRadius: 3, fontSize: 8, fontWeight: 700, textTransform: "uppercase", flexShrink: 0 }}>{item.severity}</span>
                                   <span style={{ fontFamily: "monospace", fontSize: 9, color: th.accent, background: `${th.accent}15`, padding: "1px 4px", borderRadius: 3, fontWeight: 600, flexShrink: 0 }}>{item.riskScore}</span>
-                                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 500, fontSize: 10, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{item.name}</span>
+                                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 500, fontSize: 10, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{item.name}</span>
                                   <span style={{ color: th.textMuted, fontSize: 9, fontFamily: "monospace", flexShrink: 0 }}>{(item.timestamp || "").slice(0, 19)}</span>
-                                  {item.computer && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontWeight: 500, flexShrink: 0, fontFamily: "-apple-system, sans-serif" }}>{item.computer}</span>}
+                                  {item.computer && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#3fb95018", color: "#3fb950", fontWeight: 500, flexShrink: 0, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{item.computer}</span>}
                                   {(item.evidencePills || []).slice(0, 2).map((p, i) => (
-                                    <span key={i} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: (PA_PILL_COLORS[p.type] || "#8b949e") + "18", color: PA_PILL_COLORS[p.type] || "#8b949e", fontWeight: 500, flexShrink: 0, whiteSpace: "nowrap", fontFamily: "-apple-system, sans-serif" }}>{p.text}</span>
+                                    <span key={i} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: (PA_PILL_COLORS[p.type] || "#8b949e") + "18", color: PA_PILL_COLORS[p.type] || "#8b949e", fontWeight: 500, flexShrink: 0, whiteSpace: "nowrap", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{p.text}</span>
                                   ))}
                                 </div>
                               ))}
-                              {filteredItems.length > (modal._itemsLimit || 500) && <div style={{ fontSize: 10, color: th.textMuted, padding: 6, fontFamily: "-apple-system, sans-serif", display: "flex", alignItems: "center", gap: 8 }}>
+                              {filteredItems.length > (modal._itemsLimit || 500) && <div style={{ fontSize: 10, color: th.textMuted, padding: 6, fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", alignItems: "center", gap: 8 }}>
                                 <span style={{ fontStyle: "italic" }}>Showing {modal._itemsLimit || 500} of {filteredItems.length}</span>
-                                <button onClick={() => setModal(p => ({ ...p, _itemsLimit: (p._itemsLimit || 500) + 500 }))} style={{ padding: "2px 10px", fontSize: 9, background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 3, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Load more</button>
+                                <button onClick={() => setModal(p => ({ ...p, _itemsLimit: (p._itemsLimit || 500) + 500 }))} style={{ padding: "2px 10px", fontSize: 9, background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 3, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Load more</button>
                               </div>}
-                              {filteredItems.length === 0 && <div style={{ fontSize: 11, color: th.textMuted, fontFamily: "-apple-system, sans-serif", padding: 20, textAlign: "center" }}>No items found matching filters.</div>}
+                              {filteredItems.length === 0 && <div style={{ fontSize: 11, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", padding: 20, textAlign: "center" }}>No items found matching filters.</div>}
                             </div>
                           )}
                         </div>
@@ -14247,11 +14247,11 @@ export default function App() {
                         <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6, flexWrap: "wrap" }}>
                           {Object.entries(TL_MODES).map(([k, m]) => (
                             <button key={k} onClick={() => setModal((p) => ({ ...p, tlMode: k }))} title={m.desc}
-                              style={{ padding: "3px 10px", fontSize: 10, fontWeight: tlMode === k ? 700 : 500, background: tlMode === k ? th.accent : `${th.accent}15`, color: tlMode === k ? "#fff" : th.accent, border: `1px solid ${tlMode === k ? th.accent : th.accent + "33"}`, borderRadius: 4, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>{m.label}</button>
+                              style={{ padding: "3px 10px", fontSize: 10, fontWeight: tlMode === k ? 700 : 500, background: tlMode === k ? th.accent : `${th.accent}15`, color: tlMode === k ? "#fff" : th.accent, border: `1px solid ${tlMode === k ? th.accent : th.accent + "33"}`, borderRadius: 4, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{m.label}</button>
                           ))}
-                          {tlMode === "custom" && <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif", fontStyle: "italic" }}>Custom sort/filter</span>}
+                          {tlMode === "custom" && <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", fontStyle: "italic" }}>Custom sort/filter</span>}
                           <span style={{ width: 1, height: 16, background: th.border, margin: "0 2px" }} />
-                          <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", cursor: "pointer" }}>
+                          <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", cursor: "pointer" }}>
                             <input type="checkbox" checked={suspOnly} onChange={(e) => {
                               if (e.target.checked) setModal((p) => ({ ...p, tlMode: "custom", _tlSuspOnly: true }));
                               else setModal((p) => ({ ...p, _tlSuspOnly: false, tlMode: p.tlMode === "custom" ? "chronology" : p.tlMode }));
@@ -14259,7 +14259,7 @@ export default function App() {
                             Suspicious Only
                           </label>
                           {/* Banner summary */}
-                          {suspCount > 0 && <span style={{ marginLeft: "auto", fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>
+                          {suspCount > 0 && <span style={{ marginLeft: "auto", fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                             <span style={{ color: th.danger || "#f85149", fontWeight: 600 }}>{suspCount} suspicious</span> across {suspHosts} host{suspHosts !== 1 ? "s" : ""}
                             {topCats.length > 0 && <> | Top: {topCats.join(", ")}</>}
                             {topPills.length > 0 && <> | {topPills.map(([t, c]) => `${c} ${t}`).join(", ")}</>}
@@ -14275,17 +14275,17 @@ export default function App() {
                                   const cur = p.tlCatFilter ? new Set(p.tlCatFilter) : new Set(allCatKeys);
                                   if (cur.has(cat)) cur.delete(cat); else cur.add(cat);
                                   return { ...p, tlCatFilter: cur.size === allCatKeys.length ? null : cur };
-                                })} style={{ padding: "2px 7px", fontSize: 9, background: active ? `${th.accent}18` : "transparent", color: active ? th.accent : th.textMuted + "66", border: `1px solid ${active ? th.accent + "33" : th.border + "22"}`, borderRadius: 3, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: active ? 600 : 400 }}>
+                                })} style={{ padding: "2px 7px", fontSize: 9, background: active ? `${th.accent}18` : "transparent", color: active ? th.accent : th.textMuted + "66", border: `1px solid ${active ? th.accent + "33" : th.border + "22"}`, borderRadius: 3, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: active ? 600 : 400 }}>
                                   {cat} ({catCounts[cat] || 0})
                                 </button>
                               );
                             })}
-                            {tlCatFilter && <button onClick={() => setModal((p) => ({ ...p, tlCatFilter: null }))} style={{ padding: "2px 7px", fontSize: 9, background: "transparent", color: th.textMuted, border: `1px solid ${th.border}22`, borderRadius: 3, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Reset</button>}
+                            {tlCatFilter && <button onClick={() => setModal((p) => ({ ...p, tlCatFilter: null }))} style={{ padding: "2px 7px", fontSize: 9, background: "transparent", color: th.textMuted, border: `1px solid ${th.border}22`, borderRadius: 3, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Reset</button>}
                           </div>
                         )}
                         {/* Active filter indicator */}
                         {activeFilterCount > 0 && (
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 8px", marginBottom: 6, background: `${th.accent}11`, borderRadius: 6, fontSize: 10, color: th.accent, fontFamily: "-apple-system, sans-serif" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 8px", marginBottom: 6, background: `${th.accent}11`, borderRadius: 6, fontSize: 10, color: th.accent, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                             <span style={{ fontWeight: 600 }}>Filter active ({activeFilterCount} column{activeFilterCount > 1 ? "s" : ""})</span>
                             <span style={{ fontSize: 10, color: th.textMuted }}>— {tlFiltered.length} of {filteredItems.length} items</span>
                             <button onClick={() => setModal((p) => ({ ...p, tableColFilters: {} }))} style={{ marginLeft: "auto", padding: "1px 8px", fontSize: 9, background: th.accent, color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontWeight: 600 }}>Clear All</button>
@@ -14306,7 +14306,7 @@ export default function App() {
                           }} style={{ width: 13, height: 13, cursor: "pointer", accentColor: th.accent, flexShrink: 0 }} title={sorted.length > 0 && sorted.slice(0, modal._tlRowLimit || 500).every((i) => isChecked(i)) ? "Deselect all" : "Select all visible"} />
                           {tlCols.map((col) => (
                             <div key={col.key} style={{ width: gtlw(col.key), minWidth: 40, flexShrink: 0, display: "flex", alignItems: "center", position: "relative", userSelect: "none", gap: 3 }}>
-                              <span onClick={() => col.key !== "evidence" && toggleTlSort(col.key)} style={{ fontSize: 10, fontWeight: 600, color: tlSortCol === col.key ? th.accent : th.textMuted, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase", letterSpacing: 0.5, cursor: col.key !== "evidence" ? "pointer" : "default", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              <span onClick={() => col.key !== "evidence" && toggleTlSort(col.key)} style={{ fontSize: 10, fontWeight: 600, color: tlSortCol === col.key ? th.accent : th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: 0.5, cursor: col.key !== "evidence" ? "pointer" : "default", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                 {col.label}{tlSortCol === col.key ? (tlSortDir === "asc" ? " \u25B2" : " \u25BC") : ""}
                               </span>
                               {col.key !== "evidence" && col.key !== "riskScore" && <span style={{ cursor: "pointer", fontSize: 9, color: colFilters[col.key] ? th.accent : th.textMuted, flexShrink: 0, marginLeft: "auto", paddingRight: 8, opacity: colFilters[col.key] ? 1 : 0.5 }}
@@ -14328,7 +14328,7 @@ export default function App() {
                                   onClick={() => setModal((p) => ({ ...p, _expandedStreak: p._expandedStreak === idx ? null : idx }))}>
                                   <div style={{ position: "absolute", left: -17, width: 8, height: 8, borderRadius: 4, background: th.textMuted + "44", border: `2px solid ${th.modalBg}`, zIndex: 1 }} />
                                   <span style={{ width: 13, flexShrink: 0, fontSize: 9, textAlign: "center", color: th.textMuted }}>{expanded ? "\u25BC" : "\u25B6"}</span>
-                                  <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>
+                                  <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                     <span style={{ fontWeight: 500 }}>{rep.artifact || rep.name}</span>
                                     {rep.computer && <span> on {rep.computer}</span>}
                                     <span style={{ padding: "1px 5px", marginLeft: 6, borderRadius: 3, background: `${th.border}22`, fontSize: 9, fontWeight: 600 }}>\u00D7 {count}</span>
@@ -14355,30 +14355,30 @@ export default function App() {
                             onMouseLeave={(e) => { if (!isSelPersist(item)) e.currentTarget.style.background = isChecked(item) ? `${th.accent}0a` : "transparent"; }}>
                             <div style={{ position: "absolute", left: -17, width: 8, height: 8, borderRadius: 4, background: item.isSuspicious ? (th.danger || "#f85149") : (SEVERITY_COLORS[item.severity] || th.textMuted), border: `2px solid ${th.modalBg}`, zIndex: 1 }} />
                             <input type="checkbox" checked={isChecked(item)} onChange={(e) => toggleCheck(item, e)} onClick={(e) => e.stopPropagation()} style={{ width: 13, height: 13, cursor: "pointer", accentColor: th.accent, flexShrink: 0 }} />
-                            <span style={{ width: gtlw("timestamp"), minWidth: 40, fontSize: 10, color: isLowRisk ? th.textDim : th.textMuted, fontFamily: "SF Mono, Menlo, monospace", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.timestamp ? String(item.timestamp).substring(0, 19) : "\u2014"}</span>
+                            <span style={{ width: gtlw("timestamp"), minWidth: 40, fontSize: 10, color: isLowRisk ? th.textDim : th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.timestamp ? String(item.timestamp).substring(0, 19) : "\u2014"}</span>
                             <span style={{ width: gtlw("severity"), minWidth: 40, fontSize: 9, flexShrink: 0 }}>
-                              <span style={{ padding: "1px 5px", borderRadius: 3, background: (SEVERITY_COLORS[item.severity] || th.textMuted) + "20", color: SEVERITY_COLORS[item.severity] || th.textMuted, fontWeight: 700, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase" }}>{item.severity.substring(0, 4)}</span>
+                              <span style={{ padding: "1px 5px", borderRadius: 3, background: (SEVERITY_COLORS[item.severity] || th.textMuted) + "20", color: SEVERITY_COLORS[item.severity] || th.textMuted, fontWeight: 700, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase" }}>{item.severity.substring(0, 4)}</span>
                             </span>
                             <span style={{ width: gtlw("riskScore"), minWidth: 40, fontSize: 10, fontFamily: "monospace", fontWeight: 600, textAlign: "right", paddingRight: 6, color: (item.riskScore || 0) >= 8 ? "#f85149" : (item.riskScore || 0) >= 6 ? "#f0883e" : th.textMuted, flexShrink: 0 }}>{item.riskScore || 0}{item.confidence === "confirmed" ? <span style={{ fontSize: 6, color: "#3fb950", marginLeft: 2 }}>●</span> : item.confidence === "likely" ? <span style={{ fontSize: 6, color: "#f0883e", marginLeft: 2 }}>●</span> : null}</span>
-                            <span style={{ width: gtlw("name"), minWidth: 40, fontSize: 11, fontWeight: 500, color: isLowRisk ? th.textDim : th.text, fontFamily: "-apple-system, sans-serif", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            <span style={{ width: gtlw("name"), minWidth: 40, fontSize: 11, fontWeight: 500, color: isLowRisk ? th.textDim : th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                               {item.name}{item.isSuspicious && <span style={{ fontSize: 7, padding: "1px 4px", marginLeft: 4, borderRadius: 2, background: `${th.danger || "#f85149"}22`, color: th.danger || "#f85149", fontWeight: 700, textTransform: "uppercase" }}>!</span>}{item.rmmTool && <span title="Remote Management tool" style={{ fontSize: 7, padding: "1px 4px", marginLeft: 4, borderRadius: 2, background: "#f0883e22", color: "#f0883e", fontWeight: 700, textTransform: "uppercase" }}>RMM</span>}
                             </span>
-                            <span title={item.artifact || ""} style={{ width: gtlw("artifact"), minWidth: 40, fontSize: 10, color: item.isSuspicious ? (th.danger || "#f85149") : isLowRisk ? th.textDim : th.textMuted, fontWeight: item.isSuspicious ? 500 : 400, fontFamily: "SF Mono, Menlo, monospace", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.artifact || ""}</span>
+                            <span title={item.artifact || ""} style={{ width: gtlw("artifact"), minWidth: 40, fontSize: 10, color: item.isSuspicious ? (th.danger || "#f85149") : isLowRisk ? th.textDim : th.textMuted, fontWeight: item.isSuspicious ? 500 : 400, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.artifact || ""}</span>
                             <span style={{ width: gtlw("evidence"), minWidth: 40, flexShrink: 0, display: "flex", gap: 3, alignItems: "center", overflow: "hidden" }}>
                               {(item.evidencePills || []).filter(p => p.type !== "target").slice(0, 3).map((p, i) => (
-                                <span key={i} style={{ fontSize: 8, padding: "1px 4px", borderRadius: 3, background: (PA_PILL_COLORS[p.type] || "#8b949e") + "18", color: PA_PILL_COLORS[p.type] || "#8b949e", fontWeight: 500, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>{p.text}</span>
+                                <span key={i} style={{ fontSize: 8, padding: "1px 4px", borderRadius: 3, background: (PA_PILL_COLORS[p.type] || "#8b949e") + "18", color: PA_PILL_COLORS[p.type] || "#8b949e", fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>{p.text}</span>
                               ))}
                               {(!item.evidencePills || item.evidencePills.filter(p => p.type !== "target").length === 0) && <span style={{ fontSize: 9, color: th.textMuted + "44" }}>\u2014</span>}
                             </span>
-                            <span title={item.command || item.detailsSummary || ""} style={{ width: gtlw("command"), minWidth: 40, fontSize: 10, color: isLowRisk ? th.textDim + "88" : th.textDim, fontFamily: "SF Mono, Menlo, monospace", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.command || item.detailsSummary || ""}</span>
+                            <span title={item.command || item.detailsSummary || ""} style={{ width: gtlw("command"), minWidth: 40, fontSize: 10, color: isLowRisk ? th.textDim + "88" : th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.command || item.detailsSummary || ""}</span>
                           </div>
                           );
                         })}
-                        {sorted.length > (modal._tlRowLimit || 500) && <div style={{ padding: "8px 0 4px 10px", fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", display: "flex", alignItems: "center", gap: 8 }}>
+                        {sorted.length > (modal._tlRowLimit || 500) && <div style={{ padding: "8px 0 4px 10px", fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", alignItems: "center", gap: 8 }}>
                           <span style={{ fontStyle: "italic" }}>Showing {modal._tlRowLimit || 500} of {sorted.length}</span>
-                          <button onClick={() => setModal(p => ({ ...p, _tlRowLimit: (p._tlRowLimit || 500) + 500 }))} style={{ padding: "2px 10px", fontSize: 9, background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 3, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Load more</button>
+                          <button onClick={() => setModal(p => ({ ...p, _tlRowLimit: (p._tlRowLimit || 500) + 500 }))} style={{ padding: "2px 10px", fontSize: 9, background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 3, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Load more</button>
                         </div>}
-                        {displayRows.length === 0 && <div style={{ padding: "20px 10px", fontSize: 11, color: th.textMuted, textAlign: "center", fontFamily: "-apple-system, sans-serif" }}>No items match current filters{tlMode === "triage" ? " — try Hunt or Chronology mode" : ""}</div>}
+                        {displayRows.length === 0 && <div style={{ padding: "20px 10px", fontSize: 11, color: th.textMuted, textAlign: "center", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>No items match current filters{tlMode === "triage" ? " — try Hunt or Chronology mode" : ""}</div>}
                         {/* Column filter dropdown popup */}
                         {filterOpen && (
                           <>
@@ -14395,12 +14395,12 @@ export default function App() {
                                   const onUp = () => { document.body.style.cursor = ""; document.body.style.userSelect = ""; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
                                   window.addEventListener("mousemove", onMove); window.addEventListener("mouseup", onUp);
                                 }}>
-                                <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "SF Mono, Menlo, monospace" }}>FILTER — {(tlCols.find((c) => c.key === filterOpen)?.label || filterOpen).toUpperCase()}</span>
+                                <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>FILTER — {(tlCols.find((c) => c.key === filterOpen)?.label || filterOpen).toUpperCase()}</span>
                                 <span style={{ cursor: "pointer", color: th.textMuted, fontSize: 14, lineHeight: 1 }} onClick={() => setModal((p) => ({ ...p, colFilterOpen: null }))}>×</span>
                               </div>
                               <div style={{ padding: "6px 10px", flexShrink: 0 }}>
                                 <input type="text" placeholder="Search values..." value={filterSearch} onChange={(e) => setModal((p) => ({ ...p, colFilterSearch: e.target.value }))}
-                                  style={{ width: "100%", boxSizing: "border-box", padding: "5px 8px", fontSize: 11, background: th.panelBg, border: `1px solid ${th.border}55`, borderRadius: 4, color: th.text, outline: "none", fontFamily: "SF Mono, Menlo, monospace" }}
+                                  style={{ width: "100%", boxSizing: "border-box", padding: "5px 8px", fontSize: 11, background: th.panelBg, border: `1px solid ${th.border}55`, borderRadius: 4, color: th.text, outline: "none", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}
                                   autoFocus />
                               </div>
                               <div style={{ padding: "2px 10px 6px", display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
@@ -14415,7 +14415,7 @@ export default function App() {
                                     onMouseEnter={(e) => e.currentTarget.style.background = `${th.accent}0a`}
                                     onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
                                     <input type="checkbox" checked={filterSel.has(v)} readOnly style={{ width: 13, height: 13, accentColor: th.accent, cursor: "pointer", flexShrink: 0 }} />
-                                    <span style={{ fontSize: 11, color: th.text, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "SF Mono, Menlo, monospace" }}>{v || "(empty)"}</span>
+                                    <span style={{ fontSize: 11, color: th.text, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{v || "(empty)"}</span>
                                     <span style={{ fontSize: 10, color: th.textMuted, flexShrink: 0 }}>{filterCounts[v]}</span>
                                   </div>
                                 ))}
@@ -14625,7 +14625,7 @@ export default function App() {
                             <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{rep?.name || inc.category}</span>
                             {inc.occurrenceCount > 1 && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}15`, color: th.accent, fontWeight: 600, flexShrink: 0 }}>{inc.occurrenceCount}x</span>}
                             {inc.rmmTool && <span style={{ fontSize: 7, padding: "1px 4px", borderRadius: 2, background: "#f0883e22", color: "#f0883e", fontWeight: 700, textTransform: "uppercase", flexShrink: 0 }}>RMM</span>}
-                            {topPills.map((p, i) => <span key={i} style={{ fontSize: 7, padding: "1px 4px", borderRadius: 2, background: (PA_PILL_COLORS[p.type] || "#8b949e") + "15", color: PA_PILL_COLORS[p.type] || "#8b949e", fontWeight: 500, fontFamily: "-apple-system, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>{p.text}</span>)}
+                            {topPills.map((p, i) => <span key={i} style={{ fontSize: 7, padding: "1px 4px", borderRadius: 2, background: (PA_PILL_COLORS[p.type] || "#8b949e") + "15", color: PA_PILL_COLORS[p.type] || "#8b949e", fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>{p.text}</span>)}
                           </span>;
                         }
                         if (col.key === "timestamp") {
@@ -14649,15 +14649,15 @@ export default function App() {
                           <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", borderBottom: `1px solid ${th.border}22` }}>
                             {Object.entries(TBL_MODES).map(([k, m]) => (
                               <button key={k} onClick={() => setModal((p) => ({ ...p, tblMode: k, _expandedCluster: null }))} title={m.desc}
-                                style={{ padding: "3px 10px", fontSize: 10, fontWeight: tblMode === k ? 700 : 500, background: tblMode === k ? th.accent : `${th.accent}15`, color: tblMode === k ? "#fff" : th.accent, border: `1px solid ${tblMode === k ? th.accent : th.accent + "33"}`, borderRadius: 4, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>{m.label}</button>
+                                style={{ padding: "3px 10px", fontSize: 10, fontWeight: tblMode === k ? 700 : 500, background: tblMode === k ? th.accent : `${th.accent}15`, color: tblMode === k ? "#fff" : th.accent, border: `1px solid ${tblMode === k ? th.accent : th.accent + "33"}`, borderRadius: 4, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{m.label}</button>
                             ))}
-                            {tblMode === "custom" && <span style={{ fontSize: 9, color: th.textMuted, fontStyle: "italic", fontFamily: "-apple-system, sans-serif" }}>Custom</span>}
+                            {tblMode === "custom" && <span style={{ fontSize: 9, color: th.textMuted, fontStyle: "italic", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Custom</span>}
                             <button onClick={() => setModal(p => ({ ...p, _tblHideExpected: !p._tblHideExpected }))} title="Hide expected/whitelisted items"
-                              style={{ padding: "2px 8px", fontSize: 9, fontWeight: hideExpected ? 600 : 400, background: hideExpected ? `${th.accent}15` : "transparent", color: hideExpected ? th.accent : th.textMuted, border: `1px solid ${hideExpected ? th.accent + "33" : th.border + "33"}`, borderRadius: 3, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>
+                              style={{ padding: "2px 8px", fontSize: 9, fontWeight: hideExpected ? 600 : 400, background: hideExpected ? `${th.accent}15` : "transparent", color: hideExpected ? th.accent : th.textMuted, border: `1px solid ${hideExpected ? th.accent + "33" : th.border + "33"}`, borderRadius: 3, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                               {hideExpected ? "Expected Hidden" : "Hide Expected"}
                             </button>
-                            {expectedHiddenCount > 0 && <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif", fontStyle: "italic" }}>{expectedHiddenCount} hidden</span>}
-                            <span style={{ marginLeft: "auto", fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>
+                            {expectedHiddenCount > 0 && <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", fontStyle: "italic" }}>{expectedHiddenCount} hidden</span>}
+                            <span style={{ marginLeft: "auto", fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                               {useCollapse ? `${sortedIncidents.length} clusters` : `${tableFiltered.length} items`}
                               {useCollapse && sortedIncidents.filter(i => i.isSuspicious).length > 0 && <span style={{ color: th.danger || "#f85149", fontWeight: 600 }}> | {sortedIncidents.filter(i => i.isSuspicious).length} suspicious</span>}
                             </span>
@@ -14680,7 +14680,7 @@ export default function App() {
                                 </div>
                                 {orderedCols.map((c) => (
                                   <div key={c.key} draggable onDragStart={(e) => onColDragStart(e, c.key)} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onColDrop(e, c.key)} onDragEnd={() => setModal((p) => ({ ...p, dragCol: null }))}
-                                    style={{ width: gw(c.key), flexShrink: 0, padding: "6px 8px", fontSize: 10, fontWeight: 600, color: sortCol === c.key ? th.accent : th.textMuted, cursor: "grab", fontFamily: "-apple-system, sans-serif", userSelect: "none", position: "relative", opacity: modal.dragCol === c.key ? 0.4 : 1, transition: "opacity 0.15s", display: "flex", alignItems: "center", gap: 2 }}>
+                                    style={{ width: gw(c.key), flexShrink: 0, padding: "6px 8px", fontSize: 10, fontWeight: 600, color: sortCol === c.key ? th.accent : th.textMuted, cursor: "grab", fontFamily: "'Segoe UI', system-ui, sans-serif", userSelect: "none", position: "relative", opacity: modal.dragCol === c.key ? 0.4 : 1, transition: "opacity 0.15s", display: "flex", alignItems: "center", gap: 2 }}>
                                     <span onClick={() => toggleSort(c.key)} style={{ cursor: "pointer", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                       {c.label}{sortCol === c.key ? (sortDir === "asc" ? " \u25B2" : " \u25BC") : ""}
                                     </span>
@@ -14707,7 +14707,7 @@ export default function App() {
                                       onMouseLeave={(e) => e.currentTarget.style.background = inc.isSuspicious ? `${(th.danger || "#f85149")}06` : "transparent"}>
                                       <div style={{ width: 30, flexShrink: 0, padding: "5px 8px" }} />
                                       {orderedCols.map((col) => (
-                                        <div key={col.key} style={{ width: gw(col.key), flexShrink: 0, padding: "5px 8px", fontSize: col.key === "riskScore" ? 11 : 10, color: col.key === "name" || col.key === "category" ? th.text : col.key === "artifact" && inc.isSuspicious ? (th.danger || "#f85149") : th.textMuted, fontWeight: col.key === "name" ? 500 : col.key === "artifact" && inc.isSuspicious ? 600 : 400, fontFamily: col.key === "artifact" || col.key === "command" || col.key === "timestamp" ? "SF Mono, Menlo, monospace" : "-apple-system, sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                        <div key={col.key} style={{ width: gw(col.key), flexShrink: 0, padding: "5px 8px", fontSize: col.key === "riskScore" ? 11 : 10, color: col.key === "name" || col.key === "category" ? th.text : col.key === "artifact" && inc.isSuspicious ? (th.danger || "#f85149") : th.textMuted, fontWeight: col.key === "name" ? 500 : col.key === "artifact" && inc.isSuspicious ? 600 : 400, fontFamily: col.key === "artifact" || col.key === "command" || col.key === "timestamp" ? "'Cascadia Code','Consolas','Courier New',monospace" : "'Segoe UI', system-ui, sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                           {renderIncCell(inc, col)}
                                         </div>
                                       ))}
@@ -14723,7 +14723,7 @@ export default function App() {
                                             <input type="checkbox" checked={isChecked(item)} onChange={(e) => toggleCheck(item, e)} onClick={(e) => e.stopPropagation()} style={{ width: 13, height: 13, cursor: "pointer", accentColor: th.accent }} />
                                           </div>
                                           {orderedCols.map((col) => (
-                                            <div key={col.key} style={{ width: gw(col.key), flexShrink: 0, padding: "5px 8px", fontSize: 10, opacity: 0.75, color: th.textDim, fontFamily: col.key === "artifact" || col.key === "command" || col.key === "timestamp" ? "SF Mono, Menlo, monospace" : "-apple-system, sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                            <div key={col.key} style={{ width: gw(col.key), flexShrink: 0, padding: "5px 8px", fontSize: 10, opacity: 0.75, color: th.textDim, fontFamily: col.key === "artifact" || col.key === "command" || col.key === "timestamp" ? "'Cascadia Code','Consolas','Courier New',monospace" : "'Segoe UI', system-ui, sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                               {renderCell(item, col)}
                                             </div>
                                           ))}
@@ -14746,7 +14746,7 @@ export default function App() {
                                     <input type="checkbox" checked={isChecked(item)} onChange={(e) => toggleCheck(item, e)} onClick={(e) => e.stopPropagation()} style={{ width: 13, height: 13, cursor: "pointer", accentColor: th.accent }} />
                                   </div>
                                   {orderedCols.map((col) => (
-                                    <div key={col.key} title={col.key === "artifact" && item.isSuspicious ? item.suspiciousReasons?.join(", ") : undefined} style={{ width: gw(col.key), flexShrink: 0, padding: "5px 8px", fontSize: col.key === "riskScore" ? 11 : 10, color: col.key === "name" || col.key === "category" ? th.text : col.key === "artifact" && item.isSuspicious ? (th.danger || "#f85149") : th.textMuted, fontWeight: col.key === "name" ? 500 : col.key === "artifact" && item.isSuspicious ? 600 : 400, fontFamily: col.key === "artifact" || col.key === "command" || col.key === "timestamp" ? "SF Mono, Menlo, monospace" : "-apple-system, sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                    <div key={col.key} title={col.key === "artifact" && item.isSuspicious ? item.suspiciousReasons?.join(", ") : undefined} style={{ width: gw(col.key), flexShrink: 0, padding: "5px 8px", fontSize: col.key === "riskScore" ? 11 : 10, color: col.key === "name" || col.key === "category" ? th.text : col.key === "artifact" && item.isSuspicious ? (th.danger || "#f85149") : th.textMuted, fontWeight: col.key === "name" ? 500 : col.key === "artifact" && item.isSuspicious ? 600 : 400, fontFamily: col.key === "artifact" || col.key === "command" || col.key === "timestamp" ? "'Cascadia Code','Consolas','Courier New',monospace" : "'Segoe UI', system-ui, sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                       {renderCell(item, col)}
                                     </div>
                                   ))}
@@ -14756,9 +14756,9 @@ export default function App() {
                           </div>
                           {displayData.length > (modal._tblLimit || 500) && <div style={{ padding: "6px 10px", fontSize: 10, color: th.textMuted, borderTop: `1px solid ${th.border}11`, display: "flex", alignItems: "center", gap: 8 }}>
                             <span style={{ fontStyle: "italic" }}>Showing {modal._tblLimit || 500} of {displayData.length} {useCollapse ? "clusters" : "items"}</span>
-                            <button onClick={() => setModal(p => ({ ...p, _tblLimit: (p._tblLimit || 500) + 500 }))} style={{ padding: "2px 10px", fontSize: 9, background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 3, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Load more</button>
+                            <button onClick={() => setModal(p => ({ ...p, _tblLimit: (p._tblLimit || 500) + 500 }))} style={{ padding: "2px 10px", fontSize: 9, background: `${th.accent}15`, color: th.accent, border: `1px solid ${th.accent}33`, borderRadius: 3, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Load more</button>
                           </div>}
-                          {displayData.length === 0 && <div style={{ padding: "20px 10px", fontSize: 11, color: th.textMuted, textAlign: "center", fontFamily: "-apple-system, sans-serif" }}>No items match current filters{tblMode === "triage" ? " \u2014 try Review or Raw mode" : ""}</div>}
+                          {displayData.length === 0 && <div style={{ padding: "20px 10px", fontSize: 11, color: th.textMuted, textAlign: "center", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>No items match current filters{tblMode === "triage" ? " \u2014 try Review or Raw mode" : ""}</div>}
                           {/* Column filter dropdown popup */}
                           {filterOpen && (
                             <>
@@ -14776,12 +14776,12 @@ export default function App() {
                                     const onUp = () => { document.body.style.cursor = ""; document.body.style.userSelect = ""; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
                                     window.addEventListener("mousemove", onMove); window.addEventListener("mouseup", onUp);
                                   }}>
-                                  <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "SF Mono, Menlo, monospace" }}>FILTER — {(colDefs.find((c) => c.key === filterOpen)?.label || filterOpen).toUpperCase()}</span>
+                                  <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>FILTER — {(colDefs.find((c) => c.key === filterOpen)?.label || filterOpen).toUpperCase()}</span>
                                   <span style={{ cursor: "pointer", color: th.textMuted, fontSize: 14, lineHeight: 1 }} onClick={() => setModal((p) => ({ ...p, colFilterOpen: null }))}>×</span>
                                 </div>
                                 <div style={{ padding: "6px 10px", flexShrink: 0 }}>
                                   <input type="text" placeholder="Search values..." value={filterSearch} onChange={(e) => setModal((p) => ({ ...p, colFilterSearch: e.target.value }))}
-                                    style={{ width: "100%", boxSizing: "border-box", padding: "5px 8px", fontSize: 11, background: th.panelBg, border: `1px solid ${th.border}55`, borderRadius: 4, color: th.text, outline: "none", fontFamily: "SF Mono, Menlo, monospace" }}
+                                    style={{ width: "100%", boxSizing: "border-box", padding: "5px 8px", fontSize: 11, background: th.panelBg, border: `1px solid ${th.border}55`, borderRadius: 4, color: th.text, outline: "none", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}
                                     autoFocus />
                                 </div>
                                 <div style={{ padding: "2px 10px 6px", display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
@@ -14796,7 +14796,7 @@ export default function App() {
                                       onMouseEnter={(e) => e.currentTarget.style.background = `${th.accent}0a`}
                                       onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
                                       <input type="checkbox" checked={filterSel.has(v)} readOnly style={{ width: 13, height: 13, accentColor: th.accent, cursor: "pointer", flexShrink: 0 }} />
-                                      <span style={{ fontSize: 11, color: th.text, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "SF Mono, Menlo, monospace" }}>{v || "(empty)"}</span>
+                                      <span style={{ fontSize: 11, color: th.text, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{v || "(empty)"}</span>
                                       <span style={{ fontSize: 10, color: th.textMuted, flexShrink: 0 }}>{filterCounts[v]}</span>
                                     </div>
                                   ))}
@@ -14844,9 +14844,9 @@ export default function App() {
                       {selItem.rmmTool && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: "#f0883e22", color: "#f0883e", fontWeight: 700, textTransform: "uppercase" }}>RMM</span>}
                       {(selItem.tags || []).filter(t => t !== "RMM Tool").map((t, i) => <span key={i} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${th.accent}22`, color: th.accent, fontWeight: 600, textTransform: "uppercase" }}>{t}</span>)}
                       <PaMitreBadge category={selItem.category} />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{selItem.name}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{selItem.name}</span>
                       <span style={{ fontSize: 10, color: th.textMuted, marginLeft: "auto", display: "flex", alignItems: "center", gap: 6 }}>Risk Score: <span style={{ fontWeight: 700, color: selItem.riskScore >= 8 ? "#f85149" : selItem.riskScore >= 6 ? "#f0883e" : th.textMuted }}>{selItem.riskScore}/10</span>
-                        {selItem.confidence && <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 4, fontWeight: 600, fontFamily: "-apple-system, sans-serif", textTransform: "capitalize", background: selItem.confidence === "confirmed" ? "#3fb95020" : selItem.confidence === "likely" ? "#f0883e20" : (th.textMuted + "15"), color: selItem.confidence === "confirmed" ? "#3fb950" : selItem.confidence === "likely" ? "#f0883e" : th.textMuted }}>{selItem.confidence}</span>}
+                        {selItem.confidence && <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 4, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "capitalize", background: selItem.confidence === "confirmed" ? "#3fb95020" : selItem.confidence === "likely" ? "#f0883e20" : (th.textMuted + "15"), color: selItem.confidence === "confirmed" ? "#3fb950" : selItem.confidence === "likely" ? "#f0883e" : th.textMuted }}>{selItem.confidence}</span>}
                       </span>
                       <button onClick={() => setModal((p) => ({ ...p, selectedPersistKey: null }))} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 14, padding: "0 4px", lineHeight: 1 }} title="Close">&times;</button>
                     </div>
@@ -14861,8 +14861,8 @@ export default function App() {
                         { label: "Confidence", value: selItem.confidence ? selItem.confidence.charAt(0).toUpperCase() + selItem.confidence.slice(1) : "" },
                       ].filter(f => f.value).map((f, i) => (
                         <div key={i} style={{ display: "flex", gap: 6, alignItems: "baseline" }}>
-                          <span style={{ fontSize: 10, color: th.accent, fontWeight: 600, fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>{f.label}:</span>
-                          <span style={{ fontSize: 10, color: th.text, fontFamily: "SF Mono, Menlo, monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.value}</span>
+                          <span style={{ fontSize: 10, color: th.accent, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>{f.label}:</span>
+                          <span style={{ fontSize: 10, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.value}</span>
                         </div>
                       ))}
                     </div>
@@ -14878,16 +14878,16 @@ export default function App() {
                       if (sameAH.length <= 1 && otherCats.length === 0 && userOther.length === 0) return null;
                       return (
                         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", padding: "6px 0", borderTop: `1px solid ${th.border}15`, borderBottom: `1px solid ${th.border}15` }}>
-                          {sameAH.length > 1 && <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>
+                          {sameAH.length > 1 && <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                             <span style={{ fontWeight: 600, color: th.accent }}>{sameAH.length}</span> occurrences on {ctxHost}
-                            {sahFirst && sahLast && sahFirst !== sahLast && <span style={{ marginLeft: 4, fontFamily: "SF Mono, Menlo, monospace", fontSize: 8 }}>({String(sahFirst).substring(0, 10)} \u2014 {String(sahLast).substring(0, 10)})</span>}
+                            {sahFirst && sahLast && sahFirst !== sahLast && <span style={{ marginLeft: 4, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 8 }}>({String(sahFirst).substring(0, 10)} \u2014 {String(sahLast).substring(0, 10)})</span>}
                           </span>}
-                          {otherCats.length > 0 && <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>
+                          {otherCats.length > 0 && <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                             Also in: {otherCats.map((c, i) => <span key={i} style={{ fontSize: 8, padding: "1px 4px", borderRadius: 3, marginLeft: 2, background: `${th.accent}12`, color: th.accent, fontWeight: 500 }}>{c}</span>)}
                           </span>}
-                          {userOther.length > 0 && <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>
+                          {userOther.length > 0 && <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                             {ctxUser} \u2192 <span style={{ fontWeight: 600, color: th.text }}>{userOther.length}</span> other artifact{userOther.length !== 1 ? "s" : ""}
-                            {userOther.length <= 3 && <span style={{ fontFamily: "SF Mono, Menlo, monospace", fontSize: 8, marginLeft: 4, color: th.textDim }}>({userOther.map(a => (a || "").split("\\").pop()).join(", ")})</span>}
+                            {userOther.length <= 3 && <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 8, marginLeft: 4, color: th.textDim }}>({userOther.map(a => (a || "").split("\\").pop()).join(", ")})</span>}
                           </span>}
                         </div>
                       );
@@ -14895,25 +14895,25 @@ export default function App() {
                     {/* Artifact + Command */}
                     {selItem.artifact && (
                       <div style={{ display: "flex", gap: 6, alignItems: "baseline" }}>
-                        <span style={{ fontSize: 10, color: th.accent, fontWeight: 600, fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>Artifact:</span>
-                        <span style={{ fontSize: 10, color: selItem.isSuspicious ? (th.danger || "#f85149") : th.text, fontWeight: selItem.isSuspicious ? 600 : 400, fontFamily: "SF Mono, Menlo, monospace", wordBreak: "break-all" }}>{selItem.artifact}</span>
+                        <span style={{ fontSize: 10, color: th.accent, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>Artifact:</span>
+                        <span style={{ fontSize: 10, color: selItem.isSuspicious ? (th.danger || "#f85149") : th.text, fontWeight: selItem.isSuspicious ? 600 : 400, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", wordBreak: "break-all" }}>{selItem.artifact}</span>
                       </div>
                     )}
                     {selItem.command && (
                       <div style={{ display: "flex", gap: 6, alignItems: "baseline" }}>
-                        <span style={{ fontSize: 10, color: th.accent, fontWeight: 600, fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>Command:</span>
-                        <span style={{ fontSize: 10, color: th.text, fontFamily: "SF Mono, Menlo, monospace", wordBreak: "break-all", maxHeight: 60, overflow: "auto" }}>{selItem.command}</span>
+                        <span style={{ fontSize: 10, color: th.accent, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>Command:</span>
+                        <span style={{ fontSize: 10, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", wordBreak: "break-all", maxHeight: 60, overflow: "auto" }}>{selItem.command}</span>
                       </div>
                     )}
                     {/* All extracted details */}
                     {selItem.details && Object.keys(selItem.details).length > 0 && (
                       <div style={{ background: `${th.modalBg}cc`, borderRadius: 6, padding: "8px 10px", border: `1px solid ${th.border}22` }}>
-                        <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4, fontFamily: "-apple-system, sans-serif" }}>Extracted Fields</div>
+                        <div style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Extracted Fields</div>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "3px 16px" }}>
                           {Object.entries(selItem.details).filter(([k]) => !k.startsWith("_")).map(([k, v]) => (
                             <div key={k} style={{ display: "flex", gap: 6, alignItems: "baseline" }}>
-                              <span style={{ fontSize: 10, color: th.accent + "cc", fontWeight: 500, fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>{k}:</span>
-                              <span style={{ fontSize: 10, color: th.text, fontFamily: "SF Mono, Menlo, monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={v}>{v}</span>
+                              <span style={{ fontSize: 10, color: th.accent + "cc", fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>{k}:</span>
+                              <span style={{ fontSize: 10, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={v}>{v}</span>
                             </div>
                           ))}
                         </div>
@@ -14923,16 +14923,16 @@ export default function App() {
                     {selItem.isSuspicious && selItem.suspiciousReasons?.length > 0 && (
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                         {selItem.suspiciousReasons.map((r, i) => (
-                          <span key={i} style={{ fontSize: 9, padding: "2px 6px", borderRadius: 4, background: `${th.danger || "#f85149"}15`, color: th.danger || "#f85149", fontFamily: "-apple-system, sans-serif" }}>{r}</span>
+                          <span key={i} style={{ fontSize: 9, padding: "2px 6px", borderRadius: 4, background: `${th.danger || "#f85149"}15`, color: th.danger || "#f85149", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{r}</span>
                         ))}
                       </div>
                     )}
                     {/* Evidence pills */}
                     {selItem.evidencePills?.length > 0 && (
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                        <span style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, fontFamily: "-apple-system, sans-serif", marginRight: 2 }}>Evidence:</span>
+                        <span style={{ fontSize: 9, color: th.textMuted, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", marginRight: 2 }}>Evidence:</span>
                         {selItem.evidencePills.filter(p => p.type !== "target").map((p, i) => (
-                          <span key={i} style={{ fontSize: 9, padding: "2px 6px", borderRadius: 4, background: (PA_PILL_COLORS[p.type] || "#8b949e") + "18", color: PA_PILL_COLORS[p.type] || "#8b949e", fontWeight: 500, fontFamily: "-apple-system, sans-serif" }}>{p.text}</span>
+                          <span key={i} style={{ fontSize: 9, padding: "2px 6px", borderRadius: 4, background: (PA_PILL_COLORS[p.type] || "#8b949e") + "18", color: PA_PILL_COLORS[p.type] || "#8b949e", fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{p.text}</span>
                         ))}
                       </div>
                     )}
@@ -14941,13 +14941,13 @@ export default function App() {
                       {selItem.artifact && <button onClick={() => {
                         const leaf = (selItem.artifact || "").split(/[/\\]/).pop().replace(/\{[0-9a-f-]+\}$/i, "").trim();
                         setModal((p) => ({ ...p, searchTerm: leaf || selItem.artifact, tableColFilters: {}, viewTab: "timeline", tlMode: "chronology", tlCatFilter: null }));
-                      }} style={{ fontSize: 9, padding: "3px 8px", borderRadius: 4, background: `${th.accent}11`, color: th.accent, border: `1px solid ${th.accent}22`, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>Same Artifact</button>}
+                      }} style={{ fontSize: 9, padding: "3px 8px", borderRadius: 4, background: `${th.accent}11`, color: th.accent, border: `1px solid ${th.accent}22`, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>Same Artifact</button>}
                       {selItem.computer && <button onClick={() => {
                         setModal((p) => ({ ...p, tableColFilters: { computer: [selItem.computer] }, searchTerm: "", viewTab: "timeline", tlMode: "chronology", tlCatFilter: null }));
-                      }} style={{ fontSize: 9, padding: "3px 8px", borderRadius: 4, background: `${th.accent}11`, color: th.accent, border: `1px solid ${th.accent}22`, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>Same Host</button>}
+                      }} style={{ fontSize: 9, padding: "3px 8px", borderRadius: 4, background: `${th.accent}11`, color: th.accent, border: `1px solid ${th.accent}22`, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>Same Host</button>}
                       {selItem.user && <button onClick={() => {
                         setModal((p) => ({ ...p, tableColFilters: { user: [selItem.user] }, searchTerm: "", viewTab: "timeline", tlMode: "chronology", tlCatFilter: null }));
-                      }} style={{ fontSize: 9, padding: "3px 8px", borderRadius: 4, background: `${th.accent}11`, color: th.accent, border: `1px solid ${th.accent}22`, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>Same User</button>}
+                      }} style={{ fontSize: 9, padding: "3px 8px", borderRadius: 4, background: `${th.accent}11`, color: th.accent, border: `1px solid ${th.accent}22`, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>Same User</button>}
                       <button onClick={() => {
                         const lines = [`[${selItem.severity.toUpperCase()}] ${selItem.name}`, `Category: ${selItem.category}`, `Source: ${selItem.source}`, `Timestamp: ${selItem.timestamp}`, `Computer: ${selItem.computer}`, `User: ${selItem.user}`];
                         if (selItem.artifact) lines.push(`Artifact: ${selItem.artifact}`);
@@ -14960,7 +14960,7 @@ export default function App() {
                         const mitre = PA_CAT_MITRE[selItem.category];
                         if (mitre) lines.push(`MITRE ATT&CK: ${mitre}`);
                         navigator.clipboard.writeText(lines.join("\n"));
-                      }} style={{ fontSize: 10, padding: "3px 10px", borderRadius: 5, background: th.accent + "18", color: th.accent, border: `1px solid ${th.accent}33`, cursor: "pointer", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>Copy Details</button>
+                      }} style={{ fontSize: 10, padding: "3px 10px", borderRadius: 5, background: th.accent + "18", color: th.accent, border: `1px solid ${th.accent}33`, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>Copy Details</button>
                     </div>
                   </div>
                 );
@@ -14976,7 +14976,7 @@ export default function App() {
                 )}
                 {phase === "loading" && (
                   <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center" }}>
-                    <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>{Math.round(modal.progress || 0)}% complete</span>
+                    <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{Math.round(modal.progress || 0)}% complete</span>
                     <button onClick={() => setModal((p) => ({ ...p, phase: "config", loading: false, progress: 0, _cancelled: true }))} style={{ ...ms.bs, borderRadius: 8 }}>Cancel</button>
                   </div>
                 )}
@@ -14986,7 +14986,7 @@ export default function App() {
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                       {checkedItems.size > 0 && (
                         <>
-                          <span style={{ fontSize: 11, color: th.accent, fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>{checkedItems.size} selected</span>
+                          <span style={{ fontSize: 11, color: th.accent, fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>{checkedItems.size} selected</span>
                           <button onClick={() => {
                             const hdr = "Severity\tDetection\tDetails\tTimestamp\tComputer\tUser\tSource\tRisk\n";
                             const body = [...checkedItems].map((key) => itemForKey(key)).filter(Boolean).map((i) => formatItemText(i)).join("\n");
@@ -15266,18 +15266,18 @@ export default function App() {
           };
           const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Ransomware Analysis — ${esc(encryptedExt)}</title><style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:${c.bg};color:${c.text};font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,sans-serif;font-size:12px;padding:32px 40px;line-height:1.5}
+body{background:${c.bg};color:${c.text};font-family:"Segoe UI",system-ui,Helvetica,sans-serif;font-size:12px;padding:32px 40px;line-height:1.5}
 .header{margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid ${c.border}}
 h1{font-size:20px;font-weight:700;color:${c.text};margin-bottom:6px}
 .meta{font-size:11px;color:${c.textMuted}}
-code{background:${c.bgAlt};padding:2px 6px;border-radius:4px;font-family:"SF Mono",Menlo,monospace;font-size:11px;color:${c.code}}
+code{background:${c.bgAlt};padding:2px 6px;border-radius:4px;font-family:"Cascadia Code","Consolas","Courier New",monospace;font-size:11px;color:${c.code}}
 .stats{display:flex;gap:10px;margin:12px 0 16px}
 .stat{flex:1;background:${c.bgAlt};border:1px solid ${c.border};border-radius:8px;padding:14px 10px;text-align:center}
 .stat-val{font-size:20px;font-weight:700;line-height:1.2}
 .stat-label{font-size:9px;text-transform:uppercase;letter-spacing:0.05em;color:${c.textMuted};margin-top:4px}
 .section{margin-bottom:20px}
 h2{font-size:13px;font-weight:600;color:${c.text};margin-bottom:8px;padding:6px 10px;background:${c.bgAlt};border-radius:6px;border-left:3px solid ${c.accent}}
-table{width:100%;border-collapse:collapse;font-size:11px;font-family:"SF Mono",Menlo,monospace}
+table{width:100%;border-collapse:collapse;font-size:11px;font-family:"Cascadia Code","Consolas","Courier New",monospace}
 th{text-align:left;padding:6px 10px;background:${c.bgAlt};color:${c.textMuted};font-weight:600;border-bottom:1px solid ${c.border};font-size:10px;text-transform:uppercase;letter-spacing:0.05em}
 td{padding:5px 10px;border-bottom:1px solid ${c.borderSub};color:${c.textDim};word-break:break-all}
 tr:nth-child(even) td{background:${c.stripeBg}}
@@ -15306,7 +15306,7 @@ strong{color:${c.text}}
         const rowStyle = (i) => ({
           display: "flex", alignItems: "center", gap: 8, padding: "5px 10px", fontSize: 11,
           background: i % 2 === 0 ? "transparent" : `${th.border}15`,
-          borderBottom: `1px solid ${th.border}22`, fontFamily: "'SF Mono',Menlo,monospace",
+          borderBottom: `1px solid ${th.border}22`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace",
         });
 
         const cbStyle = (checked) => ({
@@ -15476,7 +15476,7 @@ strong{color:${c.text}}
         );
 
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", position: "absolute", left: rx, top: ry, width: rw, height: rh, background: th.modalBg + "f2", border: `1px solid ${th.modalBorder}88`, borderRadius: 14, padding: 0, display: "flex", flexDirection: "column", boxShadow: "0 24px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04) inset", overflow: "hidden", backdropFilter: "blur(40px) saturate(1.6)", WebkitBackdropFilter: "blur(40px) saturate(1.6)" }}>
               {/* Resize handles — edges */}
               <div onMouseDown={(e) => startRwResize(e, "t")} style={rwEdge("ns-resize", { top: 0, left: 8, right: 8, height: 5 })} />
@@ -15496,8 +15496,8 @@ strong{color:${c.text}}
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={th.danger || "#f85149"} strokeWidth="1.8" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill={(th.danger || "#f85149") + "18"}/><rect x="10" y="9" width="4" height="5" rx="1"/><circle cx="12" cy="7.5" r="2.5" fill="none"/></svg>
                   </div>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.01em" }}>Ransomware MFT Analysis</h3>
-                    <p style={{ margin: "2px 0 0", color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>Identify encrypted files, ransom notes, and suspicious activity</p>
+                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.01em" }}>Ransomware MFT Analysis</h3>
+                    <p style={{ margin: "2px 0 0", color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Identify encrypted files, ransom notes, and suspicious activity</p>
                   </div>
                 </div>
                 <button onClick={() => setModal(null)} style={{ background: `${th.border}22`, border: `1px solid ${th.border}33`, color: th.textMuted, cursor: "pointer", fontSize: 14, padding: "4px 8px", borderRadius: 6, lineHeight: 1 }}>✕</button>
@@ -15509,7 +15509,7 @@ strong{color:${c.text}}
                 {phase === "input" && (<>
                   {/* MFT format warning */}
                   {ct?.sourceFormat && ct.sourceFormat !== "raw-mft" && (
-                    <div style={{ marginBottom: 10, padding: "8px 12px", background: `${th.warning || "#d29922"}0a`, border: `1px solid ${th.warning || "#d29922"}22`, borderRadius: 8, fontSize: 10, color: th.warning || "#d29922", fontFamily: "-apple-system, sans-serif" }}>
+                    <div style={{ marginBottom: 10, padding: "8px 12px", background: `${th.warning || "#d29922"}0a`, border: `1px solid ${th.warning || "#d29922"}22`, borderRadius: 8, fontSize: 10, color: th.warning || "#d29922", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                       This tab was not imported as raw MFT data. Results may be unreliable — timestamps and columns may not match MFT semantics.
                     </div>
                   )}
@@ -15517,8 +15517,8 @@ strong{color:${c.text}}
                   {!scanData && (
                     <div style={{ marginBottom: 14, padding: "14px 16px", background: `linear-gradient(135deg, ${th.accent}08, ${th.panelBg}cc)`, border: `1px solid ${th.accent}22`, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                       <div>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Auto-detect ransomware indicators</div>
-                        <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif", marginTop: 2 }}>Scan MFT for suspicious extensions and ransom note patterns</div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Auto-detect ransomware indicators</div>
+                        <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", marginTop: 2 }}>Scan MFT for suspicious extensions and ransom note patterns</div>
                       </div>
                       <button onClick={handleScan} style={{ ...ms.bp, borderRadius: 8, fontSize: 11, padding: "6px 16px" }}>Scan MFT</button>
                     </div>
@@ -15535,8 +15535,8 @@ strong{color:${c.text}}
                     return (
                     <div style={{ marginBottom: 14 }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                        <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>Detected Encrypted Extensions</span>
-                        {selExts.size > 1 && <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>{selExts.size} selected</span>}
+                        <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Detected Encrypted Extensions</span>
+                        {selExts.size > 1 && <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{selExts.size} selected</span>}
                       </div>
                       <div style={{ maxHeight: 180, overflow: "auto", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, border: `1px solid ${th.border}33`, borderRadius: 10 }}>
                         {scanData.candidates.map((c, i) => {
@@ -15548,11 +15548,11 @@ strong{color:${c.text}}
                               <div style={{ width: 14, height: 14, borderRadius: 4, flexShrink: 0, background: sel ? th.accent : "transparent", border: `1.5px solid ${sel ? th.accent : th.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                                 {sel && <svg width="10" height="10" viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                               </div>
-                              <span style={{ padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 700, background: `${scoreColor}22`, color: scoreColor, fontFamily: "'SF Mono',Menlo,monospace", minWidth: 28, textAlign: "center" }}>{Math.round(c.score * 100)}</span>
-                              <span style={{ fontFamily: "'SF Mono',Menlo,monospace", fontWeight: 600, color: th.text, minWidth: 80 }}>{c.extension}</span>
-                              <span style={{ color: th.textDim, fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>{c.fileCount.toLocaleString()} files</span>
-                              {c.peakMinuteCount > 0 && <span style={{ color: th.textMuted, fontSize: 9, fontFamily: "'SF Mono',Menlo,monospace" }}>peak {c.peakMinuteCount.toLocaleString()}/min</span>}
-                              {c.samplePaths?.[0] && <span style={{ color: th.textMuted, fontSize: 9, fontFamily: "'SF Mono',Menlo,monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0, textAlign: "right" }}>{c.samplePaths[0]}</span>}
+                              <span style={{ padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 700, background: `${scoreColor}22`, color: scoreColor, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", minWidth: 28, textAlign: "center" }}>{Math.round(c.score * 100)}</span>
+                              <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 600, color: th.text, minWidth: 80 }}>{c.extension}</span>
+                              <span style={{ color: th.textDim, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{c.fileCount.toLocaleString()} files</span>
+                              {c.peakMinuteCount > 0 && <span style={{ color: th.textMuted, fontSize: 9, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>peak {c.peakMinuteCount.toLocaleString()}/min</span>}
+                              {c.samplePaths?.[0] && <span style={{ color: th.textMuted, fontSize: 9, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0, textAlign: "right" }}>{c.samplePaths[0]}</span>}
                             </div>
                           );
                         })}
@@ -15564,16 +15564,16 @@ strong{color:${c.text}}
                   {/* Scan results — ransom note candidates */}
                   {scanData?.noteCandidates?.length > 0 && (
                     <div style={{ marginBottom: 14 }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: th.warning || "#d29922", textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif", marginBottom: 6 }}>Detected Ransom Note Patterns</div>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: th.warning || "#d29922", textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 6 }}>Detected Ransom Note Patterns</div>
                       <div style={{ maxHeight: 130, overflow: "auto", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, border: `1px solid ${th.border}33`, borderRadius: 10 }}>
                         {scanData.noteCandidates.map((n, i) => {
                           const sel = ransomNotePattern === n.fileName;
                           return (
                             <div key={i} onClick={() => setModal((p) => ({ ...p, ransomNotePattern: n.fileName }))}
                               style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", fontSize: 11, borderBottom: `1px solid ${th.border}15`, cursor: "pointer", background: sel ? `${(th.warning || "#d29922")}12` : (i % 2 === 0 ? "transparent" : `${th.border}08`), borderLeft: sel ? `3px solid ${th.warning || "#d29922"}` : "3px solid transparent" }}>
-                              <span style={{ fontFamily: "'SF Mono',Menlo,monospace", fontWeight: 600, color: th.text, minWidth: 120 }}>{n.fileName}</span>
-                              <span style={{ color: th.textDim, fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>{n.dirCount} dirs</span>
-                              {n.timeSpanMinutes != null && <span style={{ color: th.textMuted, fontSize: 9, fontFamily: "'SF Mono',Menlo,monospace" }}>{n.timeSpanMinutes < 60 ? `${n.timeSpanMinutes} min` : n.timeSpanMinutes < 1440 ? `${Math.round(n.timeSpanMinutes / 60)}h` : `${Math.round(n.timeSpanMinutes / 1440)}d`} span</span>}
+                              <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 600, color: th.text, minWidth: 120 }}>{n.fileName}</span>
+                              <span style={{ color: th.textDim, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{n.dirCount} dirs</span>
+                              {n.timeSpanMinutes != null && <span style={{ color: th.textMuted, fontSize: 9, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{n.timeSpanMinutes < 60 ? `${n.timeSpanMinutes} min` : n.timeSpanMinutes < 1440 ? `${Math.round(n.timeSpanMinutes / 60)}h` : `${Math.round(n.timeSpanMinutes / 1440)}d`} span</span>}
                             </div>
                           );
                         })}
@@ -15583,12 +15583,12 @@ strong{color:${c.text}}
 
                   {/* No candidates found message */}
                   {scanData && scanData.candidates?.length === 0 && (
-                    <div style={{ marginBottom: 14, padding: "10px 14px", background: `${(th.success || "#3fb950")}08`, border: `1px solid ${(th.success || "#3fb950")}22`, borderRadius: 8, fontSize: 11, color: th.textDim, fontFamily: "-apple-system, sans-serif" }}>No suspicious extensions detected — enter extension manually below.</div>
+                    <div style={{ marginBottom: 14, padding: "10px 14px", background: `${(th.success || "#3fb950")}08`, border: `1px solid ${(th.success || "#3fb950")}22`, borderRadius: 8, fontSize: 11, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>No suspicious extensions detected — enter extension manually below.</div>
                   )}
 
                   {/* Manual input — always shown, acts as override */}
                   <div style={{ marginBottom: 10, padding: scanData ? "10px 0 0" : 0, borderTop: scanData ? `1px solid ${th.border}22` : "none" }}>
-                    {scanData && <div style={{ fontSize: 9, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif", marginBottom: 6 }}>Manual Override</div>}
+                    {scanData && <div style={{ fontSize: 9, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 6 }}>Manual Override</div>}
                     <div style={ms.fg}>
                       <label style={ms.lb}>Encrypted File Extension</label>
                       <input value={encryptedExt} onChange={(e) => setModal((p) => ({ ...p, encryptedExt: e.target.value }))}
@@ -15598,7 +15598,7 @@ strong{color:${c.text}}
                         <div style={{ display: "flex", gap: 4, marginTop: 6, flexWrap: "wrap" }}>
                           {[".locked", ".encrypted", ".enc", ".crypt", ".WNCRY", ".cerber", ".locky", ".ryuk"].map((ext) => (
                             <button key={ext} onClick={() => setModal((p) => ({ ...p, encryptedExt: ext }))}
-                              style={{ padding: "3px 8px", background: encryptedExt === ext ? th.accent : th.btnBg, color: encryptedExt === ext ? "#fff" : th.textDim, border: `1px solid ${encryptedExt === ext ? th.accent : th.btnBorder}`, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "'SF Mono',Menlo,monospace" }}>
+                              style={{ padding: "3px 8px", background: encryptedExt === ext ? th.accent : th.btnBg, color: encryptedExt === ext ? "#fff" : th.textDim, border: `1px solid ${encryptedExt === ext ? th.accent : th.btnBorder}`, borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                               {ext}
                             </button>
                           ))}
@@ -15628,7 +15628,7 @@ strong{color:${c.text}}
                         </select>
                       </div>
                     ) : (
-                      <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif", fontStyle: "italic", marginTop: 2 }}>Load a USN Journal ($J) for more precise encryption timing</div>
+                      <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", fontStyle: "italic", marginTop: 2 }}>Load a USN Journal ($J) for more precise encryption timing</div>
                     ); })()}
                   </div>
                   {modal.error && <div style={{ color: th.danger, fontSize: 11, padding: "8px 10px", background: `${th.danger}15`, borderRadius: 6, marginBottom: 10 }}>Error: {modal.error}</div>}
@@ -15642,13 +15642,13 @@ strong{color:${c.text}}
                         <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
                       </svg>
                     </div>
-                    <div style={{ color: th.text, fontSize: 13, fontWeight: 600, fontFamily: "-apple-system, sans-serif", marginBottom: 4 }}>Scanning MFT</div>
-                    <div style={{ color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif", marginBottom: 16 }}>{modal.rwProgress?.detail || "Detecting ransomware indicators..."}</div>
+                    <div style={{ color: th.text, fontSize: 13, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 4 }}>Scanning MFT</div>
+                    <div style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 16 }}>{modal.rwProgress?.detail || "Detecting ransomware indicators..."}</div>
                     <div style={{ width: 280, maxWidth: "100%" }}>
                       <div style={{ height: 6, background: th.border, borderRadius: 3, overflow: "hidden", marginBottom: 8 }}>
                         <div style={{ height: "100%", width: "100%", background: th.accent, borderRadius: 3, transformOrigin: "left", transform: `scaleX(${Math.min((modal.rwProgress?.pct || 0) / 100, 1)})`, transition: "transform 0.3s ease" }} />
                       </div>
-                      <div style={{ color: th.textMuted, fontSize: 11, fontFamily: "'SF Mono',Menlo,monospace" }}>{modal.rwProgress?.pct || 0}%</div>
+                      <div style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{modal.rwProgress?.pct || 0}%</div>
                     </div>
                   </div>
                 )}
@@ -15661,13 +15661,13 @@ strong{color:${c.text}}
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill={(th.danger || "#f85149") + "18"} />
                       </svg>
                     </div>
-                    <div style={{ color: th.text, fontSize: 13, fontWeight: 600, fontFamily: "-apple-system, sans-serif", marginBottom: 4 }}>Analyzing MFT</div>
-                    <div style={{ color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif", marginBottom: 16 }}>{modal.rwProgress?.detail || "Scanning for ransomware activity..."}</div>
+                    <div style={{ color: th.text, fontSize: 13, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 4 }}>Analyzing MFT</div>
+                    <div style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 16 }}>{modal.rwProgress?.detail || "Scanning for ransomware activity..."}</div>
                     <div style={{ width: 280, maxWidth: "100%" }}>
                       <div style={{ height: 6, background: th.border, borderRadius: 3, overflow: "hidden", marginBottom: 8 }}>
                         <div style={{ height: "100%", width: "100%", background: th.danger || "#f85149", borderRadius: 3, transformOrigin: "left", transform: `scaleX(${Math.min((modal.rwProgress?.pct || 0) / 100, 1)})`, transition: "transform 0.3s ease" }} />
                       </div>
-                      <div style={{ color: th.textMuted, fontSize: 11, fontFamily: "'SF Mono',Menlo,monospace" }}>{modal.rwProgress?.pct || 0}%</div>
+                      <div style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{modal.rwProgress?.pct || 0}%</div>
                     </div>
                   </div>
                 )}
@@ -15679,8 +15679,8 @@ strong{color:${c.text}}
                       <div style={{ width: 56, height: 56, borderRadius: 14, background: `linear-gradient(135deg, ${th.success || "#3fb950"}22, ${th.success || "#3fb950"}08)`, border: `1px solid ${th.success || "#3fb950"}22`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={th.success || "#3fb950"} strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
                       </div>
-                      <div style={{ color: th.text, fontSize: 14, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>No encrypted files found</div>
-                      <p style={{ color: th.textMuted, fontSize: 12, fontFamily: "-apple-system, sans-serif", marginTop: 4 }}>No files with extension <span style={{ fontFamily: "'SF Mono',Menlo,monospace", color: th.accent }}>{encryptedExt}</span> were detected in this MFT.</p>
+                      <div style={{ color: th.text, fontSize: 14, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>No encrypted files found</div>
+                      <p style={{ color: th.textMuted, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif", marginTop: 4 }}>No files with extension <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.accent }}>{encryptedExt}</span> were detected in this MFT.</p>
                     </div>
                   ) : (<>
                     {/* Section 1: Summary Stats */}
@@ -15692,8 +15692,8 @@ strong{color:${c.text}}
                         { val: (data.filesPerMinute || 0).toFixed(1), label: "files/min", color: th.accent },
                       ].map((c, i) => (
                         <div key={i} style={{ textAlign: "center", padding: "12px 8px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderRadius: 10, border: `1px solid ${th.border}33` }}>
-                          <div style={{ fontSize: 22, fontWeight: 700, color: c.color, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.5px", lineHeight: 1 }}>{c.val}</div>
-                          <div style={{ fontSize: 9, color: c.color + "bb", marginTop: 4, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>{c.label}</div>
+                          <div style={{ fontSize: 22, fontWeight: 700, color: c.color, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.5px", lineHeight: 1 }}>{c.val}</div>
+                          <div style={{ fontSize: 9, color: c.color + "bb", marginTop: 4, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>{c.label}</div>
                         </div>
                       ))}
                     </div>
@@ -15707,11 +15707,11 @@ strong{color:${c.text}}
                         ].map((card) => (
                           <div key={card.label} style={{ flex: 1, minWidth: 0, padding: "12px 14px", background: `linear-gradient(135deg, ${card.color}08, ${th.panelBg}ee)`, backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", borderRadius: 10, border: `1px solid ${card.color}22`, borderLeft: `3px solid ${card.color}`, overflow: "hidden" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                              <span style={{ padding: "2px 8px", background: `linear-gradient(135deg, ${card.color}33, ${card.color}15)`, color: card.color, borderRadius: 5, fontSize: 9, fontWeight: 700, fontFamily: "-apple-system, sans-serif", letterSpacing: "0.05em", textTransform: "uppercase" }}>{card.label}</span>
+                              <span style={{ padding: "2px 8px", background: `linear-gradient(135deg, ${card.color}33, ${card.color}15)`, color: card.color, borderRadius: 5, fontSize: 9, fontWeight: 700, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "0.05em", textTransform: "uppercase" }}>{card.label}</span>
                             </div>
-                            <div style={{ fontSize: 13, color: th.text, fontWeight: 600, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{card.data.fileName}</div>
-                            <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'SF Mono',Menlo,monospace", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{card.data.parentPath}</div>
-                            <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'SF Mono',Menlo,monospace", marginTop: 2 }}>{card.data.timestamp}</div>
+                            <div style={{ fontSize: 13, color: th.text, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{card.data.fileName}</div>
+                            <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{card.data.parentPath}</div>
+                            <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", marginTop: 2 }}>{card.data.timestamp}</div>
                           </div>
                         ))}
                       </div>
@@ -15722,14 +15722,14 @@ strong{color:${c.text}}
                       const renderTimingCard = (title, snap, color) => (
                         <div style={{ minWidth: 0, padding: "10px 12px", background: `linear-gradient(135deg, ${color}08, ${th.panelBg}ee)`, borderRadius: 10, border: `1px solid ${color}22`, borderLeft: `3px solid ${color}` }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
-                            <span style={{ fontSize: 9, fontWeight: 700, color, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>{title}</span>
-                            {snap?.skewMinutes > 0 && <span style={{ fontSize: 8, color: th.textMuted, fontFamily: "'SF Mono',Menlo,monospace" }}>skew {snap.skewMinutes}m</span>}
+                            <span style={{ fontSize: 9, fontWeight: 700, color, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{title}</span>
+                            {snap?.skewMinutes > 0 && <span style={{ fontSize: 8, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>skew {snap.skewMinutes}m</span>}
                           </div>
                           <div style={{ display: "grid", gap: 4 }}>
                             {(snap?.sources || []).map((src) => (
                               <div key={`${title}-${src.column}-${src.label}`} style={{ display: "grid", gridTemplateColumns: "96px 1fr", gap: 8, fontSize: 10, alignItems: "baseline" }}>
-                                <span style={{ color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>{src.label}</span>
-                                <span style={{ color: th.text, fontFamily: "'SF Mono',Menlo,monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{src.timestamp}</span>
+                                <span style={{ color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{src.label}</span>
+                                <span style={{ color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{src.timestamp}</span>
                               </div>
                             ))}
                           </div>
@@ -15739,25 +15739,25 @@ strong{color:${c.text}}
                         <div style={{ marginBottom: 16 }}>
                           <div style={{ display: "grid", gridTemplateColumns: "1.05fr 1fr 1fr", gap: 8 }}>
                             <div style={{ minWidth: 0, padding: "10px 12px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, borderRadius: 10, border: `1px solid ${th.border}33` }}>
-                              <div style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif", marginBottom: 8 }}>Timestamp Evidence</div>
+                              <div style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 8 }}>Timestamp Evidence</div>
                               {te.timelineBasis && (
                                 <div style={{ marginBottom: 8 }}>
-                                  <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Timeline</div>
-                                  <div style={{ fontSize: 11, color: th.text, fontFamily: "'SF Mono',Menlo,monospace" }}>{te.timelineBasis.label} ({te.timelineBasis.column})</div>
+                                  <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Timeline</div>
+                                  <div style={{ fontSize: 11, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{te.timelineBasis.label} ({te.timelineBasis.column})</div>
                                 </div>
                               )}
                               {te.suspiciousWindowBasis?.timestamp && (
                                 <div style={{ marginBottom: 8 }}>
-                                  <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Payload Anchor</div>
-                                  <div style={{ fontSize: 11, color: th.text, fontFamily: "'SF Mono',Menlo,monospace" }}>{te.suspiciousWindowBasis.label} ({te.suspiciousWindowBasis.column})</div>
-                                  <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'SF Mono',Menlo,monospace", marginTop: 2 }}>{te.suspiciousWindowBasis.timestamp}</div>
+                                  <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Payload Anchor</div>
+                                  <div style={{ fontSize: 11, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{te.suspiciousWindowBasis.label} ({te.suspiciousWindowBasis.column})</div>
+                                  <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", marginTop: 2 }}>{te.suspiciousWindowBasis.timestamp}</div>
                                 </div>
                               )}
                               {te.filterWindow?.from && te.filterWindow?.to && (
                                 <div>
-                                  <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Grid Filter Window</div>
-                                  <div style={{ fontSize: 10, color: th.text, fontFamily: "'SF Mono',Menlo,monospace" }}>{te.filterWindow.column}</div>
-                                  <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'SF Mono',Menlo,monospace", marginTop: 2 }}>{te.filterWindow.from} {"->"} {te.filterWindow.to}</div>
+                                  <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Grid Filter Window</div>
+                                  <div style={{ fontSize: 10, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{te.filterWindow.column}</div>
+                                  <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", marginTop: 2 }}>{te.filterWindow.from} {"->"} {te.filterWindow.to}</div>
                                 </div>
                               )}
                             </div>
@@ -15783,11 +15783,11 @@ strong{color:${c.text}}
                             <div onClick={() => toggleAll("rwSelFirst", shown.length)} style={cbStyle(allF)}>
                               {allF && <svg width="10" height="10" viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                             </div>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>Encryption Spread — First {shown.length} Files</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Encryption Spread — First {shown.length} Files</span>
                           </div>
                         </div>
                         <div style={{ maxHeight: 220, overflow: "auto", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, border: `1px solid ${th.border}33`, borderRadius: 10 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "-apple-system, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "'Segoe UI', system-ui, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1 }}>
                             <div style={{ width: 14, flexShrink: 0 }} />
                             {rwHdrCol(firstW[0], "Entry#", "rwSortFirst", "entryNumber", "rwFirstColW", defFirstW, 0)}
                             {rwHdrCol(firstW[1], "FileName", "rwSortFirst", "fileName", "rwFirstColW", defFirstW, 1)}
@@ -15810,7 +15810,7 @@ strong{color:${c.text}}
                               <span style={{ width: firstW[4], flexShrink: 0, color: th.textMuted, fontSize: 10, textAlign: "right" }}>{f.fileSize != null ? fmtSz(f.fileSize) : ""}</span>
                             </div>
                             {isExp && (
-                              <div style={{ padding: "6px 10px 6px 42px", background: `${th.panelBg}dd`, borderBottom: `1px solid ${th.border}22`, fontSize: 9, fontFamily: "'SF Mono',Menlo,monospace", color: th.textDim }}>
+                              <div style={{ padding: "6px 10px 6px 42px", background: `${th.panelBg}dd`, borderBottom: `1px solid ${th.border}22`, fontSize: 9, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.textDim }}>
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px 16px" }}>
                                   <span>Created (SI): {f.created0x10 || "—"}</span><span>Modified (SI): {f.timestamp || "—"}</span>
                                   <span>Record Change: {f.recordChange0x10 || "—"}</span><span>Created (FN): {f.created0x30 || "—"}</span>
@@ -15835,25 +15835,25 @@ strong{color:${c.text}}
                       return (
                       <div style={{ marginBottom: 16 }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>Original-to-Encrypted Pair Detection</span>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Original-to-Encrypted Pair Detection</span>
                         </div>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 8 }}>
                           <div style={{ textAlign: "center", padding: "8px 6px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, borderRadius: 8, border: `1px solid ${th.border}33` }}>
-                            <div style={{ fontSize: 18, fontWeight: 700, color: th.danger || "#f85149", fontFamily: "-apple-system, sans-serif", lineHeight: 1 }}>{op.confirmedPairs}</div>
-                            <div style={{ fontSize: 8, color: th.textMuted, marginTop: 3, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>confirmed pairs</div>
+                            <div style={{ fontSize: 18, fontWeight: 700, color: th.danger || "#f85149", fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1 }}>{op.confirmedPairs}</div>
+                            <div style={{ fontSize: 8, color: th.textMuted, marginTop: 3, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>confirmed pairs</div>
                           </div>
                           <div style={{ textAlign: "center", padding: "8px 6px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, borderRadius: 8, border: `1px solid ${th.border}33` }}>
-                            <div style={{ fontSize: 18, fontWeight: 700, color: th.warning || "#d29922", fontFamily: "-apple-system, sans-serif", lineHeight: 1 }}>{op.likelyPairs}</div>
-                            <div style={{ fontSize: 8, color: th.textMuted, marginTop: 3, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>likely pairs</div>
+                            <div style={{ fontSize: 18, fontWeight: 700, color: th.warning || "#d29922", fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1 }}>{op.likelyPairs}</div>
+                            <div style={{ fontSize: 8, color: th.textMuted, marginTop: 3, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>likely pairs</div>
                           </div>
                           <div style={{ textAlign: "center", padding: "8px 6px", background: `linear-gradient(160deg, ${rateColor}08, ${th.panelBg}cc)`, borderRadius: 8, border: `1px solid ${rateColor}33` }}>
-                            <div style={{ fontSize: 18, fontWeight: 700, color: rateColor, fontFamily: "-apple-system, sans-serif", lineHeight: 1 }}>{Math.round(op.pairRate * 100)}%</div>
-                            <div style={{ fontSize: 8, color: rateColor + "bb", marginTop: 3, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>pair rate</div>
+                            <div style={{ fontSize: 18, fontWeight: 700, color: rateColor, fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1 }}>{Math.round(op.pairRate * 100)}%</div>
+                            <div style={{ fontSize: 8, color: rateColor + "bb", marginTop: 3, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>pair rate</div>
                           </div>
                         </div>
                         {shownPairs.length > 0 && (
                         <div style={{ maxHeight: 160, overflow: "auto", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, border: `1px solid ${th.border}33`, borderRadius: 10 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "-apple-system, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "'Segoe UI', system-ui, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1 }}>
                             <div style={{ width: 14, flexShrink: 0 }} />
                             <div style={{ width: 130, flexShrink: 0 }}>Original</div>
                             <div style={{ width: 150, flexShrink: 0 }}>Encrypted</div>
@@ -15891,8 +15891,8 @@ strong{color:${c.text}}
                         { val: (data.suspiciousFiles || []).length, label: "suspicious exes", color: (data.suspiciousFiles || []).length > 0 ? (th.danger || "#f85149") : th.textDim, active: (data.suspiciousFiles || []).length > 0 },
                       ].map((c, i) => (
                         <div key={i} style={{ textAlign: "center", padding: "10px 6px", background: c.active ? `linear-gradient(160deg, ${c.color}12, ${th.panelBg}cc)` : `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderRadius: 10, border: `1px solid ${c.active ? c.color + "33" : th.border + "33"}` }}>
-                          <div style={{ fontSize: 20, fontWeight: 700, color: c.color, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.5px", lineHeight: 1 }}>{c.val}</div>
-                          <div style={{ fontSize: 9, color: c.active ? c.color + "bb" : th.textMuted, marginTop: 3, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>{c.label}</div>
+                          <div style={{ fontSize: 20, fontWeight: 700, color: c.color, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.5px", lineHeight: 1 }}>{c.val}</div>
+                          <div style={{ fontSize: 9, color: c.active ? c.color + "bb" : th.textMuted, marginTop: 3, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 500 }}>{c.label}</div>
                         </div>
                       ))}
                     </div>
@@ -15900,8 +15900,8 @@ strong{color:${c.text}}
                     {data.forensicIndicators?.length > 0 && (
                       <div style={{ marginBottom: 16, padding: "8px 12px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, border: `1px solid ${th.border}33`, borderRadius: 10 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                          <span style={{ fontSize: 9, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>Evidence</span>
-                          <span style={{ fontSize: 8, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>
+                          <span style={{ fontSize: 9, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Evidence</span>
+                          <span style={{ fontSize: 8, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                             <span style={{ color: th.accent }}>&#9679;</span> Observed
                             <span style={{ margin: "0 4px" }}>|</span>
                             <span style={{ color: th.textMuted }}>&#9675;</span> Inferred
@@ -15913,7 +15913,7 @@ strong{color:${c.text}}
                             const color = pc[fi.type] || th.textMuted;
                             const isInferred = fi.basis === "inferred";
                             return (
-                              <span key={i} title={isInferred ? "Inferred from pattern analysis" : "Directly observed in data"} style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, background: `${color}${isInferred ? "0c" : "18"}`, color, fontWeight: 500, fontFamily: "-apple-system, sans-serif", border: `1px ${isInferred ? "dashed" : "solid"} ${color}33`, opacity: isInferred ? 0.85 : 1 }}>
+                              <span key={i} title={isInferred ? "Inferred from pattern analysis" : "Directly observed in data"} style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, background: `${color}${isInferred ? "0c" : "18"}`, color, fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif", border: `1px ${isInferred ? "dashed" : "solid"} ${color}33`, opacity: isInferred ? 0.85 : 1 }}>
                                 {fi.text}
                               </span>
                             );
@@ -15933,8 +15933,8 @@ strong{color:${c.text}}
                       return (
                         <div style={{ marginBottom: 16 }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>File Type Impact</span>
-                            <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'SF Mono',Menlo,monospace" }}>{types.length} types</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>File Type Impact</span>
+                            <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{types.length} types</span>
                           </div>
                           <div style={{ display: "flex", gap: 8, overflow: "hidden" }}>
                             {/* Horizontal bar chart */}
@@ -15944,26 +15944,26 @@ strong{color:${c.text}}
                                 const c = getColor(t.ext);
                                 return (
                                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 12px", fontSize: 11 }}>
-                                    <span style={{ width: 70, flexShrink: 0, fontFamily: "'SF Mono',Menlo,monospace", fontSize: 10, color: c, fontWeight: 600, textAlign: "right", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.ext}</span>
+                                    <span style={{ width: 70, flexShrink: 0, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 10, color: c, fontWeight: 600, textAlign: "right", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.ext}</span>
                                     <div style={{ flex: 1, minWidth: 0, height: 14, borderRadius: 4, background: `${th.border}15`, overflow: "hidden", position: "relative" }}>
                                       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${pct}%`, borderRadius: 4, background: `linear-gradient(90deg, ${c}88, ${c}44)`, transition: "width 0.3s" }} />
                                     </div>
-                                    <span style={{ width: 40, flexShrink: 0, textAlign: "right", fontSize: 10, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{t.count.toLocaleString()}</span>
+                                    <span style={{ width: 40, flexShrink: 0, textAlign: "right", fontSize: 10, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{t.count.toLocaleString()}</span>
                                   </div>
                                 );
                               })}
                             </div>
                             {/* Top types summary */}
                             <div style={{ width: 150, flexShrink: 0, background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10, padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 4, overflow: "hidden" }}>
-                              <div style={{ fontSize: 9, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif", marginBottom: 2 }}>Top Types</div>
+                              <div style={{ fontSize: 9, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 2 }}>Top Types</div>
                               {types.slice(0, 6).map((t, i) => {
                                 const c = getColor(t.ext);
                                 const pct = ((t.count / data.encryptedCount) * 100).toFixed(1);
                                 return (
                                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
                                     <div style={{ width: 8, height: 8, borderRadius: 2, background: c, flexShrink: 0 }} />
-                                    <span style={{ fontSize: 10, color: th.textDim, fontFamily: "'SF Mono',Menlo,monospace", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.ext}</span>
-                                    <span style={{ fontSize: 10, color: th.text, fontWeight: 600, fontFamily: "-apple-system, sans-serif", flexShrink: 0 }}>{pct}%</span>
+                                    <span style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.ext}</span>
+                                    <span style={{ fontSize: 10, color: th.text, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", flexShrink: 0 }}>{pct}%</span>
                                   </div>
                                 );
                               })}
@@ -15982,8 +15982,8 @@ strong{color:${c.text}}
                       return (
                         <div style={{ marginBottom: 16 }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>Business Impact Assessment</span>
-                            <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'SF Mono',Menlo,monospace" }}>{cats.length} categories</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Business Impact Assessment</span>
+                            <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{cats.length} categories</span>
                           </div>
                           <div style={{ background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, border: `1px solid ${th.border}33`, borderRadius: 10, padding: "8px 0", maxHeight: 200, overflow: "auto" }}>
                             {cats.map((c, i) => {
@@ -15992,12 +15992,12 @@ strong{color:${c.text}}
                               return (
                                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 12px", fontSize: 11 }}>
                                   <div style={{ width: 8, height: 8, borderRadius: 2, background: color, flexShrink: 0 }} />
-                                  <span style={{ width: 110, flexShrink: 0, fontFamily: "-apple-system, sans-serif", fontSize: 10, color: th.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.category}</span>
+                                  <span style={{ width: 110, flexShrink: 0, fontFamily: "'Segoe UI', system-ui, sans-serif", fontSize: 10, color: th.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.category}</span>
                                   <div style={{ flex: 1, minWidth: 0, height: 14, borderRadius: 4, background: `${th.border}15`, overflow: "hidden", position: "relative" }}>
                                     <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${pct}%`, borderRadius: 4, background: `linear-gradient(90deg, ${color}88, ${color}44)`, transition: "width 0.3s" }} />
                                   </div>
-                                  <span style={{ width: 50, flexShrink: 0, textAlign: "right", fontSize: 10, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{c.count.toLocaleString()}</span>
-                                  <span style={{ width: 36, flexShrink: 0, textAlign: "right", fontSize: 9, color: th.textMuted, fontFamily: "'SF Mono',Menlo,monospace" }}>{Math.round(c.percentage * 100)}%</span>
+                                  <span style={{ width: 50, flexShrink: 0, textAlign: "right", fontSize: 10, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{c.count.toLocaleString()}</span>
+                                  <span style={{ width: 36, flexShrink: 0, textAlign: "right", fontSize: 9, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{Math.round(c.percentage * 100)}%</span>
                                 </div>
                               );
                             })}
@@ -16015,20 +16015,20 @@ strong{color:${c.text}}
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={dc} strokeWidth="2" strokeLinecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                              <span style={{ fontSize: 10, fontWeight: 700, color: dc, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>Backup & Recovery Artifacts Affected</span>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: dc, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Backup & Recovery Artifacts Affected</span>
                             </div>
-                            <span style={{ fontSize: 10, color: dc, fontWeight: 600, fontFamily: "'SF Mono',Menlo,monospace" }}>{data.backupRecoveryTotal.toLocaleString()} files</span>
+                            <span style={{ fontSize: 10, color: dc, fontWeight: 600, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{data.backupRecoveryTotal.toLocaleString()} files</span>
                           </div>
                           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                             {items.map((item, i) => (
                               <div key={i} style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 8px", background: `${dc}12`, borderRadius: 6, border: `1px solid ${dc}22` }}>
-                                <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>{item.subtype}</span>
-                                <span style={{ fontSize: 10, fontWeight: 600, color: th.text, fontFamily: "'SF Mono',Menlo,monospace" }}>{item.ext}</span>
-                                <span style={{ fontSize: 9, color: dc, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>{item.count.toLocaleString()}</span>
+                                <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{item.subtype}</span>
+                                <span style={{ fontSize: 10, fontWeight: 600, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{item.ext}</span>
+                                <span style={{ fontSize: 9, color: dc, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{item.count.toLocaleString()}</span>
                               </div>
                             ))}
                           </div>
-                          <div style={{ marginTop: 6, fontSize: 10, color: dc + "cc", fontFamily: "-apple-system, sans-serif" }}>Recovery capability may be impacted — verify backup integrity</div>
+                          <div style={{ marginTop: 6, fontSize: 10, color: dc + "cc", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Recovery capability may be impacted — verify backup integrity</div>
                         </div>
                       );
                     })()}
@@ -16052,8 +16052,8 @@ strong{color:${c.text}}
                       return (
                         <div style={{ marginBottom: 16 }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>Encryption Timeline</span>
-                            {peakBucket && <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'SF Mono',Menlo,monospace" }}>peak: <span style={{ color: dc, fontWeight: 600 }}>{peakBucket.count.toLocaleString()}</span> files at {peakBucket.bucket}</span>}
+                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Encryption Timeline</span>
+                            {peakBucket && <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>peak: <span style={{ color: dc, fontWeight: 600 }}>{peakBucket.count.toLocaleString()}</span> files at {peakBucket.bucket}</span>}
                           </div>
                           <div style={{ background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10, overflow: "hidden", padding: "12px 8px 6px" }}>
                             <svg width="100%" height={CHART_H} viewBox={`0 0 ${buckets.length} ${CHART_H}`} preserveAspectRatio="none" style={{ display: "block" }}>
@@ -16068,7 +16068,7 @@ strong{color:${c.text}}
                                 return <rect key={i} x={i} y={CHART_H - h} width={0.85} height={h} fill="url(#rwBarGrad)" rx={0.2} />;
                               })}
                             </svg>
-                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: th.textMuted, marginTop: 6, padding: "0 2px", fontFamily: "'SF Mono',Menlo,monospace" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: th.textMuted, marginTop: 6, padding: "0 2px", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                               <span>{buckets[0]?.bucket}</span>
                               <span>{buckets[buckets.length - 1]?.bucket}</span>
                             </div>
@@ -16090,9 +16090,9 @@ strong{color:${c.text}}
                             <div onClick={() => toggleAll("rwSelDirs", shown.length)} style={cbStyle(allD)}>
                               {allD && <svg width="10" height="10" viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                             </div>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>Affected Subtrees</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Affected Subtrees</span>
                           </div>
-                          <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'SF Mono',Menlo,monospace" }}>{data.topDirectories.length} subtrees</span>
+                          <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{data.topDirectories.length} subtrees</span>
                         </div>
                         <div style={{ maxHeight: 220, overflow: "auto", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10 }}>
                           {shown.map((dir, i) => {
@@ -16109,10 +16109,10 @@ strong{color:${c.text}}
                                 <div style={{ ...cbStyle(sel), position: "relative" }}>
                                   {sel && <svg width="10" height="10" viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                                 </div>
-                                <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'SF Mono',Menlo,monospace", color: th.textDim, position: "relative", fontSize: 10 }}>{dir.path || "(root)"}</span>
-                                {dir.childDirCount > 1 && <span style={{ position: "relative", fontSize: 8, color: th.textMuted, padding: "1px 4px", background: `${th.border}22`, borderRadius: 3, fontFamily: "-apple-system, sans-serif" }}>{dir.childDirCount} dirs</span>}
-                                <span style={{ fontWeight: 600, color: th.text, fontSize: 10, whiteSpace: "nowrap", position: "relative", fontFamily: "'SF Mono',Menlo,monospace", padding: "1px 6px", background: `${th.border}22`, borderRadius: 4 }}>{enc.toLocaleString()} / {total.toLocaleString()}</span>
-                                <span style={{ position: "relative", fontSize: 9, fontWeight: 700, color: ratioColor, fontFamily: "'SF Mono',Menlo,monospace", minWidth: 32, textAlign: "right" }}>{ratioPct}%</span>
+                                <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.textDim, position: "relative", fontSize: 10 }}>{dir.path || "(root)"}</span>
+                                {dir.childDirCount > 1 && <span style={{ position: "relative", fontSize: 8, color: th.textMuted, padding: "1px 4px", background: `${th.border}22`, borderRadius: 3, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{dir.childDirCount} dirs</span>}
+                                <span style={{ fontWeight: 600, color: th.text, fontSize: 10, whiteSpace: "nowrap", position: "relative", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", padding: "1px 6px", background: `${th.border}22`, borderRadius: 4 }}>{enc.toLocaleString()} / {total.toLocaleString()}</span>
+                                <span style={{ position: "relative", fontSize: 9, fontWeight: 700, color: ratioColor, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", minWidth: 32, textAlign: "right" }}>{ratioPct}%</span>
                               </div>
                             );
                           })}
@@ -16133,13 +16133,13 @@ strong{color:${c.text}}
                             <div onClick={() => toggleAll("rwSelNotes", shownN.length)} style={cbStyle(allN)}>
                               {allN && <svg width="10" height="10" viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                             </div>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>Ransom Note Locations</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Ransom Note Locations</span>
                           </div>
-                          <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'SF Mono',Menlo,monospace" }}>{data.ransomNoteCount} found</span>
+                          <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{data.ransomNoteCount} found</span>
                         </div>
                         <div style={{ maxHeight: 180, overflow: "auto", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10 }}>
                           {/* Column header */}
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "-apple-system, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "'Segoe UI', system-ui, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1 }}>
                             <div style={{ width: 14, flexShrink: 0 }} />
                             {rwHdrCol(notesW[0], "Entry#", "rwSortNotes", "entryNumber", "rwNotesColW", defNotesW, 0)}
                             {rwHdrCol(notesW[1], "FileName", "rwSortNotes", "fileName", "rwNotesColW", defNotesW, 1)}
@@ -16160,7 +16160,7 @@ strong{color:${c.text}}
                             </div>
                             );
                           })}
-                          {data.ransomNoteCount > 50 && <div style={{ padding: "6px 10px", fontSize: 10, color: th.textMuted, textAlign: "center", fontFamily: "-apple-system, sans-serif" }}>...and {(data.ransomNoteCount - 50).toLocaleString()} more</div>}
+                          {data.ransomNoteCount > 50 && <div style={{ padding: "6px 10px", fontSize: 10, color: th.textMuted, textAlign: "center", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>...and {(data.ransomNoteCount - 50).toLocaleString()} more</div>}
                         </div>
                       </div>
                       );
@@ -16180,13 +16180,13 @@ strong{color:${c.text}}
                             <div onClick={() => toggleAll("rwSelSusp", data.suspiciousFiles.length)} style={cbStyle(allS)}>
                               {allS && <svg width="10" height="10" viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                             </div>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>Payload Candidates</span>
-                            {topConf && <span style={{ fontSize: 8, padding: "1px 6px", borderRadius: 3, background: `${confColor}22`, color: confColor, fontFamily: "'SF Mono',Menlo,monospace", fontWeight: 600, border: `1px solid ${confColor}44`, textTransform: "uppercase", letterSpacing: "0.05em" }}>{topConf}</span>}
+                            <span style={{ fontSize: 10, fontWeight: 700, color: th.accent, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Payload Candidates</span>
+                            {topConf && <span style={{ fontSize: 8, padding: "1px 6px", borderRadius: 3, background: `${confColor}22`, color: confColor, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontWeight: 600, border: `1px solid ${confColor}44`, textTransform: "uppercase", letterSpacing: "0.05em" }}>{topConf}</span>}
                           </div>
-                          <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'SF Mono',Menlo,monospace" }}>{"\u00B1"}30 min window</span>
+                          <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{"\u00B1"}30 min window</span>
                         </div>
                         <div style={{ maxHeight: 280, overflow: "auto", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "-apple-system, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "'Segoe UI', system-ui, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1 }}>
                             <div style={{ width: 14, flexShrink: 0 }} />
                             <div style={{ width: 32, flexShrink: 0 }}>Score</div>
                             {rwHdrCol(suspW[0], "Ext", "rwSortSusp", "extension", "rwSuspColW", defSuspW, 0)}
@@ -16205,7 +16205,7 @@ strong{color:${c.text}}
                               <div style={cbStyle(sel)}>
                                 {sel && <svg width="10" height="10" viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                               </div>
-                              <span style={{ padding: "1px 5px", borderRadius: 4, fontSize: 9, fontWeight: 700, background: `${scoreColor}22`, color: scoreColor, fontFamily: "'SF Mono',Menlo,monospace", minWidth: 28, textAlign: "center", width: 32, flexShrink: 0 }}>{Math.round(sc * 100)}</span>
+                              <span style={{ padding: "1px 5px", borderRadius: 4, fontSize: 9, fontWeight: 700, background: `${scoreColor}22`, color: scoreColor, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", minWidth: 28, textAlign: "center", width: 32, flexShrink: 0 }}>{Math.round(sc * 100)}</span>
                               <span onClick={(e) => { e.stopPropagation(); setModal((p) => ({ ...p, rwExpandedRow: isExpanded ? null : { section: "susp", idx: i } })); }} style={{ width: suspW[0], flexShrink: 0, color: th.danger || "#f85149", fontWeight: 600, fontSize: 10, cursor: "pointer", textDecoration: "underline", textDecorationStyle: "dotted" }}>{sf.extension}</span>
                               <span style={{ width: suspW[1], flexShrink: 0, color: th.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{sf.fileName}</span>
                               <span style={{ flex: 1, color: th.textDim, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{sf.parentPath}</span>
@@ -16221,14 +16221,14 @@ strong{color:${c.text}}
                                   {sf.signals.map((sig, si) => {
                                     const pc = { execution: th.danger || "#f85149", correlation: th.accent || "#58a6ff", context: th.textMuted || "#8b949e" };
                                     const c = pc[sig.type] || th.textMuted;
-                                    return <span key={si} title={sig.basis === "inferred" ? "Inferred" : "Observed"} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${c}${sig.basis === "inferred" ? "0c" : "15"}`, color: c, fontFamily: "-apple-system, sans-serif", border: `1px ${sig.basis === "inferred" ? "dashed" : "solid"} ${c}22`, opacity: sig.basis === "inferred" ? 0.8 : 1 }}>{sig.text}</span>;
+                                    return <span key={si} title={sig.basis === "inferred" ? "Inferred" : "Observed"} style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: `${c}${sig.basis === "inferred" ? "0c" : "15"}`, color: c, fontFamily: "'Segoe UI', system-ui, sans-serif", border: `1px ${sig.basis === "inferred" ? "dashed" : "solid"} ${c}22`, opacity: sig.basis === "inferred" ? 0.8 : 1 }}>{sig.text}</span>;
                                   })}
                                 </div>
                               )}
                             </div>
                             {/* Expandable timestamp detail */}
                             {isExpanded && (
-                              <div style={{ padding: "6px 10px 6px 42px", background: `${th.panelBg}dd`, borderBottom: `1px solid ${th.border}22`, fontSize: 9, fontFamily: "'SF Mono',Menlo,monospace", color: th.textDim }}>
+                              <div style={{ padding: "6px 10px 6px 42px", background: `${th.panelBg}dd`, borderBottom: `1px solid ${th.border}22`, fontSize: 9, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.textDim }}>
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px 16px" }}>
                                   <span>Created (SI): {sf.created || "—"}</span><span>Modified (SI): {sf.lastModified || "—"}</span>
                                   <span>Record Change: {sf.recordChange0x10 || "—"}</span><span>Created (FN): {sf.created0x30 || "—"}</span>
@@ -16240,7 +16240,7 @@ strong{color:${c.text}}
                           })}
                         </div>
                         {/* Click any row entry# to expand timestamps */}
-                        <div style={{ fontSize: 8, color: th.textMuted, marginTop: 3, fontFamily: "-apple-system, sans-serif", fontStyle: "italic" }}>Click extension to expand timestamps</div>
+                        <div style={{ fontSize: 8, color: th.textMuted, marginTop: 3, fontFamily: "'Segoe UI', system-ui, sans-serif", fontStyle: "italic" }}>Click extension to expand timestamps</div>
                       </div>
                       );
                     })()}
@@ -16262,14 +16262,14 @@ strong{color:${c.text}}
                       <div style={{ marginBottom: 16 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={dc} strokeWidth="2" strokeLinecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: dc, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>Anti-Forensics & Cleanup</span>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: dc, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Anti-Forensics & Cleanup</span>
                         </div>
                         {/* Summary bar */}
                         <div style={{ display: "grid", gridTemplateColumns: `repeat(${cats.length}, 1fr)`, gap: 6, marginBottom: 8 }}>
                           {cats.map((c) => (
                             <div key={c.key} style={{ textAlign: "center", padding: "6px", background: `${c.color}08`, borderRadius: 8, border: `1px solid ${c.color}22` }}>
-                              <div style={{ fontSize: 16, fontWeight: 700, color: c.color, fontFamily: "-apple-system, sans-serif", lineHeight: 1 }}>{c.items.length}</div>
-                              <div style={{ fontSize: 8, color: c.color + "bb", marginTop: 2, textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "-apple-system, sans-serif" }}>{c.label}</div>
+                              <div style={{ fontSize: 16, fontWeight: 700, color: c.color, fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1 }}>{c.items.length}</div>
+                              <div style={{ fontSize: 8, color: c.color + "bb", marginTop: 2, textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{c.label}</div>
                             </div>
                           ))}
                         </div>
@@ -16283,11 +16283,11 @@ strong{color:${c.text}}
                               return (
                                 <div key={`${cat.key}-${ii}`} onClick={() => toggleSet("rwSelAF", gi)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 10px", fontSize: 10, borderBottom: `1px solid ${th.border}12`, cursor: "pointer", background: sel ? `${th.accent}0a` : (gi % 2 === 0 ? "transparent" : `${th.border}08`), borderLeft: `2px solid ${cat.color}44` }}>
                                   <div style={cbStyle(sel)}>{sel && <svg width="10" height="10" viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}</div>
-                                  <span style={{ fontSize: 7, padding: "1px 4px", borderRadius: 3, background: `${cat.color}22`, color: cat.color, fontWeight: 600, fontFamily: "-apple-system, sans-serif", textTransform: "uppercase", flexShrink: 0 }}>{cat.label.split(" ")[0]}</span>
-                                  <span style={{ color: th.textDim, fontFamily: "'SF Mono',Menlo,monospace", fontSize: 9, flexShrink: 0 }}>#{item.entryNumber}</span>
-                                  <span style={{ color: th.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0, fontFamily: "'SF Mono',Menlo,monospace" }}>{item.fileName}</span>
-                                  <span style={{ flex: 1, color: th.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0, fontFamily: "'SF Mono',Menlo,monospace" }}>{item.parentPath}</span>
-                                  <span style={{ color: th.textMuted, fontSize: 9, whiteSpace: "nowrap", flexShrink: 0, fontFamily: "'SF Mono',Menlo,monospace" }}>{(item.created || item.lastModified || "").slice(0, 19)}</span>
+                                  <span style={{ fontSize: 7, padding: "1px 4px", borderRadius: 3, background: `${cat.color}22`, color: cat.color, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase", flexShrink: 0 }}>{cat.label.split(" ")[0]}</span>
+                                  <span style={{ color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 9, flexShrink: 0 }}>#{item.entryNumber}</span>
+                                  <span style={{ color: th.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{item.fileName}</span>
+                                  <span style={{ flex: 1, color: th.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{item.parentPath}</span>
+                                  <span style={{ color: th.textMuted, fontSize: 9, whiteSpace: "nowrap", flexShrink: 0, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{(item.created || item.lastModified || "").slice(0, 19)}</span>
                                 </div>
                               );
                             });
@@ -16304,13 +16304,13 @@ strong{color:${c.text}}
                       return (
                       <div style={{ marginBottom: 16 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: ac, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>USN Journal Correlation</span>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: ac, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>USN Journal Correlation</span>
                         </div>
                         {/* Precise start callout */}
                         {usn.preciseStartTime && data.firstEncrypted?.timestamp && usn.preciseStartTime !== data.firstEncrypted.timestamp && (
                           <div style={{ marginBottom: 8, padding: "8px 12px", background: `${ac}08`, border: `1px solid ${ac}22`, borderRadius: 8, borderLeft: `3px solid ${ac}` }}>
-                            <div style={{ fontSize: 10, color: ac, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>USN places encryption start at <span style={{ fontFamily: "'SF Mono',Menlo,monospace" }}>{usn.preciseStartTime}</span></div>
-                            <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif", marginTop: 2 }}>MFT LastModified shows <span style={{ fontFamily: "'SF Mono',Menlo,monospace" }}>{data.firstEncrypted.timestamp}</span></div>
+                            <div style={{ fontSize: 10, color: ac, fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>USN places encryption start at <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{usn.preciseStartTime}</span></div>
+                            <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif", marginTop: 2 }}>MFT LastModified shows <span style={{ fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{data.firstEncrypted.timestamp}</span></div>
                           </div>
                         )}
                         {/* Summary stats */}
@@ -16321,8 +16321,8 @@ strong{color:${c.text}}
                             { val: usn.deleteTotal, label: "deletions", color: th.danger || "#f85149" },
                           ].map((c, i) => (
                             <div key={i} style={{ textAlign: "center", padding: "8px 6px", background: `${c.color}08`, borderRadius: 8, border: `1px solid ${c.color}22` }}>
-                              <div style={{ fontSize: 18, fontWeight: 700, color: c.color, fontFamily: "-apple-system, sans-serif", lineHeight: 1 }}>{c.val.toLocaleString()}</div>
-                              <div style={{ fontSize: 8, color: c.color + "bb", marginTop: 3, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "-apple-system, sans-serif" }}>{c.label}</div>
+                              <div style={{ fontSize: 18, fontWeight: 700, color: c.color, fontFamily: "'Segoe UI', system-ui, sans-serif", lineHeight: 1 }}>{c.val.toLocaleString()}</div>
+                              <div style={{ fontSize: 8, color: c.color + "bb", marginTop: 3, textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{c.label}</div>
                             </div>
                           ))}
                         </div>
@@ -16332,11 +16332,11 @@ strong{color:${c.text}}
                           const maxC = Math.max(...bkts.map(b => b.count), 1);
                           return (
                             <div style={{ marginBottom: 8, background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, border: `1px solid ${th.border}33`, borderRadius: 10, padding: "8px 8px 4px" }}>
-                              <div style={{ fontSize: 9, fontWeight: 600, color: th.textMuted, marginBottom: 4, fontFamily: "-apple-system, sans-serif" }}>Data Overwrite Burst Pattern</div>
+                              <div style={{ fontSize: 9, fontWeight: 600, color: th.textMuted, marginBottom: 4, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Data Overwrite Burst Pattern</div>
                               <svg width="100%" height="50" viewBox={`0 0 ${bkts.length} 50`} preserveAspectRatio="none" style={{ display: "block" }}>
                                 {bkts.map((b, i) => { const h = Math.max(0.5, (b.count / maxC) * 44); return <rect key={i} x={i} y={50 - h} width={0.85} height={h} fill={(th.warning || "#d29922") + "88"} rx={0.2} />; })}
                               </svg>
-                              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 8, color: th.textMuted, marginTop: 2, fontFamily: "'SF Mono',Menlo,monospace" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 8, color: th.textMuted, marginTop: 2, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                 <span>{bkts[0]?.bucket}</span><span>{bkts[bkts.length - 1]?.bucket}</span>
                               </div>
                             </div>
@@ -16345,7 +16345,7 @@ strong{color:${c.text}}
                         {/* Sample rename events */}
                         {usn.renameSamples?.length > 0 && (
                           <div style={{ maxHeight: 140, overflow: "auto", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, border: `1px solid ${th.border}33`, borderRadius: 10 }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "-apple-system, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "'Segoe UI', system-ui, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1 }}>
                               <div style={{ width: 14, flexShrink: 0 }} />
                               <div style={{ width: 130, flexShrink: 0 }}>Timestamp</div>
                               <div style={{ flex: 1 }}>FileName</div>
@@ -16354,7 +16354,7 @@ strong{color:${c.text}}
                             {usn.renameSamples.map((r, i) => {
                               const sel = (modal.rwSelUsn || new Set()).has(i);
                               return (
-                                <div key={i} onClick={() => toggleSet("rwSelUsn", i)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 10px", fontSize: 10, borderBottom: `1px solid ${th.border}12`, cursor: "pointer", background: sel ? `${th.accent}0a` : (i % 2 === 0 ? "transparent" : `${th.border}08`), fontFamily: "'SF Mono',Menlo,monospace" }}>
+                                <div key={i} onClick={() => toggleSet("rwSelUsn", i)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 10px", fontSize: 10, borderBottom: `1px solid ${th.border}12`, cursor: "pointer", background: sel ? `${th.accent}0a` : (i % 2 === 0 ? "transparent" : `${th.border}08`), fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                   <div style={cbStyle(sel)}>{sel && <svg width="10" height="10" viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}</div>
                                   <span style={{ width: 130, flexShrink: 0, color: th.textMuted, fontSize: 9 }}>{(r.timestamp || "").slice(0, 19)}</span>
                                   <span style={{ flex: 1, color: th.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.name}</span>
@@ -16377,8 +16377,8 @@ strong{color:${c.text}}
                   <button onClick={() => setModal(null)} style={ms.bs}>Cancel</button>
                   <button onClick={handleAnalyze} disabled={!encryptedExt.trim() || loading} style={{ ...ms.bp, opacity: !encryptedExt.trim() ? 0.5 : 1 }}>Analyze</button>
                 </>)}
-                {phase === "scanning" && <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>Scanning...</span>}
-                {phase === "loading" && <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "-apple-system, sans-serif" }}>Analyzing...</span>}
+                {phase === "scanning" && <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Scanning...</span>}
+                {phase === "loading" && <span style={{ color: th.textMuted, fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Analyzing...</span>}
                 {phase === "results" && (<>
                   <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
                     <button onClick={() => setModal((p) => ({ ...p, phase: "input", data: null }))} style={ms.bs}>Back</button>
@@ -16401,7 +16401,7 @@ strong{color:${c.text}}
                                 setModal((p) => ({ ...p, rwPivotMsg: `Tagged ${data.encryptedCount.toLocaleString()} files as "Encrypted"`, rwShowPivots: false }));
                                 setTimeout(() => setModal((p) => p ? { ...p, rwPivotMsg: null } : p), 3000);
                               } catch {}
-                            }} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif" }}>
+                            }} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                               Tag Encrypted Files ({data.encryptedCount.toLocaleString()})
                             </button>
                             {/* Filter grid to encryption window */}
@@ -16414,7 +16414,7 @@ strong{color:${c.text}}
                                 const to = data.timingEvidence?.filterWindow?.to || data.lastEncrypted.timestamp;
                                 up("dateRangeFilters", { ...(ct.dateRangeFilters || {}), [filterCol]: { from, to } });
                                 setModal(null);
-                              }} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif" }}>
+                              }} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                 Filter Grid to Encryption Window
                               </button>
                             )}
@@ -16428,7 +16428,7 @@ strong{color:${c.text}}
                                   { column: "ParentPath", operator: "starts_with", value: `${topDir}\\`, logic: "OR" },
                                 ]);
                                 setModal(null);
-                              }} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif" }}>
+                              }} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                 Open Top Directory in Grid
                               </button>
                             )}
@@ -16446,7 +16446,7 @@ strong{color:${c.text}}
                                   setModal((p) => ({ ...p, rwPivotMsg: `Tagged ${Object.keys(tagMap).length} files as "Ransom Note"`, rwShowPivots: false }));
                                   setTimeout(() => setModal((p) => p ? { ...p, rwPivotMsg: null } : p), 3000);
                                 } catch {}
-                              }} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif" }}>
+                              }} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                 Tag Ransom Note Files ({data.ransomNoteCount})
                               </button>
                             )}
@@ -16465,7 +16465,7 @@ strong{color:${c.text}}
                                   setModal((p) => ({ ...p, rwPivotMsg: `Tagged ${Object.keys(tagMap).length} files as "Payload"`, rwShowPivots: false }));
                                   setTimeout(() => setModal((p) => p ? { ...p, rwPivotMsg: null } : p), 3000);
                                 } catch {}
-                              }} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif" }}>
+                              }} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                                 Tag Payload Candidates ({data.suspiciousFiles.filter(s => s.score >= 0.35).length})
                               </button>
                             )}
@@ -16476,7 +16476,7 @@ strong{color:${c.text}}
                   </div>
                   {/* Pivot feedback toast */}
                   {modal.rwPivotMsg && (
-                    <span style={{ fontSize: 10, color: th.accent, fontWeight: 500, fontFamily: "-apple-system, sans-serif", animation: "tle-fadeIn 0.2s" }}>{modal.rwPivotMsg}</span>
+                    <span style={{ fontSize: 10, color: th.accent, fontWeight: 500, fontFamily: "'Segoe UI', system-ui, sans-serif", animation: "tle-fadeIn 0.2s" }}>{modal.rwPivotMsg}</span>
                   )}
                   <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                     {totalSelected > 0 && <button onClick={copySelected} style={{ ...ms.bs, display: "flex", alignItems: "center", gap: 4 }}>Copy Selected <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 8, background: th.accent, color: "#fff", fontWeight: 700, lineHeight: "14px" }}>{totalSelected}</span></button>}
@@ -16508,7 +16508,7 @@ strong{color:${c.text}}
         const rowStyle = (i) => ({
           display: "flex", alignItems: "center", gap: 8, padding: "5px 10px", fontSize: 11,
           background: i % 2 === 0 ? "transparent" : `${th.border}15`,
-          borderBottom: `1px solid ${th.border}22`, fontFamily: "'SF Mono',Menlo,monospace",
+          borderBottom: `1px solid ${th.border}22`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace",
         });
 
         const cbStyle = (checked) => ({
@@ -16654,7 +16654,7 @@ strong{color:${c.text}}
         );
 
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", position: "absolute", left: rx, top: ry, width: rw, height: rh, background: th.modalBg + "f2", border: `1px solid ${th.modalBorder}88`, borderRadius: 14, padding: 0, display: "flex", flexDirection: "column", boxShadow: "0 24px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04) inset", overflow: "hidden", backdropFilter: "blur(40px) saturate(1.6)", WebkitBackdropFilter: "blur(40px) saturate(1.6)" }}>
               {/* Resize handles */}
               <div onMouseDown={(e) => startResize(e, "t")} style={edgeStyle("ns-resize", { top: 0, left: 8, right: 8, height: 5 })} />
@@ -16673,8 +16673,8 @@ strong{color:${c.text}}
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={th.warning || "#E85D2A"} strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="10" fill={(th.warning || "#E85D2A") + "18"}/><polyline points="12 6 12 12 16 14"/><circle cx="19" cy="5" r="2" fill={th.danger || "#f85149"} stroke="none"/></svg>
                   </div>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.01em" }}>Timestomp Indicator Review</h3>
-                    <p style={{ margin: "2px 0 0", color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>Score likely timestomp indicators from SI &lt; FN plus NTFS confidence heuristics</p>
+                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.01em" }}>Timestomp Indicator Review</h3>
+                    <p style={{ margin: "2px 0 0", color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Score likely timestomp indicators from SI &lt; FN plus NTFS confidence heuristics</p>
                   </div>
                 </div>
                 <button onClick={() => setModal(null)} style={{ background: "none", border: "none", color: th.textMuted, fontSize: 18, cursor: "pointer", padding: "4px 8px", lineHeight: 1 }}>{"\u2715"}</button>
@@ -16687,7 +16687,7 @@ strong{color:${c.text}}
                     <div style={{ width: 44, height: 44, borderRadius: 12, background: `linear-gradient(135deg, ${th.warning || "#E85D2A"}33, ${th.warning || "#E85D2A"}11)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <div style={{ width: 20, height: 20, border: `2px solid ${th.warning || "#E85D2A"}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
                     </div>
-                    <span style={{ color: th.textDim, fontSize: 13, fontFamily: "-apple-system, sans-serif" }}>Scoring timestomp indicators...</span>
+                    <span style={{ color: th.textDim, fontSize: 13, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Scoring timestomp indicators...</span>
                   </div>
                 )}
 
@@ -16700,7 +16700,7 @@ strong{color:${c.text}}
                     <div style={{ width: 44, height: 44, borderRadius: 12, background: `linear-gradient(135deg, ${th.success || "#4ade80"}33, ${th.success || "#4ade80"}11)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={th.success || "#4ade80"} strokeWidth="2" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
                     </div>
-                    <span style={{ color: th.textDim, fontSize: 13, fontFamily: "-apple-system, sans-serif" }}>No high-confidence timestomp indicators detected</span>
+                    <span style={{ color: th.textDim, fontSize: 13, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>No high-confidence timestomp indicators detected</span>
                   </div>
                 )}
 
@@ -16720,16 +16720,16 @@ strong{color:${c.text}}
                         { label: "Context", value: d.contextCount.toLocaleString(), sub: "Weak / lower-confidence indicators", color: th.textDim },
                       ].map((c, i) => (
                         <div key={i} style={{ padding: "14px 16px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10 }}>
-                          <div style={{ fontSize: 10, color: c.color, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>{c.label}</div>
-                          <div style={{ fontSize: 22, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.02em" }}>{c.value}</div>
-                          <div style={{ fontSize: 10, color: th.textMuted, marginTop: 3, fontFamily: "-apple-system, sans-serif" }}>{c.sub}</div>
+                          <div style={{ fontSize: 10, color: c.color, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{c.label}</div>
+                          <div style={{ fontSize: 22, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.02em" }}>{c.value}</div>
+                          <div style={{ fontSize: 10, color: th.textMuted, marginTop: 3, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{c.sub}</div>
                         </div>
                       ))}
                     </div>
 
                     {/* Severity distribution bar */}
                     <div style={{ padding: "10px 14px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10, marginBottom: 16 }}>
-                      <div style={{ fontSize: 10, color: th.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8, fontFamily: "-apple-system, sans-serif" }}>Severity Distribution</div>
+                      <div style={{ fontSize: 10, color: th.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Severity Distribution</div>
                       <div style={{ display: "flex", height: 18, borderRadius: 6, overflow: "hidden", border: `1px solid ${th.border}33` }}>
                         {[
                           { count: d.criticalCount, color: sevColors.critical, label: "Critical" },
@@ -16737,7 +16737,7 @@ strong{color:${c.text}}
                           { count: d.mediumCount, color: sevColors.medium, label: "Medium" },
                           { count: d.lowCount, color: sevColors.low, label: "Low" },
                         ].filter((s) => s.count > 0).map((s, i) => (
-                          <div key={i} title={`${s.label}: ${s.count}`} style={{ flex: s.count, background: `linear-gradient(180deg, ${s.color}cc, ${s.color}88)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 600, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.4)", fontFamily: "-apple-system, sans-serif" }}>
+                          <div key={i} title={`${s.label}: ${s.count}`} style={{ flex: s.count, background: `linear-gradient(180deg, ${s.color}cc, ${s.color}88)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 600, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.4)", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                             {s.count > 0 && d.totalTimestomped > 0 && (s.count / d.totalTimestomped * 100) >= 8 ? `${s.label} ${s.count}` : ""}
                           </div>
                         ))}
@@ -16751,12 +16751,12 @@ strong{color:${c.text}}
                           <div onClick={() => toggleAll("tsSelFiles", files.length)} style={cbStyle(selFiles.size === files.length && files.length > 0)}>
                             {selFiles.size === files.length && files.length > 0 && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
                           </div>
-                          <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Potential Timestomp Indicators ({files.length.toLocaleString()}{d.totalTimestomped > files.length ? ` of ${d.totalTimestomped.toLocaleString()}` : ""})</span>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Potential Timestomp Indicators ({files.length.toLocaleString()}{d.totalTimestomped > files.length ? ` of ${d.totalTimestomped.toLocaleString()}` : ""})</span>
                         </div>
                       </div>
                       <div style={{ maxHeight: 320, overflow: "auto" }}>
                         {/* Header row */}
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "-apple-system, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1, minWidth: "fit-content" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "'Segoe UI', system-ui, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1, minWidth: "fit-content" }}>
                           <div style={{ width: 14, flexShrink: 0 }} />
                           {tsHdrCol(tsW[0], "Sev", "severity", 0)}
                           {tsHdrCol(tsW[1], "FileName", "fileName", 1)}
@@ -16798,14 +16798,14 @@ strong{color:${c.text}}
                             <div onClick={() => toggleAll("tsSelDirs", (d.topDirectories || []).length)} style={cbStyle(selDirs.size === (d.topDirectories || []).length && (d.topDirectories || []).length > 0)}>
                               {selDirs.size === (d.topDirectories || []).length && (d.topDirectories || []).length > 0 && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
                             </div>
-                            <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Top Directories</span>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Top Directories</span>
                           </div>
                         </div>
                         <div style={{ maxHeight: 200, overflow: "auto", padding: "4px 0" }}>
                           {(d.topDirectories || []).map((dir, i) => {
                             const maxC = (d.topDirectories || [])[0]?.count || 1;
                             return (
-                              <div key={i} onClick={() => toggleSet("tsSelDirs", i)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 12px", cursor: "pointer", fontSize: 11, fontFamily: "'SF Mono',Menlo,monospace" }}>
+                              <div key={i} onClick={() => toggleSet("tsSelDirs", i)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 12px", cursor: "pointer", fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                 <div style={cbStyle(selDirs.has(i))}>
                                   {selDirs.has(i) && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
                                 </div>
@@ -16827,14 +16827,14 @@ strong{color:${c.text}}
                       {/* Extension Breakdown */}
                       <div style={{ flex: 1, minWidth: 0, background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10, overflow: "hidden" }}>
                         <div style={{ padding: "10px 12px", borderBottom: `1px solid ${th.border}22` }}>
-                          <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Extension Breakdown</span>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Extension Breakdown</span>
                         </div>
                         <div style={{ maxHeight: 200, overflow: "auto", padding: "4px 0" }}>
                           {(d.extensionBreakdown || []).map((eb, i) => {
                             const maxC = (d.extensionBreakdown || [])[0]?.count || 1;
                             const isExec = [".exe",".dll",".bat",".cmd",".ps1",".vbs",".js",".wsf",".hta",".scr",".pif",".msi",".com",".sys",".drv"].includes((eb.extension || "").toLowerCase());
                             return (
-                              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 12px", fontSize: 11, fontFamily: "'SF Mono',Menlo,monospace" }}>
+                              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 12px", fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 2 }}>
                                     <span style={{ color: isExec ? (th.danger || "#f85149") : th.text, fontWeight: isExec ? 600 : 400 }}>{eb.extension || "(none)"}</span>
@@ -16994,7 +16994,7 @@ strong{color:${c.text}}
         const footerSelectedWindow = footerSuspiciousState.selected;
 
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", position: "absolute", left: rx, top: ry, width: rw, height: rh, background: th.modalBg + "f2", border: `1px solid ${th.modalBorder}88`, borderRadius: 14, padding: 0, display: "flex", flexDirection: "column", boxShadow: "0 24px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04) inset", overflow: "hidden", backdropFilter: "blur(40px) saturate(1.6)", WebkitBackdropFilter: "blur(40px) saturate(1.6)" }}>
               {/* Resize handles */}
               <div onMouseDown={(e) => startResize(e, "t")} style={edgeStyle("ns-resize", { top: 0, left: 8, right: 8, height: 5 })} />
@@ -17013,8 +17013,8 @@ strong{color:${c.text}}
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="1.8" strokeLinecap="round"><rect x="3" y="3" width="7" height="7" rx="1" fill={th.accent + "44"}/><rect x="14" y="3" width="7" height="7" rx="1" fill={th.accent + "22"}/><rect x="3" y="14" width="7" height="7" rx="1" fill={th.accent + "66"}/><rect x="14" y="14" width="7" height="7" rx="1" fill={th.accent + "88"}/></svg>
                   </div>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.01em" }}>File Activity Heatmap</h3>
-                    <p style={{ margin: "2px 0 0", color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>Visualize file creation and modification patterns over time</p>
+                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.01em" }}>File Activity Heatmap</h3>
+                    <p style={{ margin: "2px 0 0", color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Visualize file creation and modification patterns over time</p>
                   </div>
                 </div>
                 <button onClick={() => setModal(null)} style={{ background: "none", border: "none", color: th.textMuted, fontSize: 18, cursor: "pointer", padding: "4px 8px", lineHeight: 1 }}>{"\u2715"}</button>
@@ -17032,11 +17032,11 @@ strong{color:${c.text}}
                         <div style={{ width: 20, height: 20, border: `2px solid ${th.accent}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
                       </div>
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, width: 300 }}>
-                        <span style={{ color: th.textDim, fontSize: 13, fontFamily: "-apple-system, sans-serif" }}>{detail}</span>
+                        <span style={{ color: th.textDim, fontSize: 13, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{detail}</span>
                         <div style={{ width: "100%", height: 6, borderRadius: 3, background: th.border + "44", overflow: "hidden" }}>
                           <div style={{ height: "100%", borderRadius: 3, background: `linear-gradient(90deg, ${th.accent}, ${th.accent}cc)`, width: `${pct}%`, transition: "width 0.4s ease" }} />
                         </div>
-                        <span style={{ color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>{pct}%</span>
+                        <span style={{ color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{pct}%</span>
                       </div>
                     </div>
                   );
@@ -17122,23 +17122,23 @@ strong{color:${c.text}}
                     {/* Summary cards */}
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 16 }}>
                       <div style={{ padding: "14px 16px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10 }}>
-                        <div style={{ fontSize: 10, color: th.accent, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>File Creations</div>
-                        <div style={{ fontSize: 22, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{(d.totalCreated || 0).toLocaleString()}</div>
-                        {d.peakCreated && <div style={{ fontSize: 10, color: th.textMuted, marginTop: 3, fontFamily: "-apple-system, sans-serif" }}>Peak: {d.peakCreated.bucket} ({d.peakCreated.count.toLocaleString()})</div>}
+                        <div style={{ fontSize: 10, color: th.accent, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>File Creations</div>
+                        <div style={{ fontSize: 22, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{(d.totalCreated || 0).toLocaleString()}</div>
+                        {d.peakCreated && <div style={{ fontSize: 10, color: th.textMuted, marginTop: 3, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Peak: {d.peakCreated.bucket} ({d.peakCreated.count.toLocaleString()})</div>}
                       </div>
                       <div style={{ padding: "14px 16px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10 }}>
-                        <div style={{ fontSize: 10, color: "#6cb6ff", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>File Modifications</div>
-                        <div style={{ fontSize: 22, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{(d.totalModified || 0).toLocaleString()}</div>
-                        {d.peakModified && <div style={{ fontSize: 10, color: th.textMuted, marginTop: 3, fontFamily: "-apple-system, sans-serif" }}>Peak: {d.peakModified.bucket} ({d.peakModified.count.toLocaleString()})</div>}
+                        <div style={{ fontSize: 10, color: "#6cb6ff", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>File Modifications</div>
+                        <div style={{ fontSize: 22, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{(d.totalModified || 0).toLocaleString()}</div>
+                        {d.peakModified && <div style={{ fontSize: 10, color: th.textMuted, marginTop: 3, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Peak: {d.peakModified.bucket} ({d.peakModified.count.toLocaleString()})</div>}
                       </div>
                       <div style={{ padding: "14px 16px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10 }}>
-                        <div style={{ fontSize: 10, color: th.textDim, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>Full Span</div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: th.text, fontFamily: "'SF Mono',Menlo,monospace" }}>{(d.timeRange?.earliest || "").slice(0, 10)}</div>
+                        <div style={{ fontSize: 10, color: th.textDim, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Full Span</div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{(d.timeRange?.earliest || "").slice(0, 10)}</div>
                         <div style={{ fontSize: 10, color: th.textMuted, marginTop: 2 }}>to {(d.timeRange?.latest || "").slice(0, 10)} ({d.bucketSize} buckets)</div>
                       </div>
                       <div style={{ padding: "14px 16px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10 }}>
-                        <div style={{ fontSize: 10, color: th.warning || "#d29922", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>Investigation Focus</div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: th.text, fontFamily: "'SF Mono',Menlo,monospace" }}>{(d.timeRange?.focusEarliest || d.timeRange?.earliest || "").slice(0, 10)}</div>
+                        <div style={{ fontSize: 10, color: th.warning || "#d29922", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Investigation Focus</div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{(d.timeRange?.focusEarliest || d.timeRange?.earliest || "").slice(0, 10)}</div>
                         <div style={{ fontSize: 10, color: th.textMuted, marginTop: 2 }}>to {(d.timeRange?.focusLatest || d.timeRange?.latest || "").slice(0, 10)} ({(d.suspiciousWindows || []).length} suspicious windows)</div>
                       </div>
                     </div>
@@ -17146,18 +17146,18 @@ strong{color:${c.text}}
                     {/* Activity Timeline Chart */}
                     <div style={{ background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10, padding: "14px", marginBottom: 16 }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                        <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Activity Timeline</span>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Activity Timeline</span>
                         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                           {(d.timeRange?.focusEarliest && d.timeRange?.focusLatest) && (
                             <div style={{ display: "flex", gap: 4 }}>
                               {["focus", "full"].map((m) => (
-                                <button key={m} onClick={() => setModal((p) => p ? { ...p, hmRangeMode: m } : p)} style={{ padding: "3px 9px", fontSize: 10, fontWeight: 600, borderRadius: 6, border: `1px solid ${rangeMode === m ? (th.warning || "#d29922") : th.border}44`, background: rangeMode === m ? `${th.warning || "#d29922"}22` : "transparent", color: rangeMode === m ? (th.warning || "#d29922") : th.textMuted, cursor: "pointer", fontFamily: "-apple-system, sans-serif", textTransform: "capitalize" }}>{m}</button>
+                                <button key={m} onClick={() => setModal((p) => p ? { ...p, hmRangeMode: m } : p)} style={{ padding: "3px 9px", fontSize: 10, fontWeight: 600, borderRadius: 6, border: `1px solid ${rangeMode === m ? (th.warning || "#d29922") : th.border}44`, background: rangeMode === m ? `${th.warning || "#d29922"}22` : "transparent", color: rangeMode === m ? (th.warning || "#d29922") : th.textMuted, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "capitalize" }}>{m}</button>
                               ))}
                             </div>
                           )}
                           <div style={{ display: "flex", gap: 4 }}>
                           {["created", "modified", "both"].map((m) => (
-                            <button key={m} onClick={() => setModal((p) => p ? { ...p, hmView: m } : p)} style={{ padding: "3px 10px", fontSize: 10, fontWeight: 600, borderRadius: 6, border: `1px solid ${viewMode === m ? th.accent : th.border}44`, background: viewMode === m ? `${th.accent}22` : "transparent", color: viewMode === m ? th.accent : th.textMuted, cursor: "pointer", fontFamily: "-apple-system, sans-serif", textTransform: "capitalize" }}>{m}</button>
+                            <button key={m} onClick={() => setModal((p) => p ? { ...p, hmView: m } : p)} style={{ padding: "3px 10px", fontSize: 10, fontWeight: 600, borderRadius: 6, border: `1px solid ${viewMode === m ? th.accent : th.border}44`, background: viewMode === m ? `${th.accent}22` : "transparent", color: viewMode === m ? th.accent : th.textMuted, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "capitalize" }}>{m}</button>
                           ))}
                           </div>
                         </div>
@@ -17207,11 +17207,11 @@ strong{color:${c.text}}
                               return (
                                 <g key={l.idx}>
                                   <line x1={x} y1={chartH} x2={x} y2={chartH + 4} stroke={th.border + "66"} strokeWidth="1" />
-                                  <text x={x} y={chartH + 15} fill={th.textMuted} fontSize="8" fontFamily="'SF Mono',Menlo,monospace" textAnchor="middle">{l.label}</text>
+                                  <text x={x} y={chartH + 15} fill={th.textMuted} fontSize="8" fontFamily="'Cascadia Code','Consolas','Courier New',monospace" textAnchor="middle">{l.label}</text>
                                 </g>
                               );
                             })}
-                            <text x={chartW - 5} y={chartH + 15} fill={th.textMuted + "88"} fontSize="7" fontFamily="-apple-system,sans-serif" textAnchor="end">UTC</text>
+                            <text x={chartW - 5} y={chartH + 15} fill={th.textMuted + "88"} fontSize="7" fontFamily="'Segoe UI',system-ui,sans-serif" textAnchor="end">UTC</text>
                           </svg>
                         );
                       })()}
@@ -17220,12 +17220,12 @@ strong{color:${c.text}}
                     {/* Day-of-Week × Hour Heatmap */}
                     <div style={{ background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10, padding: "14px", marginBottom: 16 }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                        <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Day-of-Week x Hour {viewMode === "both" ? "Combined" : viewMode === "modified" ? "Modification" : "Creation"} Activity <span style={{ fontSize: 9, fontWeight: 500, color: th.textMuted }}>(UTC)</span></span>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Day-of-Week x Hour {viewMode === "both" ? "Combined" : viewMode === "modified" ? "Modification" : "Creation"} Activity <span style={{ fontSize: 9, fontWeight: 500, color: th.textMuted }}>(UTC)</span></span>
                         {availableMonths.length > 1 && (
                           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                            <button onClick={() => setModal((p) => p ? { ...p, hmMonth: "all" } : p)} style={{ padding: "3px 8px", fontSize: 9, fontWeight: 600, borderRadius: 5, border: `1px solid ${hmMonth === "all" ? th.accent : th.border}44`, background: hmMonth === "all" ? `${th.accent}22` : "transparent", color: hmMonth === "all" ? th.accent : th.textMuted, cursor: "pointer", fontFamily: "'SF Mono',Menlo,monospace" }}>All</button>
+                            <button onClick={() => setModal((p) => p ? { ...p, hmMonth: "all" } : p)} style={{ padding: "3px 8px", fontSize: 9, fontWeight: 600, borderRadius: 5, border: `1px solid ${hmMonth === "all" ? th.accent : th.border}44`, background: hmMonth === "all" ? `${th.accent}22` : "transparent", color: hmMonth === "all" ? th.accent : th.textMuted, cursor: "pointer", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>All</button>
                             <select value={hmMonth === "all" ? "" : hmMonth} onChange={(e) => setModal((p) => p ? { ...p, hmMonth: e.target.value || "all" } : p)}
-                              style={{ padding: "3px 22px 3px 6px", fontSize: 9, fontWeight: 600, borderRadius: 5, border: `1px solid ${hmMonth !== "all" ? th.accent : th.border}44`, background: hmMonth !== "all" ? `${th.accent}22` : "transparent", color: hmMonth !== "all" ? th.accent : th.textMuted, cursor: "pointer", fontFamily: "'SF Mono',Menlo,monospace", appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l3 3 3-3' stroke='%23888' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 6px center" }}>
+                              style={{ padding: "3px 22px 3px 6px", fontSize: 9, fontWeight: 600, borderRadius: 5, border: `1px solid ${hmMonth !== "all" ? th.accent : th.border}44`, background: hmMonth !== "all" ? `${th.accent}22` : "transparent", color: hmMonth !== "all" ? th.accent : th.textMuted, cursor: "pointer", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l3 3 3-3' stroke='%23888' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 6px center" }}>
                               <option value="">Select month...</option>
                               {availableMonths.map((m) => <option key={m} value={m}>{m}</option>)}
                             </select>
@@ -17236,13 +17236,13 @@ strong{color:${c.text}}
                         {/* Hour labels */}
                         <div style={{ display: "flex", gap: 2, paddingLeft: 40 }}>
                           {Array.from({ length: 24 }, (_, h) => (
-                            <div key={h} style={{ width: 28, textAlign: "center", fontSize: 8, color: th.textMuted, fontFamily: "'SF Mono',Menlo,monospace" }}>{String(h).padStart(2, "0")}</div>
+                            <div key={h} style={{ width: 28, textAlign: "center", fontSize: 8, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{String(h).padStart(2, "0")}</div>
                           ))}
                         </div>
                         {/* Grid rows */}
                         {matrix.map((row, dow) => (
                           <div key={dow} style={{ display: "flex", alignItems: "center", gap: 2 }}>
-                            <div style={{ width: 36, fontSize: 10, color: th.textDim, fontWeight: 500, textAlign: "right", paddingRight: 4, fontFamily: "-apple-system, sans-serif" }}>{dayLabels[dow]}</div>
+                            <div style={{ width: 36, fontSize: 10, color: th.textDim, fontWeight: 500, textAlign: "right", paddingRight: 4, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{dayLabels[dow]}</div>
                             {row.map((count, hour) => {
                               const intensity = maxCell > 0 ? count / maxCell : 0;
                               const isWeekend = dow === 0 || dow === 6;
@@ -17250,7 +17250,7 @@ strong{color:${c.text}}
                               const cellZ = count > 0 ? (count - cellMed) / (1.4826 * cellMad) : 0;
                               const suspicious = (isWeekend || isOffHours) && cellZ >= cellZThreshold;
                               return (
-                                <div key={hour} title={`${dayLabels[dow]} ${String(hour).padStart(2, "0")}:00 — ${count.toLocaleString()} files`} style={{ width: 28, height: 22, borderRadius: 3, background: count === 0 ? `${th.border}22` : suspicious ? `rgba(${(th.danger || "#f85149").slice(1).match(/../g).map((h) => parseInt(h, 16)).join(",")}, ${Math.max(0.15, intensity * 0.9)})` : `rgba(${(th.accent).slice(1).match(/../g).map((h) => parseInt(h, 16)).join(",")}, ${Math.max(0.08, intensity * 0.85)})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: intensity > 0.4 ? "#fff" : "transparent", fontWeight: 600, fontFamily: "'SF Mono',Menlo,monospace", transition: "background 0.15s", cursor: "default" }}>
+                                <div key={hour} title={`${dayLabels[dow]} ${String(hour).padStart(2, "0")}:00 — ${count.toLocaleString()} files`} style={{ width: 28, height: 22, borderRadius: 3, background: count === 0 ? `${th.border}22` : suspicious ? `rgba(${(th.danger || "#f85149").slice(1).match(/../g).map((h) => parseInt(h, 16)).join(",")}, ${Math.max(0.15, intensity * 0.9)})` : `rgba(${(th.accent).slice(1).match(/../g).map((h) => parseInt(h, 16)).join(",")}, ${Math.max(0.08, intensity * 0.85)})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: intensity > 0.4 ? "#fff" : "transparent", fontWeight: 600, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", transition: "background 0.15s", cursor: "default" }}>
                                   {count > 0 && intensity > 0.3 ? (count > 999 ? `${(count/1000).toFixed(0)}k` : count) : ""}
                                 </div>
                               );
@@ -17258,7 +17258,7 @@ strong{color:${c.text}}
                           </div>
                         ))}
                       </div>
-                      <div style={{ marginTop: 8, display: "flex", gap: 16, fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>
+                      <div style={{ marginTop: 8, display: "flex", gap: 16, fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><div style={{ width: 10, height: 10, borderRadius: 2, background: `${th.accent}66` }} /> Normal activity</span>
                         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><div style={{ width: 10, height: 10, borderRadius: 2, background: `${th.danger || "#f85149"}66` }} /> Weekend / off-hours concentration</span>
                       </div>
@@ -17269,10 +17269,10 @@ strong{color:${c.text}}
                       <div style={{ background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10, padding: "14px", marginBottom: 16 }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 10 }}>
                           <div>
-                            <div style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Suspicious Windows</div>
-                            <div style={{ marginTop: 3, fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Ranked by statistical burst score, off-hours/weekend timing, risky extension ratio, and deletion rate.</div>
+                            <div style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Suspicious Windows</div>
+                            <div style={{ marginTop: 3, fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Ranked by statistical burst score, off-hours/weekend timing, risky extension ratio, and deletion rate.</div>
                           </div>
-                          <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "'SF Mono',Menlo,monospace" }}>{suspiciousWindows.length} ranked {viewMode === "both" ? "windows" : `${viewMode} windows`}</div>
+                          <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{suspiciousWindows.length} ranked {viewMode === "both" ? "windows" : `${viewMode} windows`}</div>
                         </div>
                         <div style={{ display: "grid", gridTemplateColumns: rw > 980 ? "minmax(0, 1.15fr) minmax(300px, 0.85fr)" : "1fr", gap: 12 }}>
                           <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 280, overflow: "auto", paddingRight: 2 }}>
@@ -17296,14 +17296,14 @@ strong{color:${c.text}}
                                 >
                                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-                                      <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: window.mode === "modified" ? "#6cb6ff" : th.accent, fontFamily: "-apple-system, sans-serif" }}>{window.mode}</span>
-                                      <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'SF Mono',Menlo,monospace", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{window.bucket}</span>
+                                      <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: window.mode === "modified" ? "#6cb6ff" : th.accent, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{window.mode}</span>
+                                      <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{window.bucket}</span>
                                     </div>
-                                    <span style={{ fontSize: 10, fontWeight: 700, color: th.warning || "#d29922", fontFamily: "'SF Mono',Menlo,monospace" }}>score {window.score.toFixed(2)}</span>
+                                    <span style={{ fontSize: 10, fontWeight: 700, color: th.warning || "#d29922", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>score {window.score.toFixed(2)}</span>
                                   </div>
                                   <div style={{ marginTop: 5, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                                    <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>{window.count.toLocaleString()} files</span>
-                                    <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>{notes.join(" • ") || "volume spike"}</span>
+                                    <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{window.count.toLocaleString()} files</span>
+                                    <span style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{notes.join(" • ") || "volume spike"}</span>
                                   </div>
                                 </button>
                               );
@@ -17314,36 +17314,36 @@ strong{color:${c.text}}
                               <>
                                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
                                   <div>
-                                    <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: selectedWindow.mode === "modified" ? "#6cb6ff" : th.accent, fontFamily: "-apple-system, sans-serif" }}>{selectedWindow.mode} window</div>
-                                    <div style={{ marginTop: 3, fontSize: 13, fontWeight: 700, color: th.text, fontFamily: "'SF Mono',Menlo,monospace" }}>{selectedWindow.bucket}</div>
+                                    <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: selectedWindow.mode === "modified" ? "#6cb6ff" : th.accent, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{selectedWindow.mode} window</div>
+                                    <div style={{ marginTop: 3, fontSize: 13, fontWeight: 700, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{selectedWindow.bucket}</div>
                                   </div>
                                   <div style={{ textAlign: "right" }}>
-                                    <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Burst score</div>
-                                    <div style={{ fontSize: 18, fontWeight: 700, color: th.warning || "#d29922", fontFamily: "'SF Mono',Menlo,monospace" }}>{selectedWindow.score.toFixed(2)}</div>
+                                    <div style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Burst score</div>
+                                    <div style={{ fontSize: 18, fontWeight: 700, color: th.warning || "#d29922", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{selectedWindow.score.toFixed(2)}</div>
                                   </div>
                                 </div>
                                 <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8, marginBottom: 10 }}>
                                   <div style={{ padding: "8px 9px", borderRadius: 8, background: `${th.panelBg}77`, border: `1px solid ${th.border}22` }}>
                                     <div style={{ fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Window</div>
-                                    <div style={{ fontSize: 10, color: th.text, fontFamily: "'SF Mono',Menlo,monospace" }}>{selectedWindow.from?.slice(0, 19)} to {selectedWindow.to?.slice(0, 19)}</div>
+                                    <div style={{ fontSize: 10, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{selectedWindow.from?.slice(0, 19)} to {selectedWindow.to?.slice(0, 19)}</div>
                                   </div>
                                   <div style={{ padding: "8px 9px", borderRadius: 8, background: `${th.panelBg}77`, border: `1px solid ${th.border}22` }}>
                                     <div style={{ fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>{selectedWindow.mode === "modified" ? "Modification Count" : "Creation Count"}</div>
-                                    <div style={{ fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{selectedWindow.count.toLocaleString()}</div>
+                                    <div style={{ fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{selectedWindow.count.toLocaleString()}</div>
                                   </div>
                                   <div style={{ padding: "8px 9px", borderRadius: 8, background: `${th.panelBg}77`, border: `1px solid ${th.border}22` }}>
                                     <div style={{ fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Risky Extensions</div>
-                                    <div style={{ fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{(selectedWindow.riskyExtensionCount || 0).toLocaleString()}</div>
+                                    <div style={{ fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{(selectedWindow.riskyExtensionCount || 0).toLocaleString()}</div>
                                   </div>
                                   <div style={{ padding: "8px 9px", borderRadius: 8, background: `${th.panelBg}77`, border: `1px solid ${th.border}22` }}>
                                     <div style={{ fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Deleted Files</div>
-                                    <div style={{ fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{(selectedWindow.deletedCount || 0).toLocaleString()}</div>
+                                    <div style={{ fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{(selectedWindow.deletedCount || 0).toLocaleString()}</div>
                                   </div>
                                 </div>
                                 {windowDetails.length > 0 && (
                                   <div style={{ marginBottom: 10, display: "flex", flexWrap: "wrap", gap: 6 }}>
                                     {windowDetails.map((note, idx) => (
-                                      <span key={`${note}-${idx}`} style={{ padding: "3px 7px", borderRadius: 999, fontSize: 9, fontWeight: 600, color: th.warning || "#d29922", background: `${th.warning || "#d29922"}18`, border: `1px solid ${th.warning || "#d29922"}33`, fontFamily: "-apple-system, sans-serif" }}>{note}</span>
+                                      <span key={`${note}-${idx}`} style={{ padding: "3px 7px", borderRadius: 999, fontSize: 9, fontWeight: 600, color: th.warning || "#d29922", background: `${th.warning || "#d29922"}18`, border: `1px solid ${th.warning || "#d29922"}33`, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{note}</span>
                                     ))}
                                   </div>
                                 )}
@@ -17351,7 +17351,7 @@ strong{color:${c.text}}
                                   <div style={{ fontSize: 9, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 5 }}>Top Directories</div>
                                   <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                                     {(selectedWindow.topDirectories || []).length > 0 ? selectedWindow.topDirectories.map((dir, idx) => (
-                                      <div key={`${dir.path || "(blank)"}-${idx}`} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, fontSize: 10, fontFamily: "'SF Mono',Menlo,monospace" }}>
+                                      <div key={`${dir.path || "(blank)"}-${idx}`} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                         <span style={{ color: th.text, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{dir.path || "(blank path)"}</span>
                                         <span style={{ color: th.accent, fontWeight: 700 }}>{dir.count.toLocaleString()}</span>
                                       </div>
@@ -17362,7 +17362,7 @@ strong{color:${c.text}}
                                   <div style={{ fontSize: 9, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 5 }}>Top Extensions</div>
                                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                                     {(selectedWindow.topExtensions || []).length > 0 ? selectedWindow.topExtensions.map((item, idx) => (
-                                      <span key={`${item.ext}-${idx}`} style={{ padding: "4px 7px", borderRadius: 7, fontSize: 9, color: th.text, background: `${th.panelBg}88`, border: `1px solid ${th.border}22`, fontFamily: "'SF Mono',Menlo,monospace" }}>{item.ext} ({item.count})</span>
+                                      <span key={`${item.ext}-${idx}`} style={{ padding: "4px 7px", borderRadius: 7, fontSize: 9, color: th.text, background: `${th.panelBg}88`, border: `1px solid ${th.border}22`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{item.ext} ({item.count})</span>
                                     )) : <span style={{ fontSize: 10, color: th.textMuted }}>No extension breakout available.</span>}
                                   </div>
                                 </div>
@@ -17386,8 +17386,8 @@ strong{color:${c.text}}
                     {topPeriods.length > 0 && (
                       <div style={{ background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10, padding: "14px", marginBottom: 16 }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 8 }}>
-                          <div style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Top {modeTitle} Periods</div>
-                          <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>Volume-ranked. Click a highlighted row to inspect its suspicious-window context.</div>
+                          <div style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Top {modeTitle} Periods</div>
+                          <div style={{ fontSize: 9, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Volume-ranked. Click a highlighted row to inspect its suspicious-window context.</div>
                         </div>
                         {topPeriods.map((h, i) => {
                           const maxH = topPeriods[0]?.count || 1;
@@ -17404,7 +17404,7 @@ strong{color:${c.text}}
                                 const next = curIdx >= 0 ? suspiciousMatches[(curIdx + 1) % suspiciousMatches.length] : topSuspMatch;
                                 return { ...p, hmSelWin: `${next.mode}:${next.bucket}` };
                               });
-                            }) : undefined} title={isSuspicious ? (suspiciousMatches.length > 1 ? "Click to cycle between created/modified windows" : "Inspect suspicious-window details") : `${periodRange.from} — ${periodRange.to}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "5px 0", fontSize: 11, fontFamily: "'SF Mono',Menlo,monospace", cursor: isSuspicious ? "pointer" : "default" }}>
+                            }) : undefined} title={isSuspicious ? (suspiciousMatches.length > 1 ? "Click to cycle between created/modified windows" : "Inspect suspicious-window details") : `${periodRange.from} — ${periodRange.to}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "5px 0", fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", cursor: isSuspicious ? "pointer" : "default" }}>
                               <span style={{ width: 20, textAlign: "right", color: th.textMuted, fontSize: 10, fontWeight: 600 }}>{i + 1}</span>
                               <span style={{ width: 120, flexShrink: 0, color: th.text }}>{h.bucket}</span>
                               <div style={{ flex: 1, minWidth: 0, height: 14, borderRadius: 4, background: `${th.border}22`, overflow: "hidden" }}>
@@ -17424,7 +17424,7 @@ strong{color:${c.text}}
               {/* Footer */}
               {!loading && data && !data.error && (
                 <div style={{ padding: "12px 20px", borderTop: `1px solid ${th.border}22`, display: "flex", gap: 10, justifyContent: "space-between", alignItems: "center", flexShrink: 0, background: `linear-gradient(135deg, ${th.panelBg}ee, ${th.modalBg}dd)`, backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}>
-                  <div style={{ minHeight: 18, fontSize: 10, color: modal.hmTagMsg ? (th.success || th.accent) : th.textMuted, fontFamily: "-apple-system, sans-serif" }}>
+                  <div style={{ minHeight: 18, fontSize: 10, color: modal.hmTagMsg ? (th.success || th.accent) : th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                     {modal.hmTagMsg || (footerSelectedWindow ? `Selected ${footerSelectedWindow.mode} window ${footerSelectedWindow.bucket}` : "Select a suspicious window to filter or tag the underlying rows.")}
                   </div>
                   <div style={{ display: "flex", gap: 10 }}>
@@ -17449,7 +17449,7 @@ strong{color:${c.text}}
         const rowStyle = (i) => ({
           display: "flex", alignItems: "center", gap: 8, padding: "5px 10px", fontSize: 11,
           background: i % 2 === 0 ? "transparent" : `${th.border}15`,
-          borderBottom: `1px solid ${th.border}22`, fontFamily: "'SF Mono',Menlo,monospace",
+          borderBottom: `1px solid ${th.border}22`, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace",
         });
 
         const cbStyle = (checked) => ({
@@ -17627,7 +17627,7 @@ strong{color:${c.text}}
         );
 
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", position: "absolute", left: rx, top: ry, width: rw, height: rh, background: th.modalBg + "f2", border: `1px solid ${th.modalBorder}88`, borderRadius: 14, padding: 0, display: "flex", flexDirection: "column", boxShadow: "0 24px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04) inset", overflow: "hidden", backdropFilter: "blur(40px) saturate(1.6)", WebkitBackdropFilter: "blur(40px) saturate(1.6)" }}>
               {/* Resize handles */}
               <div onMouseDown={(e) => startResize(e, "t")} style={edgeStyle("ns-resize", { top: 0, left: 8, right: 8, height: 5 })} />
@@ -17646,8 +17646,8 @@ strong{color:${c.text}}
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="1.8" strokeLinecap="round"><rect x="4" y="4" width="16" height="16" rx="2" fill={th.accent + "18"}/><path d="M8 8h8"/><path d="M8 12h8" opacity="0.6"/><path d="M8 16h5" opacity="0.3"/></svg>
                   </div>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.01em" }}>ADS Analyzer</h3>
-                    <p style={{ margin: "2px 0 0", color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>Alternate Data Streams, Zone.Identifier, and download forensics</p>
+                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.01em" }}>ADS Analyzer</h3>
+                    <p style={{ margin: "2px 0 0", color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Alternate Data Streams, Zone.Identifier, and download forensics</p>
                   </div>
                 </div>
                 <button onClick={() => setModal(null)} style={{ background: "none", border: "none", color: th.textMuted, fontSize: 18, cursor: "pointer", padding: "4px 8px", lineHeight: 1 }}>{"\u2715"}</button>
@@ -17660,7 +17660,7 @@ strong{color:${c.text}}
                     <div style={{ width: 44, height: 44, borderRadius: 12, background: `linear-gradient(135deg, ${th.accent}33, ${th.accent}11)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <div style={{ width: 20, height: 20, border: `2px solid ${th.accent}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
                     </div>
-                    <span style={{ color: th.textDim, fontSize: 13, fontFamily: "-apple-system, sans-serif" }}>Analyzing Alternate Data Streams...</span>
+                    <span style={{ color: th.textDim, fontSize: 13, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Analyzing Alternate Data Streams...</span>
                   </div>
                 )}
 
@@ -17673,7 +17673,7 @@ strong{color:${c.text}}
                     <div style={{ width: 44, height: 44, borderRadius: 12, background: `linear-gradient(135deg, ${th.textDim}33, ${th.textDim}11)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={th.textDim} strokeWidth="2" strokeLinecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6M9 12h4"/></svg>
                     </div>
-                    <span style={{ color: th.textDim, fontSize: 13, fontFamily: "-apple-system, sans-serif" }}>No Alternate Data Streams found</span>
+                    <span style={{ color: th.textDim, fontSize: 13, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>No Alternate Data Streams found</span>
                   </div>
                 )}
 
@@ -17686,31 +17686,31 @@ strong{color:${c.text}}
                   const zb = d.zoneBreakdown || {};
                   const totalZoned = (zb.internet || 0) + (zb.intranet || 0) + (zb.trusted || 0) + (zb.local || 0) + (zb.restricted || 0);
                   const pill = (text, color = th.accent, bg = `${th.accent}22`) => (
-                    <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 999, background: bg, color, fontWeight: 700, letterSpacing: "0.01em", fontFamily: "-apple-system, sans-serif" }}>{text}</span>
+                    <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 999, background: bg, color, fontWeight: 700, letterSpacing: "0.01em", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{text}</span>
                   );
 
                   return (<>
                     {/* Summary cards */}
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 16 }}>
                       <div style={{ padding: "14px 16px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10 }}>
-                        <div style={{ fontSize: 10, color: th.accent, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>Files with ADS</div>
-                        <div style={{ fontSize: 22, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{(d.totalWithAds || 0).toLocaleString()}</div>
+                        <div style={{ fontSize: 10, color: th.accent, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Files with ADS</div>
+                        <div style={{ fontSize: 22, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{(d.totalWithAds || 0).toLocaleString()}</div>
                       </div>
                       <div style={{ padding: "14px 16px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10 }}>
-                        <div style={{ fontSize: 10, color: th.accent, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>ADS Entries</div>
-                        <div style={{ fontSize: 22, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{(d.totalAdsEntries || 0).toLocaleString()}</div>
+                        <div style={{ fontSize: 10, color: th.accent, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>ADS Entries</div>
+                        <div style={{ fontSize: 22, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{(d.totalAdsEntries || 0).toLocaleString()}</div>
                       </div>
                       <div style={{ padding: "14px 16px", background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${(d.totalWithZoneId || 0) > 0 ? (th.danger || "#f85149") : th.border}33`, borderRadius: 10 }}>
-                        <div style={{ fontSize: 10, color: (d.totalWithZoneId || 0) > 0 ? (th.danger || "#f85149") : th.accent, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>Downloaded Files</div>
-                        <div style={{ fontSize: 22, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>{(d.totalWithZoneId || 0).toLocaleString()}</div>
-                        <div style={{ fontSize: 10, color: th.textMuted, marginTop: 3, fontFamily: "-apple-system, sans-serif" }}>Zone.Identifier present</div>
+                        <div style={{ fontSize: 10, color: (d.totalWithZoneId || 0) > 0 ? (th.danger || "#f85149") : th.accent, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Downloaded Files</div>
+                        <div style={{ fontSize: 22, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{(d.totalWithZoneId || 0).toLocaleString()}</div>
+                        <div style={{ fontSize: 10, color: th.textMuted, marginTop: 3, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Zone.Identifier present</div>
                       </div>
                     </div>
 
                     {d.summary?.narrative && (
                       <div style={{ background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.accent}33`, borderRadius: 10, padding: "14px 16px", marginBottom: 16 }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Download Forensics Summary</span>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Download Forensics Summary</span>
                           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
                             {d.summary.execCount > 0 && pill(`${d.summary.execCount} exec/script`, th.danger || "#f85149", `${th.danger || "#f85149"}22`)}
                             {d.summary.archiveCount > 0 && pill(`${d.summary.archiveCount} archive`, th.warning || "#d29922", `${th.warning || "#d29922"}22`)}
@@ -17718,23 +17718,23 @@ strong{color:${c.text}}
                             {d.summary.internalHostCount > 0 && pill(`${d.summary.internalHostCount} internal host`, "#6cb6ff", "#6cb6ff22")}
                           </div>
                         </div>
-                        <div style={{ fontSize: 12, color: th.text, lineHeight: 1.5, fontFamily: "-apple-system, sans-serif" }}>{d.summary.narrative}</div>
+                        <div style={{ fontSize: 12, color: th.text, lineHeight: 1.5, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{d.summary.narrative}</div>
                       </div>
                     )}
 
                     {(d.prioritizedDownloads || []).length > 0 && (
                       <div style={{ background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.warning || "#d29922"}33`, borderRadius: 10, padding: "12px 14px", marginBottom: 16 }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Prioritized Downloads</span>
-                          <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "-apple-system, sans-serif" }}>ranked by extension, location, source, and MOTW context</span>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Prioritized Downloads</span>
+                          <span style={{ fontSize: 10, color: th.textMuted, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>ranked by extension, location, source, and MOTW context</span>
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                           {d.prioritizedDownloads.slice(0, 8).map((f, i) => (
                             <div key={i} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${th.border}22`, background: `${th.modalBg}55` }}>
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
                                 <div style={{ minWidth: 0, flex: 1 }}>
-                                  <div style={{ fontSize: 12, fontWeight: 700, color: f.riskScore >= 4 ? (th.danger || "#f85149") : th.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'SF Mono',Menlo,monospace" }} title={f.fileName}>{f.fileName}</div>
-                                  <div style={{ marginTop: 3, fontSize: 10, color: th.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'SF Mono',Menlo,monospace" }} title={f.parentPath}>{f.parentPath}</div>
+                                  <div style={{ fontSize: 12, fontWeight: 700, color: f.riskScore >= 4 ? (th.danger || "#f85149") : th.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }} title={f.fileName}>{f.fileName}</div>
+                                  <div style={{ marginTop: 3, fontSize: 10, color: th.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }} title={f.parentPath}>{f.parentPath}</div>
                                 </div>
                                 <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
                                   {pill(`risk ${f.riskScore}`, f.riskScore >= 4 ? (th.danger || "#f85149") : (th.warning || "#d29922"), f.riskScore >= 4 ? `${th.danger || "#f85149"}22` : `${th.warning || "#d29922"}22`)}
@@ -17756,7 +17756,7 @@ strong{color:${c.text}}
                     {/* Zone Breakdown */}
                     {totalZoned > 0 && (
                       <div style={{ background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10, padding: "14px", marginBottom: 16 }}>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif", marginBottom: 10 }}>Zone Distribution</div>
+                        <div style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 10 }}>Zone Distribution</div>
                         <div style={{ display: "flex", height: 22, borderRadius: 6, overflow: "hidden", border: `1px solid ${th.border}33`, marginBottom: 10 }}>
                           {[
                             { label: "Internet", count: zb.internet || 0, color: zoneColors.Internet },
@@ -17765,7 +17765,7 @@ strong{color:${c.text}}
                             { label: "Local", count: zb.local || 0, color: zoneColors.Local },
                             { label: "Restricted", count: zb.restricted || 0, color: zoneColors.Restricted },
                           ].filter((z) => z.count > 0).map((z, i) => (
-                            <div key={i} title={`${z.label}: ${z.count}`} style={{ flex: z.count, background: `linear-gradient(180deg, ${z.color}cc, ${z.color}88)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 600, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.4)", fontFamily: "-apple-system, sans-serif" }}>
+                            <div key={i} title={`${z.label}: ${z.count}`} style={{ flex: z.count, background: `linear-gradient(180deg, ${z.color}cc, ${z.color}88)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 600, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.4)", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                               {(z.count / totalZoned * 100) >= 10 ? `${z.label} ${z.count}` : ""}
                             </div>
                           ))}
@@ -17778,7 +17778,7 @@ strong{color:${c.text}}
                             { label: "Local", count: zb.local || 0, color: zoneColors.Local },
                             { label: "Restricted", count: zb.restricted || 0, color: zoneColors.Restricted },
                           ].map((z, i) => (
-                            <span key={i} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, color: th.textDim, fontFamily: "-apple-system, sans-serif" }}>
+                            <span key={i} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, color: th.textDim, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                               <div style={{ width: 8, height: 8, borderRadius: 2, background: z.color }} />
                               {z.label}: {z.count.toLocaleString()} ({totalZoned > 0 ? ((z.count / totalZoned) * 100).toFixed(1) : 0}%)
                             </span>
@@ -17795,11 +17795,11 @@ strong{color:${c.text}}
                             <div onClick={() => toggleAll("adSelExec", d.downloadedExecutables.length)} style={cbStyle(selExec.size === d.downloadedExecutables.length && d.downloadedExecutables.length > 0)}>
                               {selExec.size === d.downloadedExecutables.length && d.downloadedExecutables.length > 0 && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
                             </div>
-                            <span style={{ fontSize: 11, fontWeight: 600, color: th.danger || "#f85149", fontFamily: "-apple-system, sans-serif" }}>Downloaded Executables ({d.downloadedExecutables.length})</span>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: th.danger || "#f85149", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Downloaded Executables ({d.downloadedExecutables.length})</span>
                           </div>
                         </div>
                         <div style={{ maxHeight: 220, overflow: "auto" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "-apple-system, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1, minWidth: "fit-content" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "'Segoe UI', system-ui, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1, minWidth: "fit-content" }}>
                             <div style={{ width: 14, flexShrink: 0 }} />
                             {adHdrCol(execW[0], "FileName", "adSortExec", "fileName", "adExecColW", defExecW, 0)}
                             {adHdrCol(execW[1], "Ext", "adSortExec", "extension", "adExecColW", defExecW, 1)}
@@ -17833,13 +17833,13 @@ strong{color:${c.text}}
                       {(d.topDownloadDirs || []).length > 0 && (
                         <div style={{ flex: 1, minWidth: 0, background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10, overflow: "hidden" }}>
                           <div style={{ padding: "10px 12px", borderBottom: `1px solid ${th.border}22` }}>
-                            <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Top Download Directories</span>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Top Download Directories</span>
                           </div>
                           <div style={{ maxHeight: 200, overflow: "auto", padding: "4px 0" }}>
                             {d.topDownloadDirs.map((dir, i) => {
                               const maxC = d.topDownloadDirs[0]?.count || 1;
                               return (
-                                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 12px", fontSize: 11, fontFamily: "'SF Mono',Menlo,monospace" }}>
+                                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 12px", fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                   <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 2 }}>
                                       <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: th.text, flex: 1, minWidth: 0 }} title={dir.path}>{dir.path || "(root)"}</span>
@@ -17860,22 +17860,22 @@ strong{color:${c.text}}
                       {((d.referrerUrls || []).length > 0 || (d.hostUrls || []).length > 0) && (
                         <div style={{ flex: 1, minWidth: 0, background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10, overflow: "hidden" }}>
                           <div style={{ padding: "10px 12px", borderBottom: `1px solid ${th.border}22` }}>
-                            <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>URLs from Zone.Identifier</span>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>URLs from Zone.Identifier</span>
                           </div>
                           <div style={{ maxHeight: 200, overflow: "auto", padding: "8px 12px" }}>
                             {(d.referrerUrls || []).length > 0 && (<>
-                              <div style={{ fontSize: 9, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4, fontFamily: "-apple-system, sans-serif" }}>Referrer URLs</div>
+                              <div style={{ fontSize: 9, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Referrer URLs</div>
                               {d.referrerUrls.slice(0, 10).map((u, i) => (
-                                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "2px 0", fontSize: 10, fontFamily: "'SF Mono',Menlo,monospace" }}>
+                                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "2px 0", fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                   <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: th.text, flex: 1, minWidth: 0 }} title={u.url}>{u.url}</span>
                                   <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 8, background: `${th.accent}22`, color: th.accent, fontWeight: 600, flexShrink: 0, marginLeft: 8 }}>{u.count}</span>
                                 </div>
                               ))}
                             </>)}
                             {(d.hostUrls || []).length > 0 && (<>
-                              <div style={{ fontSize: 9, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginTop: 10, marginBottom: 4, fontFamily: "-apple-system, sans-serif" }}>Host URLs</div>
+                              <div style={{ fontSize: 9, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginTop: 10, marginBottom: 4, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Host URLs</div>
                               {d.hostUrls.slice(0, 10).map((u, i) => (
-                                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "2px 0", fontSize: 10, fontFamily: "'SF Mono',Menlo,monospace" }}>
+                                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "2px 0", fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                   <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: th.text, flex: 1, minWidth: 0 }} title={u.url}>{u.url}</span>
                                   <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 8, background: `${th.accent}22`, color: th.accent, fontWeight: 600, flexShrink: 0, marginLeft: 8 }}>{u.count}</span>
                                 </div>
@@ -17891,11 +17891,11 @@ strong{color:${c.text}}
                         {(d.internalHosts || []).length > 0 && (
                           <div style={{ flex: 1, minWidth: 0, background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid #6cb6ff33`, borderRadius: 10, overflow: "hidden" }}>
                             <div style={{ padding: "10px 12px", borderBottom: `1px solid ${th.border}22` }}>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: "#6cb6ff", fontFamily: "-apple-system, sans-serif" }}>Internal / Private Source Hosts</span>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: "#6cb6ff", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Internal / Private Source Hosts</span>
                             </div>
                             <div style={{ maxHeight: 190, overflow: "auto", padding: "8px 12px" }}>
                               {d.internalHosts.slice(0, 10).map((h, i) => (
-                                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 0", fontSize: 10, fontFamily: "'SF Mono',Menlo,monospace" }}>
+                                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 0", fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>
                                   <span style={{ color: th.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={h.host}>{h.host}</span>
                                   <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
                                     {pill(h.transferSource || "network", "#6cb6ff", "#6cb6ff22")}
@@ -17909,19 +17909,19 @@ strong{color:${c.text}}
                         {(d.sourceClusters || []).length > 0 && (
                           <div style={{ flex: 1, minWidth: 0, background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.border}33`, borderRadius: 10, overflow: "hidden" }}>
                             <div style={{ padding: "10px 12px", borderBottom: `1px solid ${th.border}22` }}>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Source Clusters</span>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Source Clusters</span>
                             </div>
                             <div style={{ maxHeight: 190, overflow: "auto", padding: "8px 12px" }}>
                               {d.sourceClusters.slice(0, 8).map((c, i) => (
                                 <div key={i} style={{ padding: "6px 0", borderBottom: i === d.sourceClusters.slice(0, 8).length - 1 ? "none" : `1px solid ${th.border}15` }}>
                                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                                    <span style={{ color: th.text, fontSize: 10, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'SF Mono',Menlo,monospace" }} title={c.host}>{c.host}</span>
+                                    <span style={{ color: th.text, fontSize: 10, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }} title={c.host}>{c.host}</span>
                                     <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
                                       {pill(c.transferSource || "network", c.internal ? "#6cb6ff" : th.accent, c.internal ? "#6cb6ff22" : `${th.accent}22`)}
                                       {pill(`${c.count}`, th.text, `${th.border}33`)}
                                     </div>
                                   </div>
-                                  {(c.sampleFiles || []).length > 0 && <div style={{ marginTop: 4, fontSize: 9, color: th.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'SF Mono',Menlo,monospace" }} title={c.sampleFiles.join(", ")}>{c.sampleFiles.join(", ")}</div>}
+                                  {(c.sampleFiles || []).length > 0 && <div style={{ marginTop: 4, fontSize: 9, color: th.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }} title={c.sampleFiles.join(", ")}>{c.sampleFiles.join(", ")}</div>}
                                 </div>
                               ))}
                             </div>
@@ -17935,19 +17935,19 @@ strong{color:${c.text}}
                         {(d.archiveLineage || []).length > 0 && (
                           <div style={{ flex: 1.2, minWidth: 0, background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.warning || "#d29922"}33`, borderRadius: 10, overflow: "hidden" }}>
                             <div style={{ padding: "10px 12px", borderBottom: `1px solid ${th.border}22` }}>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Archive / Extraction Lineage</span>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Archive / Extraction Lineage</span>
                             </div>
                             <div style={{ maxHeight: 240, overflow: "auto", padding: "8px 12px" }}>
                               {d.archiveLineage.slice(0, 8).map((a, i) => (
                                 <div key={i} style={{ padding: "8px 0", borderBottom: i === d.archiveLineage.slice(0, 8).length - 1 ? "none" : `1px solid ${th.border}15` }}>
                                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                                    <span style={{ color: th.text, fontSize: 10, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'SF Mono',Menlo,monospace" }} title={a.archiveName}>{a.archiveName}</span>
+                                    <span style={{ color: th.text, fontSize: 10, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }} title={a.archiveName}>{a.archiveName}</span>
                                     <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
                                       {pill(`${a.childCount} child`, th.text, `${th.border}33`)}
                                       {a.motwLossCount > 0 && pill(`${a.motwLossCount} MOTW loss`, th.danger || "#f85149", `${th.danger || "#f85149"}22`)}
                                     </div>
                                   </div>
-                                  <div style={{ marginTop: 4, fontSize: 9, color: th.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'SF Mono',Menlo,monospace" }} title={a.archivePath}>{a.archivePath}</div>
+                                  <div style={{ marginTop: 4, fontSize: 9, color: th.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }} title={a.archivePath}>{a.archivePath}</div>
                                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
                                     {a.children.slice(0, 5).map((c, idx) => <Fragment key={idx}>{pill(c.fileName, c.hasZoneId ? th.textDim : (th.warning || "#d29922"), c.hasZoneId ? `${th.border}22` : `${th.warning || "#d29922"}22`)}</Fragment>)}
                                   </div>
@@ -17959,14 +17959,14 @@ strong{color:${c.text}}
                         {(d.motwSuspicious || []).length > 0 && (
                           <div style={{ flex: 0.8, minWidth: 0, background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.danger || "#f85149"}33`, borderRadius: 10, overflow: "hidden" }}>
                             <div style={{ padding: "10px 12px", borderBottom: `1px solid ${th.border}22` }}>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: th.danger || "#f85149", fontFamily: "-apple-system, sans-serif" }}>Possible MOTW Loss / Tamper</span>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: th.danger || "#f85149", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Possible MOTW Loss / Tamper</span>
                             </div>
                             <div style={{ maxHeight: 240, overflow: "auto", padding: "8px 12px" }}>
                               {d.motwSuspicious.slice(0, 10).map((m, i) => (
                                 <div key={i} style={{ padding: "7px 0", borderBottom: i === d.motwSuspicious.slice(0, 10).length - 1 ? "none" : `1px solid ${th.border}15` }}>
-                                  <div style={{ color: th.text, fontSize: 10, fontWeight: 700, fontFamily: "'SF Mono',Menlo,monospace" }}>{m.childName}</div>
-                                  <div style={{ marginTop: 3, color: th.textMuted, fontSize: 9, fontFamily: "'SF Mono',Menlo,monospace" }}>{m.archiveName}</div>
-                                  <div style={{ marginTop: 4, fontSize: 9, color: th.warning || "#d29922", fontFamily: "-apple-system, sans-serif" }}>{m.reason}</div>
+                                  <div style={{ color: th.text, fontSize: 10, fontWeight: 700, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{m.childName}</div>
+                                  <div style={{ marginTop: 3, color: th.textMuted, fontSize: 9, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{m.archiveName}</div>
+                                  <div style={{ marginTop: 4, fontSize: 9, color: th.warning || "#d29922", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{m.reason}</div>
                                 </div>
                               ))}
                             </div>
@@ -17978,7 +17978,7 @@ strong{color:${c.text}}
                     {(d.adsAnomalies || []).length > 0 && (
                       <div style={{ background: `linear-gradient(160deg, ${th.panelBg}cc, ${th.modalBg}88)`, backdropFilter: "blur(12px)", border: `1px solid ${th.warning || "#d29922"}33`, borderRadius: 10, padding: "12px 14px", marginBottom: 16 }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif" }}>Non-Zone ADS Anomalies</span>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Non-Zone ADS Anomalies</span>
                           {pill(`${d.adsAnomalies.length}`, th.warning || "#d29922", `${th.warning || "#d29922"}22`)}
                         </div>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -17995,11 +17995,11 @@ strong{color:${c.text}}
                             <div onClick={() => toggleAll("adSelZone", d.zoneIdFiles.length)} style={cbStyle(selZone.size === d.zoneIdFiles.length && d.zoneIdFiles.length > 0)}>
                               {selZone.size === d.zoneIdFiles.length && d.zoneIdFiles.length > 0 && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
                             </div>
-                            <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>All Zone.Identifier Files ({d.zoneIdFiles.length.toLocaleString()}{d.totalWithZoneId > d.zoneIdFiles.length ? ` of ${d.totalWithZoneId.toLocaleString()}` : ""})</span>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>All Zone.Identifier Files ({d.zoneIdFiles.length.toLocaleString()}{d.totalWithZoneId > d.zoneIdFiles.length ? ` of ${d.totalWithZoneId.toLocaleString()}` : ""})</span>
                           </div>
                         </div>
                         <div style={{ maxHeight: 200, overflow: "auto" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "-apple-system, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1, minWidth: "fit-content" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "'Segoe UI', system-ui, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1, minWidth: "fit-content" }}>
                             <div style={{ width: 14, flexShrink: 0 }} />
                             {adHdrCol(zoneW[0], "FileName", "adSortZone", "fileName", "adZoneColW", defZoneW, 0)}
                             {adHdrCol(zoneW[1], "Ext", "adSortZone", "extension", "adZoneColW", defZoneW, 1)}
@@ -18035,11 +18035,11 @@ strong{color:${c.text}}
                             <div onClick={() => toggleAll("adSelAds", d.adsEntries.length)} style={cbStyle(selAds.size === d.adsEntries.length && d.adsEntries.length > 0)}>
                               {selAds.size === d.adsEntries.length && d.adsEntries.length > 0 && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
                             </div>
-                            <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "-apple-system, sans-serif" }}>ADS Entries ({d.adsEntries.length.toLocaleString()}{d.totalAdsEntries > d.adsEntries.length ? ` of ${d.totalAdsEntries.toLocaleString()}` : ""})</span>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>ADS Entries ({d.adsEntries.length.toLocaleString()}{d.totalAdsEntries > d.adsEntries.length ? ` of ${d.totalAdsEntries.toLocaleString()}` : ""})</span>
                           </div>
                         </div>
                         <div style={{ maxHeight: 200, overflow: "auto" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "-apple-system, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1, minWidth: "fit-content" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", fontSize: 10, fontWeight: 600, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: `1px solid ${th.border}33`, fontFamily: "'Segoe UI', system-ui, sans-serif", position: "sticky", top: 0, background: th.modalBg, zIndex: 1, minWidth: "fit-content" }}>
                             <div style={{ width: 14, flexShrink: 0 }} />
                             {adHdrCol(adsW[0], "FileName", "adSortAds", "fileName", "adAdsColW", defAdsW, 0)}
                             {adHdrCol(adsW[1], "ParentPath", "adSortAds", "parentPath", "adAdsColW", defAdsW, 1)}
@@ -18463,7 +18463,7 @@ strong{color:${c.text}}
           "rename-burst": "#D4783A",
           "stream-activity": "#D4956A",
         }[key] || "#E8A050");
-        const tagPill = (tag, color = "#E8A050") => ({ fontSize: 9, padding: "2px 7px", borderRadius: 999, background: `${color}16`, color, border: `1px solid ${color}28`, fontFamily: "-apple-system, sans-serif", fontWeight: 600 });
+        const tagPill = (tag, color = "#E8A050") => ({ fontSize: 9, padding: "2px 7px", borderRadius: 999, background: `${color}16`, color, border: `1px solid ${color}28`, fontFamily: "'Segoe UI', system-ui, sans-serif", fontWeight: 600 });
         const incidentSeverity = (score) => score >= 10 ? { label: "High", color: "#E85D2A" } : score >= 6 ? { label: "Medium", color: "#E8A050" } : { label: "Low", color: "#C8A882" };
         const likelyFindingSeverity = (finding) => ({
           critical: { label: "Critical", color: "#C44D1E" },
@@ -18629,12 +18629,12 @@ strong{color:${c.text}}
 
           // Glass sub-section style
           const glassSub = { padding: "6px 12px", borderBottom: `1px solid ${th.border}15`, background: `linear-gradient(135deg, ${sec.color}06, transparent)` };
-          const pillStyle = { fontSize: 10, padding: "2px 8px", borderRadius: 10, background: `${sec.color}15`, color: sec.color, fontFamily: "'SF Mono',Menlo,monospace", border: `1px solid ${sec.color}18` };
+          const pillStyle = { fontSize: 10, padding: "2px 8px", borderRadius: 10, background: `${sec.color}15`, color: sec.color, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", border: `1px solid ${sec.color}18` };
 
           const secSev = secStats ? incidentSeverity(secStats.priorityScore || 0) : { label: "Info", color: sec.color };
           return (
             <div key={sec.key} style={{ marginBottom: 10, borderRadius: 10, overflow: "hidden", border: `1px solid ${sec.color}18`, background: `linear-gradient(135deg, ${sec.color}04, ${th.modalBg}88)`, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", boxShadow: `0 2px 12px ${sec.color}08, 0 0 0 1px rgba(255,255,255,0.02) inset` }}>
-              <button onClick={() => toggleExpand(sec.key, hasVisibleEvents)} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 14px", background: `linear-gradient(135deg, ${sec.color}0a, ${sec.color}04)`, border: "none", borderBottom: isExpanded ? `1px solid ${sec.color}15` : "none", color: th.text, cursor: hasVisibleEvents ? "pointer" : "default", textAlign: "left", fontFamily: "-apple-system, sans-serif", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
+              <button onClick={() => toggleExpand(sec.key, hasVisibleEvents)} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 14px", background: `linear-gradient(135deg, ${sec.color}0a, ${sec.color}04)`, border: "none", borderBottom: isExpanded ? `1px solid ${sec.color}15` : "none", color: th.text, cursor: hasVisibleEvents ? "pointer" : "default", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke={sec.color} strokeWidth="1.5" strokeLinecap="round" style={{ transform: isExpanded ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.15s ease", flexShrink: 0, opacity: hasVisibleEvents ? 1 : 0.4 }}><polyline points="3,1 7,5 3,9" /></svg>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={sec.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 3px ${sec.color}44)` }}>{sec.icon}</svg>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -18692,7 +18692,7 @@ strong{color:${c.text}}
                       fontWeight: 600,
                       padding: "5px 9px",
                       borderRadius: 8,
-                      fontFamily: "-apple-system, sans-serif",
+                      fontFamily: "'Segoe UI', system-ui, sans-serif",
                       flexShrink: 0,
                     }}
                     title={showSuppressed ? "Hide likely-benign suppressed rows" : "Reveal suppressed rows for audit"}
@@ -18700,8 +18700,8 @@ strong{color:${c.text}}
                     {showSuppressed ? "Hide Suppressed" : "Show Suppressed"}
                   </span>
                 )}
-                {selected.size > 0 && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 8, background: `${th.accent}22`, color: th.accent, fontWeight: 600, fontFamily: "'SF Mono',Menlo,monospace" }}>{selected.size} sel</span>}
-                <span style={{ fontSize: 10, padding: "2px 10px", borderRadius: 10, background: `linear-gradient(135deg, ${sec.color}28, ${sec.color}18)`, color: sec.color, fontWeight: 600, fontFamily: "'SF Mono',Menlo,monospace", border: `1px solid ${sec.color}22`, boxShadow: `0 0 8px ${sec.color}11` }}>{isFiltered ? `${events.length.toLocaleString()} / ${displayedCount.toLocaleString()}` : displayedCount.toLocaleString()}</span>
+                {selected.size > 0 && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 8, background: `${th.accent}22`, color: th.accent, fontWeight: 600, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{selected.size} sel</span>}
+                <span style={{ fontSize: 10, padding: "2px 10px", borderRadius: 10, background: `linear-gradient(135deg, ${sec.color}28, ${sec.color}18)`, color: sec.color, fontWeight: 600, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", border: `1px solid ${sec.color}22`, boxShadow: `0 0 8px ${sec.color}11` }}>{isFiltered ? `${events.length.toLocaleString()} / ${displayedCount.toLocaleString()}` : displayedCount.toLocaleString()}</span>
               </button>
               {isExpanded && (
                 <div style={{ maxHeight: 360, overflow: "auto" }}>
@@ -18709,7 +18709,7 @@ strong{color:${c.text}}
                     <div style={{ ...glassSub, display: "grid", gridTemplateColumns: "1.1fr 0.9fr 0.9fr 1fr", gap: 10, padding: "8px 12px" }}>
                       <div>
                         <div style={{ fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 2 }}>Top Directory</div>
-                        <div style={{ fontSize: 10, color: th.text, fontFamily: "'SF Mono',Menlo,monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{secStats.topDirectory?.path || "(unknown)"}</div>
+                        <div style={{ fontSize: 10, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{secStats.topDirectory?.path || "(unknown)"}</div>
                       </div>
                       <div>
                         <div style={{ fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 2 }}>Burst Rate</div>
@@ -18764,7 +18764,7 @@ strong{color:${c.text}}
                   {sec.key === "suspiciousPaths" && sData.directoryBreakdown?.length > 0 && (
                     <div style={glassSub}>
                       {sData.directoryBreakdown.slice(0, 10).map((d, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, padding: "2px 0", fontFamily: "'SF Mono',Menlo,monospace", color: th.textMuted }}>
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, padding: "2px 0", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.textMuted }}>
                           <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{d.path}</span>
                           <span style={{ flexShrink: 0, marginLeft: 12, color: sec.color, fontWeight: 600 }}>{d.count}</span>
                         </div>
@@ -18775,7 +18775,7 @@ strong{color:${c.text}}
                     <div style={glassSub}>
                       <div style={{ fontSize: 10, fontWeight: 600, color: th.textMuted, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>Hotspot Directories {sData.hotspotCount > 0 && <span style={{ color: sec.color }}>({sData.hotspotCount} with 5+ files)</span>}</div>
                       {sData.directoryBreakdown.slice(0, 15).map((d, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, padding: "2px 0", fontFamily: "'SF Mono',Menlo,monospace", color: d.uniqueFiles >= 5 ? sec.color : th.textMuted }}>
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, padding: "2px 0", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: d.uniqueFiles >= 5 ? sec.color : th.textMuted }}>
                           <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{d.path}</span>
                           <span style={{ flexShrink: 0, marginLeft: 12, fontWeight: 600 }}>{d.count} events / {d.uniqueFiles} files</span>
                         </div>
@@ -18786,7 +18786,7 @@ strong{color:${c.text}}
                     <div style={glassSub}>
                       <div style={{ fontSize: 10, fontWeight: 600, color: th.textMuted, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>Staging Directories</div>
                       {sData.stagingDirectories.map((d, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, padding: "2px 0", fontFamily: "'SF Mono',Menlo,monospace", color: th.textMuted }}>
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, padding: "2px 0", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.textMuted }}>
                           <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{d.directory}</span>
                           <span style={{ flexShrink: 0, marginLeft: 12, color: sec.color, fontWeight: 600 }}>{d.fileCount} files</span>
                         </div>
@@ -18803,7 +18803,7 @@ strong{color:${c.text}}
                   {sec.key === "dataOverwrite" && sData.directoryBreakdown?.length > 0 && (
                     <div style={glassSub}>
                       {sData.directoryBreakdown.slice(0, 10).map((d, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, padding: "2px 0", fontFamily: "'SF Mono',Menlo,monospace", color: th.textMuted }}>
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, padding: "2px 0", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.textMuted }}>
                           <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{d.path}</span>
                           <span style={{ flexShrink: 0, marginLeft: 12, color: sec.color, fontWeight: 600 }}>{d.count}</span>
                         </div>
@@ -18813,7 +18813,7 @@ strong{color:${c.text}}
                   {sec.key === "streamChanges" && sData.directoryBreakdown?.length > 0 && (
                     <div style={glassSub}>
                       {sData.directoryBreakdown.slice(0, 10).map((d, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, padding: "2px 0", fontFamily: "'SF Mono',Menlo,monospace", color: th.textMuted }}>
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, padding: "2px 0", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.textMuted }}>
                           <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{d.path}</span>
                           <span style={{ flexShrink: 0, marginLeft: 12, color: sec.color, fontWeight: 600 }}>{d.count}</span>
                         </div>
@@ -18824,7 +18824,7 @@ strong{color:${c.text}}
                     <div style={glassSub}>
                       <div style={{ fontSize: 10, fontWeight: 600, color: th.textMuted, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>Enumeration Hotspots {sData.hotspotCount > 0 && <span style={{ color: sec.color }}>({sData.hotspotCount} with 10+ events)</span>}</div>
                       {sData.directoryBreakdown.slice(0, 15).map((d, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, padding: "2px 0", fontFamily: "'SF Mono',Menlo,monospace", color: d.count >= 10 ? sec.color : th.textMuted }}>
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, padding: "2px 0", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: d.count >= 10 ? sec.color : th.textMuted }}>
                           <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{d.path}</span>
                           <span style={{ flexShrink: 0, marginLeft: 12, fontWeight: 600 }}>{d.count}</span>
                         </div>
@@ -18832,7 +18832,7 @@ strong{color:${c.text}}
                     </div>
                   )}
                   {/* Column header — opaque sticky */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 0, padding: "0 10px", fontSize: 9, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", borderBottom: `1px solid ${th.border}30`, fontFamily: "-apple-system, sans-serif", background: th.modalBg || th.panelBg || "#1e2126", position: "sticky", top: 0, zIndex: 2 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 0, padding: "0 10px", fontSize: 9, fontWeight: 700, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", borderBottom: `1px solid ${th.border}30`, fontFamily: "'Segoe UI', system-ui, sans-serif", background: th.modalBg || th.panelBg || "#1e2126", position: "sticky", top: 0, zIndex: 2 }}>
                     {/* Select-all checkbox */}
                     <div onClick={toggleAll} style={{ width: 26, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", padding: "6px 0", cursor: "pointer" }}>
                       <div style={{ width: 12, height: 12, borderRadius: 3, background: allSelected ? sec.color : "transparent", border: `1.5px solid ${allSelected ? sec.color : th.border}66`, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}>
@@ -18859,7 +18859,7 @@ strong{color:${c.text}}
                     return (
                       <div key={i} onClick={() => toggleRow(i)} style={{
                         display: "flex", alignItems: "center", gap: 0, padding: "0 10px", fontSize: 11, cursor: "pointer",
-                        fontFamily: "'SF Mono',Menlo,monospace", borderBottom: `1px solid ${th.border}0c`,
+                        fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", borderBottom: `1px solid ${th.border}0c`,
                         background: isSelected ? `${sec.color}12` : (ev._suppressed ? `${th.warning || "#d29922"}0d` : (i % 2 === 0 ? "transparent" : `${th.border}08`)),
                         opacity: ev._suppressed ? 0.86 : 1,
                         transition: "background 0.1s",
@@ -18896,7 +18896,7 @@ strong{color:${c.text}}
         };
 
         return (
-          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", WebkitAppRegion: "drag" }}>
+          <div style={{ position: "fixed", inset: 0, background: th.overlay, zIndex: 100, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", WebkitAppRegion: "no-drag" }}>
             <div onClick={(e) => e.stopPropagation()} style={{ WebkitAppRegion: "no-drag", position: "absolute", left: ux, top: uy, width: uw, height: uh, background: th.modalBg + "f2", border: `1px solid ${th.modalBorder}88`, borderRadius: 14, padding: 0, display: "flex", flexDirection: "column", boxShadow: "0 24px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04) inset", overflow: "hidden", backdropFilter: "blur(40px) saturate(1.6)", WebkitBackdropFilter: "blur(40px) saturate(1.6)" }}>
               {/* Resize handles */}
               <div onMouseDown={(e) => startResize(e, "t")} style={uEdge("ns-resize", { top: 0, left: 8, right: 8, height: 5 })} />
@@ -18915,8 +18915,8 @@ strong{color:${c.text}}
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={th.accent || "#58a6ff"} strokeWidth="1.8" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2" fill={(th.accent || "#58a6ff") + "18"}/><path d="M7 7h10M7 11h10M7 15h6"/></svg>
                   </div>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "-apple-system, sans-serif", letterSpacing: "-0.01em" }}>USN Journal Analysis</h3>
-                    <p style={{ margin: "2px 0 0", color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, sans-serif" }}>Analyze file system activity within a time window</p>
+                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif", letterSpacing: "-0.01em" }}>USN Journal Analysis</h3>
+                    <p style={{ margin: "2px 0 0", color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Analyze file system activity within a time window</p>
                   </div>
                 </div>
                 <button onClick={() => setModal(null)} style={{ background: `${th.border}22`, border: `1px solid ${th.border}33`, color: th.textMuted, cursor: "pointer", fontSize: 14, padding: "4px 8px", borderRadius: 6, lineHeight: 1 }}>✕</button>
@@ -18942,7 +18942,7 @@ strong{color:${c.text}}
                       ].map((item) => (
                         <div key={item.label} style={{ padding: "8px 10px", borderRadius: 8, background: `${th.panelBg}88`, border: `1px solid ${th.border}18` }}>
                           <div style={{ fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>{item.label}</div>
-                          <div style={{ fontSize: 12, color: th.text, fontWeight: 700, fontFamily: "'SF Mono',Menlo,monospace" }}>{item.value}</div>
+                          <div style={{ fontSize: 12, color: th.text, fontWeight: 700, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{item.value}</div>
                         </div>
                       ))}
                     </div>
@@ -18956,11 +18956,11 @@ strong{color:${c.text}}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
                     <div style={ms.fg}>
                       <label style={ms.lb}>Start Time (UTC)</label>
-                      <input type="text" value={modal.startTime} onChange={(e) => setModal((p) => ({ ...p, startTime: e.target.value }))} placeholder="YYYY-MM-DD HH:MM:SS" style={{ ...ms.ip, fontFamily: "'SF Mono',Menlo,monospace" }} autoFocus />
+                      <input type="text" value={modal.startTime} onChange={(e) => setModal((p) => ({ ...p, startTime: e.target.value }))} placeholder="YYYY-MM-DD HH:MM:SS" style={{ ...ms.ip, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }} autoFocus />
                     </div>
                     <div style={ms.fg}>
                       <label style={ms.lb}>End Time (UTC) — optional</label>
-                      <input type="text" value={modal.endTime} onChange={(e) => setModal((p) => ({ ...p, endTime: e.target.value }))} placeholder="YYYY-MM-DD HH:MM:SS" style={{ ...ms.ip, fontFamily: "'SF Mono',Menlo,monospace" }} />
+                      <input type="text" value={modal.endTime} onChange={(e) => setModal((p) => ({ ...p, endTime: e.target.value }))} placeholder="YYYY-MM-DD HH:MM:SS" style={{ ...ms.ip, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }} />
                     </div>
                   </div>
                   <div style={ms.fg}>
@@ -18995,7 +18995,7 @@ strong{color:${c.text}}
                     <label style={ms.lb}>Analyses to Run</label>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginTop: 4 }}>
                       {usnSections.map((sec) => (
-                        <button key={sec.key} onClick={() => toggleAnalysis(sec.key)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: modal.analyses[sec.key] ? `${sec.color}12` : "transparent", border: `1px solid ${modal.analyses[sec.key] ? sec.color + "44" : th.border + "44"}`, borderRadius: 6, color: th.text, cursor: "pointer", fontSize: 11, fontFamily: "-apple-system, sans-serif", textAlign: "left", transition: "all 0.15s" }}>
+                        <button key={sec.key} onClick={() => toggleAnalysis(sec.key)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: modal.analyses[sec.key] ? `${sec.color}12` : "transparent", border: `1px solid ${modal.analyses[sec.key] ? sec.color + "44" : th.border + "44"}`, borderRadius: 6, color: th.text, cursor: "pointer", fontSize: 11, fontFamily: "'Segoe UI', system-ui, sans-serif", textAlign: "left", transition: "all 0.15s" }}>
                           <div style={{ width: 14, height: 14, borderRadius: 4, flexShrink: 0, background: modal.analyses[sec.key] ? sec.color : "transparent", border: `1.5px solid ${modal.analyses[sec.key] ? sec.color : th.border}`, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}>
                             {modal.analyses[sec.key] && <svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke="#fff" strokeWidth="1.5"><polyline points="1.5,4 3.5,6 6.5,2" /></svg>}
                           </div>
@@ -19012,7 +19012,7 @@ strong{color:${c.text}}
                 {phase === "loading" && (
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 0", gap: 16 }}>
                     <div style={{ width: 40, height: 40, border: `3px solid ${th.border}33`, borderTopColor: th.accent || "#58a6ff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                    <span style={{ color: th.textMuted, fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>Analyzing USN Journal...</span>
+                    <span style={{ color: th.textMuted, fontSize: 12, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Analyzing USN Journal...</span>
                   </div>
                 )}
 
@@ -19027,8 +19027,8 @@ strong{color:${c.text}}
                       { label: "Path Filter", value: data.summary?.pathFilter || "All paths", accent: "#C96B3C" },
                     ].map((s) => (
                       <div key={s.label} style={{ padding: "10px 12px", background: `linear-gradient(135deg, ${s.accent}0a, ${th.modalBg}66)`, border: `1px solid ${s.accent}1a`, borderRadius: 10, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", boxShadow: `0 2px 8px ${s.accent}08, 0 0 0 1px rgba(255,255,255,0.02) inset` }}>
-                        <div style={{ fontSize: 9, color: `${s.accent}bb`, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system, sans-serif", marginBottom: 3 }}>{s.label}</div>
-                        <div style={{ fontSize: 13, color: th.text, fontWeight: 600, fontFamily: "'SF Mono',Menlo,monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.value}</div>
+                        <div style={{ fontSize: 9, color: `${s.accent}bb`, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 3 }}>{s.label}</div>
+                        <div style={{ fontSize: 13, color: th.text, fontWeight: 600, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.value}</div>
                       </div>
                     ))}
                   </div>
@@ -19043,8 +19043,8 @@ strong{color:${c.text}}
                         { label: "Downloaded", value: data.correlation.downloaded.toLocaleString(), accent: "#D4956A", sub: "Zone.Identifier" },
                       ].map((s) => (
                         <div key={s.label} style={{ padding: "10px 12px", background: `linear-gradient(135deg, ${s.accent}0a, ${th.modalBg}66)`, border: `1px solid ${s.accent}1a`, borderRadius: 10, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", boxShadow: `0 2px 8px ${s.accent}08, 0 0 0 1px rgba(255,255,255,0.02) inset` }}>
-                          <div style={{ fontSize: 9, color: `${s.accent}bb`, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system, sans-serif", marginBottom: 3 }}>{s.label}</div>
-                          <div style={{ fontSize: 15, color: th.text, fontWeight: 700, fontFamily: "'SF Mono',Menlo,monospace" }}>{s.value}</div>
+                          <div style={{ fontSize: 9, color: `${s.accent}bb`, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Segoe UI', system-ui, sans-serif", marginBottom: 3 }}>{s.label}</div>
+                          <div style={{ fontSize: 15, color: th.text, fontWeight: 700, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{s.value}</div>
                           <div style={{ fontSize: 8, color: th.textMuted, marginTop: 1 }}>{s.sub}</div>
                         </div>
                       ))}
@@ -19057,7 +19057,7 @@ strong{color:${c.text}}
                         {(usnScopeDir || usnSiblingDir || usnFocusEntry || timelineIncidentKey) && <button onClick={clearUsnFocus} style={{ ...ms.bs, padding: "4px 8px", fontSize: 10 }}>Clear Focus</button>}
                       </div>
                       <div style={{ display: "grid", gap: 5 }}>
-                        {(data.narrative || []).map((line, i) => <div key={i} style={{ fontSize: 12, color: th.text, fontFamily: "-apple-system, sans-serif" }}>• {line}</div>)}
+                        {(data.narrative || []).map((line, i) => <div key={i} style={{ fontSize: 12, color: th.text, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>• {line}</div>)}
                       </div>
                       {(usnScopeDir || usnSiblingDir || usnFocusEntry || timelineIncidentKey) && (
                         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
@@ -19110,8 +19110,8 @@ strong{color:${c.text}}
                                   {(finding.correlationTags || []).slice(0, 4).map((t) => <span key={t.key} style={tagPill(t.label, corrColor(t.key))}>{t.label}</span>)}
                                 </div>
                                 <div style={{ display: "grid", gridTemplateColumns: "1.4fr 0.8fr", gap: 8, marginBottom: 8 }}>
-                                  <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'SF Mono',Menlo,monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{findingPath || "(path unresolved)"}</div>
-                                  <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'SF Mono',Menlo,monospace", textAlign: "right" }}>{(finding.start || "").slice(0, 19)}{finding.end ? ` → ${(finding.end || "").slice(0, 19)}` : ""}</div>
+                                  <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{findingPath || "(path unresolved)"}</div>
+                                  <div style={{ fontSize: 10, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", textAlign: "right" }}>{(finding.start || "").slice(0, 19)}{finding.end ? ` → ${(finding.end || "").slice(0, 19)}` : ""}</div>
                                 </div>
                                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                                   {isIncident ? (
@@ -19167,9 +19167,9 @@ strong{color:${c.text}}
                                   <span style={{ ...tagPill(sev.label, sev.color), textTransform: "uppercase" }}>{sev.label}</span>
                                   <span style={{ fontSize: 13, color: th.text, fontWeight: 700 }}>{inc.title}</span>
                                   <span style={{ ...tagPill(`${inc.eventCount} events / ${inc.uniqueFiles} files`, "#E8A050") }}>{inc.eventCount} events / {inc.uniqueFiles} files</span>
-                                  <span style={{ color: th.textDim, fontSize: 10, fontFamily: "'SF Mono',Menlo,monospace" }}>{inc.start?.slice(0, 19)} → {inc.end?.slice(0, 19)}</span>
+                                  <span style={{ color: th.textDim, fontSize: 10, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{inc.start?.slice(0, 19)} → {inc.end?.slice(0, 19)}</span>
                                 </div>
-                                <div style={{ fontSize: 11, color: th.textDim, marginBottom: 8, fontFamily: "'SF Mono',Menlo,monospace" }}>{inc.path}</div>
+                                <div style={{ fontSize: 11, color: th.textDim, marginBottom: 8, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{inc.path}</div>
                                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
                                   {(inc.reasons || []).slice(0, 4).map((r) => <span key={r} style={tagPill(r, sev.color)}>{r}</span>)}
                                   {(inc.topExtensions || []).slice(0, 3).map((e) => <span key={e.ext} style={tagPill(`${e.ext || "(none)"} ×${e.count}`, "#D4956A")}>{e.ext || "(none)"} ×{e.count}</span>)}
@@ -19216,7 +19216,7 @@ strong{color:${c.text}}
                         ].map((s) => (
                           <div key={s.label} style={{ padding: "8px 10px", borderRadius: 8, background: `${th.panelBg}88`, border: `1px solid ${th.border}18` }}>
                             <div style={{ fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</div>
-                            <div style={{ fontSize: 12, color: th.text, fontWeight: 700, fontFamily: "'SF Mono',Menlo,monospace" }}>{s.value}</div>
+                            <div style={{ fontSize: 12, color: th.text, fontWeight: 700, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{s.value}</div>
                           </div>
                         ))}
                       </div>
@@ -19229,7 +19229,7 @@ strong{color:${c.text}}
                         ].map((s) => (
                           <div key={s.label} style={{ padding: "8px 10px", borderRadius: 8, background: `${th.panelBg}88`, border: `1px solid ${th.border}18` }}>
                             <div style={{ fontSize: 9, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</div>
-                            <div style={{ fontSize: 11, color: th.text, fontWeight: 600, fontFamily: "'SF Mono',Menlo,monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.value}</div>
+                            <div style={{ fontSize: 11, color: th.text, fontWeight: 600, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.value}</div>
                           </div>
                         ))}
                       </div>
@@ -19253,7 +19253,7 @@ strong{color:${c.text}}
                           <div style={{ fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Rename Chain</div>
                           <div style={{ display: "grid", gap: 4 }}>
                             {focusedChain.renamePairs.slice(0, 20).map((r, i) => (
-                              <div key={i} style={{ fontSize: 11, color: th.text, fontFamily: "'SF Mono',Menlo,monospace" }}>{r.timestamp?.slice(0, 19)} — {r.oldName} → {r.newName}</div>
+                              <div key={i} style={{ fontSize: 11, color: th.text, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{r.timestamp?.slice(0, 19)} — {r.oldName} → {r.newName}</div>
                             ))}
                           </div>
                         </div>
@@ -19274,7 +19274,7 @@ strong{color:${c.text}}
                       <div style={{ fontSize: 10, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Event Sequence</div>
                       <div style={{ display: "grid", gap: 4, maxHeight: 220, overflow: "auto" }}>
                         {(focusedChain.events || []).slice(0, 150).map((ev, i) => (
-                          <div key={i} style={{ display: "grid", gridTemplateColumns: "160px 120px 1fr", gap: 8, fontSize: 11, fontFamily: "'SF Mono',Menlo,monospace", color: th.text }}>
+                          <div key={i} style={{ display: "grid", gridTemplateColumns: "160px 120px 1fr", gap: 8, fontSize: 11, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", color: th.text }}>
                             <span style={{ color: th.textDim }}>{ev.timestamp?.slice(0, 19)}</span>
                             <span style={{ color: "#E8A050" }}>{ev.reasonLabel}</span>
                             <span>{ev.displayName || ev.name}</span>
@@ -19306,10 +19306,10 @@ strong{color:${c.text}}
                         <div style={{ display: "grid", gap: 4, maxHeight: 280, overflow: "auto", padding: "0 14px 12px" }}>
                           {timelineRows.map((ev) => (
                             <div key={ev.key} style={{ display: "grid", gridTemplateColumns: "145px 125px 1fr 190px auto auto", gap: 8, alignItems: "center", padding: "6px 8px", borderRadius: 8, border: `1px solid ${th.border}12`, background: `${th.border}08`, color: th.text }}>
-                              <span style={{ fontSize: 11, color: th.textDim, fontFamily: "'SF Mono',Menlo,monospace" }}>{ev.timestamp?.slice(0, 19)}</span>
+                              <span style={{ fontSize: 11, color: th.textDim, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{ev.timestamp?.slice(0, 19)}</span>
                               <span style={{ fontSize: 10, color: "#E8A050", fontWeight: 700 }}>{ev.reasonLabel}</span>
                               <button onClick={() => setModal((p) => p ? { ...p, usnFocusEntry: String(ev.entryNumber || ""), usnScopeDir: "", usnSiblingDir: "", usnTimelineIncident: timelineIncidentKey } : p)} style={{ background: "none", border: "none", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", padding: 0 }}>{ev.displayName || ev.name}</button>
-                              <span style={{ fontSize: 10, color: th.textDim, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'SF Mono',Menlo,monospace" }}>{ev.parentPath}</span>
+                              <span style={{ fontSize: 10, color: th.textDim, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace" }}>{ev.parentPath}</span>
                               <span style={{ display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "flex-end" }}>
                                 {(ev.correlationTags || []).slice(0, 3).map((t) => <span key={t.key} style={tagPill(t.label, corrColor(t.key))}>{t.label}</span>)}
                               </span>
@@ -19387,7 +19387,7 @@ strong{color:${c.text}}
                               document.addEventListener("mouseup", onUp);
                             }}>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={fdSec?.color || th.accent} strokeWidth="1.8" strokeLinecap="round"><polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/></svg>
-                            <span style={{ color: th.textDim, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system, sans-serif", flex: 1 }}>Filter — {(getColumns(fd.secKey).find((c) => c.key === fd.colKey)?.label) || fd.colKey}</span>
+                            <span style={{ color: th.textDim, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Segoe UI', system-ui, sans-serif", flex: 1 }}>Filter — {(getColumns(fd.secKey).find((c) => c.key === fd.colKey)?.label) || fd.colKey}</span>
                             <button onClick={() => setUsnFd(null)} style={{ background: "none", border: "none", color: th.textMuted, cursor: "pointer", fontSize: 13, padding: "0 2px", lineHeight: 1 }}>✕</button>
                           </div>
                           {/* Search input */}
@@ -19399,9 +19399,9 @@ strong{color:${c.text}}
                           {/* Select All / Clear */}
                           <div style={{ display: "flex", gap: 4, padding: "2px 8px 4px", flexShrink: 0, alignItems: "center" }}>
                             <button onClick={() => setUsnFd((p) => p ? { ...p, selected: new Set(fdValues.map((v) => v.val)) } : p)}
-                              style={{ padding: "2px 7px", background: "none", border: `1px solid ${th.border}44`, borderRadius: 4, color: th.textDim, fontSize: 9, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Select All</button>
+                              style={{ padding: "2px 7px", background: "none", border: `1px solid ${th.border}44`, borderRadius: 4, color: th.textDim, fontSize: 9, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Select All</button>
                             <button onClick={() => setUsnFd((p) => p ? { ...p, selected: new Set() } : p)}
-                              style={{ padding: "2px 7px", background: "none", border: `1px solid ${th.border}44`, borderRadius: 4, color: th.textDim, fontSize: 9, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Clear</button>
+                              style={{ padding: "2px 7px", background: "none", border: `1px solid ${th.border}44`, borderRadius: 4, color: th.textDim, fontSize: 9, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Clear</button>
                             <span style={{ flex: 1 }} />
                             <span style={{ color: th.textMuted, fontSize: 9 }}>{fdValues.length} values</span>
                           </div>
@@ -19421,7 +19421,7 @@ strong{color:${c.text}}
                                       setUsnFd((p) => p ? { ...p, selected: s } : p);
                                     }}
                                     style={{ accentColor: fdSec?.color || th.accent, flexShrink: 0 }} />
-                                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'SF Mono',Menlo,monospace", fontSize: 10 }}>{v.val || "(empty)"}</span>
+                                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", fontSize: 10 }}>{v.val || "(empty)"}</span>
                                   <span style={{ color: th.textMuted, fontSize: 9, flexShrink: 0 }}>{v.cnt.toLocaleString()}</span>
                                 </label>
                               ))}
@@ -19445,8 +19445,8 @@ strong{color:${c.text}}
                                 return { ...p, usnCheckboxFilters: newF };
                               });
                               setUsnFd(null);
-                            }} style={{ padding: "3px 10px", background: "none", border: `1px solid ${th.border}44`, borderRadius: 5, color: th.textDim, fontSize: 10, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Reset</button>
-                            <button onClick={() => setUsnFd(null)} style={{ padding: "3px 10px", background: "none", border: `1px solid ${th.border}44`, borderRadius: 5, color: th.textDim, fontSize: 10, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}>Cancel</button>
+                            }} style={{ padding: "3px 10px", background: "none", border: `1px solid ${th.border}44`, borderRadius: 5, color: th.textDim, fontSize: 10, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Reset</button>
+                            <button onClick={() => setUsnFd(null)} style={{ padding: "3px 10px", background: "none", border: `1px solid ${th.border}44`, borderRadius: 5, color: th.textDim, fontSize: 10, cursor: "pointer", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Cancel</button>
                             <button onClick={() => {
                               // Apply — save selected values as filter, then close
                               const selSet = usnFd?.selected;
@@ -19464,7 +19464,7 @@ strong{color:${c.text}}
                                 return { ...p, usnCheckboxFilters: newF, usnSelected: { ...p.usnSelected, [fd.secKey]: new Set() } };
                               });
                               setUsnFd(null);
-                            }} style={{ padding: "3px 12px", background: fdSec?.color || th.accent, color: "#fff", border: "none", borderRadius: 5, fontSize: 10, cursor: "pointer", fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>Apply</button>
+                            }} style={{ padding: "3px 12px", background: fdSec?.color || th.accent, color: "#fff", border: "none", borderRadius: 5, fontSize: 10, cursor: "pointer", fontWeight: 600, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>Apply</button>
                           </div>
                         </div>
                       </>
@@ -19481,7 +19481,7 @@ strong{color:${c.text}}
                 </>)}
                 {phase === "loading" && <span style={{ fontSize: 11, color: th.textMuted }}>Running queries...</span>}
                 {phase === "results" && (<>
-                  {totalSelected > 0 && <span style={{ fontSize: 10, color: th.accent, fontFamily: "'SF Mono',Menlo,monospace", marginRight: "auto" }}>{totalSelected} selected</span>}
+                  {totalSelected > 0 && <span style={{ fontSize: 10, color: th.accent, fontFamily: "'Cascadia Code','Consolas','Courier New',monospace", marginRight: "auto" }}>{totalSelected} selected</span>}
                   <button onClick={() => { setModal((p) => ({ ...p, phase: "input", data: null, usnSelected: {}, usnSort: {}, usnCheckboxFilters: {}, usnLikelyFindingsExpanded: false, usnShowSuppressed: {}, usnScopeDir: "", usnSiblingDir: "", usnFocusEntry: "", usnTimelineIncident: "", usnTimelineLimit: 120 })); setUsnFd(null); }} style={ms.bs}>Back</button>
                   {totalSelected > 0 && <button onClick={copySelected} style={{ ...ms.bs, borderColor: `${th.accent}44`, color: th.accent }}>Copy Selected ({totalSelected})</button>}
                   {visibleIncidents.length > 0 && <button onClick={copyVisibleUsnIncidentsJson} style={ms.bs}>Copy Incidents JSON</button>}
@@ -19555,7 +19555,7 @@ strong{color:${c.text}}
                 <button key={i} onClick={() => { item.action(); setContextMenu(null); }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = `${th.accent}22`; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                  style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)", letterSpacing: "-0.01em" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)", letterSpacing: "-0.01em" }}>
                   <span style={{ width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{item.icon}</span>
                   {item.label}
                 </button>
@@ -19574,7 +19574,7 @@ strong{color:${c.text}}
               <button onClick={() => { copyCell(rowContextMenu.cellValue); setRowContextMenu(null); }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = `${th.accent}22`; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
+                style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
                 <span style={{ width: 16, textAlign: "center", fontSize: 11 }}>📋</span>
                 Copy Cell <span style={{ color: th.textMuted, fontSize: 10, marginLeft: "auto", maxWidth: 80, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{rowContextMenu.cellColumn}</span>
               </button>
@@ -19590,7 +19590,7 @@ strong{color:${c.text}}
             }}
               onMouseEnter={(e) => { e.currentTarget.style.background = `${th.accent}22`; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-              style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
+              style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
               <span style={{ width: 16, textAlign: "center", fontSize: 11 }}>📄</span>
               Copy Row
             </button>
@@ -19598,7 +19598,7 @@ strong{color:${c.text}}
             {rowContextMenu.cellColumn && (
               <>
                 <div style={{ height: 1, background: themeName === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)", margin: "4px 8px" }} />
-                <div style={{ padding: "4px 14px 2px", color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", textTransform: "uppercase", letterSpacing: "0.06em" }}>Filters</div>
+                <div style={{ padding: "4px 14px 2px", color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: "0.06em" }}>Filters</div>
                 <button onClick={() => {
                   setTabs((prev) => prev.map((t) => {
                     if (t.id !== activeTab) return t;
@@ -19610,7 +19610,7 @@ strong{color:${c.text}}
                 }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = `${th.accent}22`; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                  style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
                   <span style={{ width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="2" strokeLinecap="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></span>
                   <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Filter in {rowContextMenu.cellValue ? String(rowContextMenu.cellValue).slice(0, 40) : "(empty)"}</span>
                 </button>
@@ -19625,7 +19625,7 @@ strong{color:${c.text}}
                 }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = `${th.accent}22`; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                  style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
                   <span style={{ width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={th.danger || "#f85149"} strokeWidth="2" strokeLinecap="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/><line x1="4" y1="21" x2="20" y2="5"/></svg></span>
                   <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Filter out {rowContextMenu.cellValue ? String(rowContextMenu.cellValue).slice(0, 40) : "(empty)"}</span>
                 </button>
@@ -19642,7 +19642,7 @@ strong{color:${c.text}}
                   <button
                     onMouseEnter={(e) => { e.currentTarget.style.background = `${th.accent}22`; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                    style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
                     <span style={{ width: 16, textAlign: "center", fontSize: 11 }}>🏷</span>
                     Tags{selectedRows.size > 1 && selectedRows.has(rowContextMenu.rowIndex) ? ` (${selectedRows.size} rows)` : ""}
                     <span style={{ marginLeft: "auto", color: th.textMuted, fontSize: 11 }}>▸</span>
@@ -19681,7 +19681,7 @@ strong{color:${c.text}}
                         }}
                           onMouseEnter={(e) => { e.currentTarget.style.background = `${th.accent}22`; }}
                           onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                          style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "5px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
+                          style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "5px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
                           <span style={{ color, fontSize: 14 }}>{hasTg ? "●" : "○"}</span>
                           <span>{tag}</span>
                         </button>
@@ -19691,7 +19691,7 @@ strong{color:${c.text}}
                     <button onClick={() => { setRowContextMenu(null); setModal({ type: "tags" }); }}
                       onMouseEnter={(e) => { e.currentTarget.style.background = `${th.accent}22`; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                      style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "5px 14px", background: "none", border: "none", color: th.textDim, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
+                      style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "5px 14px", background: "none", border: "none", color: th.textDim, fontSize: 11, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
                       Manage Tags...
                     </button>
                   </div>
@@ -19732,7 +19732,7 @@ strong{color:${c.text}}
                 }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = th.btnBg; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                  style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                   <span style={{ width: 16, textAlign: "center", fontSize: 11 }}>🔍</span>
                   Lookup on VirusTotal
                 </button>
@@ -19758,7 +19758,7 @@ strong{color:${c.text}}
                 }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = th.btnBg; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                  style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.danger, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.danger, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                   <span style={{ width: 16, textAlign: "center", fontSize: 11 }}>{'</>'}</span>
                   Decode Base64 PowerShell
                 </button>
@@ -19774,7 +19774,7 @@ strong{color:${c.text}}
               }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = th.btnBg; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, sans-serif" }}>
+                style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "6px 12px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
                 <span style={{ width: 16, textAlign: "center", fontSize: 11 }}>⏱</span>
                 Find Nearby Events...
               </button>
@@ -19788,7 +19788,7 @@ strong{color:${c.text}}
         <>
           <div onMouseDown={(e) => { if (e.button === 0) setCellContextMenu(null); }} onContextMenu={(e) => { e.preventDefault(); }} style={{ position: "fixed", inset: 0, zIndex: 299 }} />
           <div style={{ position: "fixed", left: Math.min(cellContextMenu.x, window.innerWidth - 240), top: Math.min(cellContextMenu.y, window.innerHeight - 160), background: themeName === "dark" ? "rgba(28,31,36,0.97)" : "rgba(252,252,254,0.97)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)", border: `1px solid ${themeName === "dark" ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)"}`, borderRadius: 10, padding: "5px 0", zIndex: 300, boxShadow: themeName === "dark" ? "0 12px 40px rgba(0,0,0,0.55), 0 0 0 0.5px rgba(255,255,255,0.06) inset" : "0 12px 40px rgba(0,0,0,0.18), 0 0 0 0.5px rgba(255,255,255,0.5) inset", minWidth: 200 }}>
-            <div style={{ padding: "4px 14px 2px", color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", textTransform: "uppercase", letterSpacing: "0.06em" }}>Filters</div>
+            <div style={{ padding: "4px 14px 2px", color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: "0.06em" }}>Filters</div>
             {[
               { label: `Filter in ${cellContextMenu.cellValue ? String(cellContextMenu.cellValue).slice(0, 40) : "(empty)"}`,
                 icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="2" strokeLinecap="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>,
@@ -19814,17 +19814,17 @@ strong{color:${c.text}}
               <button key={i} onClick={() => { item.action(); setCellContextMenu(null); }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = `${th.accent}22`; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)", letterSpacing: "-0.01em" }}>
+                style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)", letterSpacing: "-0.01em" }}>
                 <span style={{ width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{item.icon}</span>
                 <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.label}</span>
               </button>
             ))}
             <div style={{ height: 1, background: themeName === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)", margin: "4px 8px" }} />
-            <div style={{ padding: "4px 14px 2px", color: th.textMuted, fontSize: 10, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", textTransform: "uppercase", letterSpacing: "0.06em" }}>Columns</div>
+            <div style={{ padding: "4px 14px 2px", color: th.textMuted, fontSize: 10, fontFamily: "'Segoe UI', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: "0.06em" }}>Columns</div>
             <button onClick={() => { up("hiddenColumns", new Set([...(ct?.hiddenColumns || []), cellContextMenu.colName])); setCellContextMenu(null); }}
               onMouseEnter={(e) => { e.currentTarget.style.background = `${th.accent}22`; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-              style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)", letterSpacing: "-0.01em" }}>
+              style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "6px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'Segoe UI', system-ui, sans-serif", borderRadius: 5, margin: "0 4px", maxWidth: "calc(100% - 8px)", letterSpacing: "-0.01em" }}>
               <span style={{ width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={th.textDim} strokeWidth="2" strokeLinecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
               </span>

@@ -1,0 +1,17 @@
+{
+  "version": 3,
+  "sessionId": "copilot-session-1",
+  "creationDate": 1704067200000,
+  "lastMessageDate": 1704067260000,
+  "requests": [
+    {
+      "requestId": "req-1",
+      "timestamp": 1704067200000,
+      "modelId": "copilot/gpt-4o",
+      "message": { "text": "How do I run tests?" },
+      "response": [
+        { "kind": "markdownContent", "content": { "value": "Run **npm test** from the project root." } }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "sessionId": "sess-gemini-demo-1",
+  "projectHash": "deadbeef",
+  "startTime": "2026-03-10T14:00:00.000Z",
+  "lastUpdated": "2026-03-10T14:05:00.000Z",
+  "messages": [
+    {
+      "type": "user",
+      "content": "List open ports on a Linux host",
+      "timestamp": "2026-03-10T14:00:01.000Z"
+    },
+    {
+      "type": "gemini",
+      "content": "Use ss -tuln or netstat -tuln for listening ports.",
+      "timestamp": "2026-03-10T14:00:08.000Z",
+      "model": "gemini-2.0-flash",
+      "tokens": { "input": 42, "output": 88 },
+      "thoughts": "Recommend common networking tools."
+    }
+  ]
+}

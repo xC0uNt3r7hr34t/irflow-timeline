@@ -1,0 +1,2 @@
+{"timestamp":"2026-07-26T10:00:01.000Z","session_id":"grok-session-1","prompt":"Inspect the suspicious process tree","is_bash":false}
+{"timestamp":"2026-07-26T10:00:02.000Z","session_id":"grok-session-1","prompt":"whoami && id","is_bash":true}

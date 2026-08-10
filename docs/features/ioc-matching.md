@@ -10,7 +10,7 @@ IRFlow Timeline can scan your timeline data for Indicators of Compromise (IOCs),
 
 ## Opening IOC Matching
 
-- **Menu:** Actions > IOC Matching
+- **Menu:** Actions → IOC Matching
 
 ## Supported IOC Types
 

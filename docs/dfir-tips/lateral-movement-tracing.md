@@ -98,7 +98,7 @@ Sort stacking results in ascending order to surface values that appear only once
 
 ### 4. Open the Lateral Movement Tracker
 
-Navigate to **Tools > Lateral Movement Tracker** to open the [Lateral Movement Tracker](/features/lateral-movement). The tracker automatically parses your logon events and builds an interactive network graph.
+Navigate to **Tools → Platforms → Windows → Lateral Movement Tracker** to open the [Lateral Movement Tracker](/features/lateral-movement). The tracker automatically parses your logon events and builds an interactive network graph.
 
 ![Lateral Movement Tracker network graph showing host-to-host logon connections with RDP, Network, and Interactive connection types](/dfir-tips/lateral-movement-tracker.png)
 

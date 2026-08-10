@@ -8,6 +8,8 @@ Bookmarks and tags are the core annotation tools for building your investigation
 
 ![Bookmarks and Tags showing tagged rows with context menu for applying DFIR tags like Suspicious, Lateral Movement, and C2](/dfir-tips/Bookmarks-Tags.png)
 
+Bulk annotation: **Actions → Bulk Tag / Bookmark**. Per-row tags also appear in the right-click / `Cmd+Click` context menu.
+
 ## Bookmarks
 
 Bookmarks let you flag individual rows as important for later review and reporting.
@@ -20,7 +22,7 @@ Bookmarks let you flag individual rows as important for later review and reporti
 
 ### Bulk Bookmarking
 
-- Open **Actions > Bulk Tag / Bookmark** to bookmark or tag rows by time range
+- Open **Actions → Bulk Tag / Bookmark** to bookmark or tag rows by time range
 - Or `Cmd+Click` a row and use the bookmark option in the context menu
 
 ### Viewing Bookmarks
@@ -67,7 +69,7 @@ You can also create custom tags — just type any name. IOC Matching automatical
 
 ### Bulk Actions
 
-Open **Actions > Bulk Tag / Bookmark** for bulk operations on filtered rows:
+Open **Actions → Bulk Tag / Bookmark** for bulk operations on filtered rows:
 
 **Bulk Tagging:**
 

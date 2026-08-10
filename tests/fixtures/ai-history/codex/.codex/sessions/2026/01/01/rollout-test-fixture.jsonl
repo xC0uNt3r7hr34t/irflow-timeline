@@ -1,0 +1,5 @@
+{"timestamp":"2026-01-01T12:00:00.000Z","type":"session_meta","payload":{"id":"codex-sess-1","timestamp":"2026-01-01T12:00:00.000Z","cwd":"/tmp/codex-project","cli_version":"0.99.0"}}
+{"timestamp":"2026-01-01T12:00:01.000Z","type":"event_msg","payload":{"type":"user_message","message":"## My request for Codex:\nanalyze this binary for static analysis\n"}}
+{"timestamp":"2026-01-01T12:00:05.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"I will start with strings and headers."}]}}
+{"timestamp":"2026-01-01T12:00:06.000Z","type":"response_item","payload":{"type":"function_call","name":"shell","arguments":"{\"command\":[\"bash\",\"-lc\",\"file sample.bin\"]}","call_id":"call_codex_1"}}
+{"timestamp":"2026-01-01T12:00:07.000Z","type":"event_msg","payload":{"type":"agent_reasoning","text":"Checking file type first."}}

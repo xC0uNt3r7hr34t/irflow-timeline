@@ -1,0 +1,17 @@
+[
+  {
+    "sessionId": "sess-logs-demo-1",
+    "messageId": 0,
+    "type": "user",
+    "message": "Summarize open ports on Linux",
+    "timestamp": "2026-04-01T10:00:00.000Z"
+  },
+  {
+    "sessionId": "sess-logs-demo-1",
+    "messageId": 1,
+    "type": "gemini",
+    "message": "Use ss -tuln for listening sockets.",
+    "timestamp": "2026-04-01T10:00:05.000Z",
+    "model": "gemini-2.5-pro"
+  }
+]

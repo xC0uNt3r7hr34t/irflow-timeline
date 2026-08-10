@@ -1,0 +1,11 @@
+{
+  "sessionId": "local_demo-session-uuid",
+  "cliSessionId": "sess-abc",
+  "cwd": "/tmp/demo-project",
+  "originCwd": "/tmp/demo-project",
+  "createdAt": 1704067200000,
+  "lastActivityAt": 1704067260000,
+  "model": "claude-sonnet-4",
+  "title": "Desktop sidebar title",
+  "isArchived": false
+}

@@ -1,5 +1,8 @@
 <template>
   <Layout>
+    <template #home-hero-image>
+      <HeroAiAppsGraphic />
+    </template>
     <template #home-hero-after>
       <div class="hero-graphic-container">
         <HeroGraphic />
@@ -11,6 +14,7 @@
 <script setup>
 import DefaultTheme from 'vitepress/theme'
 import HeroGraphic from './HeroGraphic.vue'
+import HeroAiAppsGraphic from './HeroAiAppsGraphic.vue'
 
 const { Layout } = DefaultTheme
 </script>

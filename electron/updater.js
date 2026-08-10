@@ -1,16 +1,3 @@
-/**
- * updater.js — Auto-update controller for IRFlow Timeline (Windows build)
- *
- * Windows-specific changes from macOS original:
- *  - getUpdateConfigPath(): dev path unchanged; packaged path unchanged
- *    (electron-builder places app-update.yml in resources/ on all platforms).
- *  - showNotConfiguredMessage(): updated detail text to reference latest-win.yml
- *    (Windows NSIS/Squirrel target) instead of latest-mac.yml.
- *  - setProgressBar() works on Windows taskbar — no change needed.
- *  - quitAndInstall() works on Windows (NSIS installer) — no change needed.
- *  - No macOS-specific APIs are used in this file.
- */
-
 const fs = require("fs");
 const path = require("path");
 const electron = require("electron");
@@ -114,7 +101,6 @@ function createUpdateController({ getWindow, sendStatus }) {
 
   const setProgress = (value) => {
     try {
-      // Works on Windows taskbar progress indicator
       activeWindow()?.setProgressBar(value);
     } catch {}
   };
@@ -136,7 +122,6 @@ function createUpdateController({ getWindow, sendStatus }) {
     } catch {}
   };
 
-  // Updated for Windows: references latest-win.yml instead of latest-mac.yml
   const showNotConfiguredMessage = async () => {
     const dialog = getElectronDialog();
     if (!dialog?.showMessageBox) return;
@@ -147,7 +132,7 @@ function createUpdateController({ getWindow, sendStatus }) {
       detail: [
         `Expected config: ${getUpdateConfigPath()}`,
         "",
-        "To enable in-app updates, publish signed Windows builds with an NSIS target and app-update.yml/latest-win.yml metadata.",
+        "To enable in-app updates, publish signed macOS builds with a zip target and app-update.yml/latest-mac.yml metadata.",
       ].join("\n"),
       buttons: ["OK"],
     });
@@ -182,9 +167,13 @@ function createUpdateController({ getWindow, sendStatus }) {
       const releaseNotes = getReleaseNotesText(info);
       currentUpdateInfo = { version: info?.version || null, releaseNotes };
       downloadedUpdateInfo = null;
-      currentDownloadProgress = { percent: 0, transferred: 0, total: 0, bytesPerSecond: 0 };
+      currentDownloadProgress = {
+        percent: 0,
+        transferred: 0,
+        total: 0,
+        bytesPerSecond: 0,
+      };
       dbg("UPDATER", "Update available", { version: info?.version });
-
       if (options.emitStatus) {
         emitStatus({
           phase: options.autoDownload ? "downloading" : "available",
@@ -210,7 +199,10 @@ function createUpdateController({ getWindow, sendStatus }) {
           setProgress(-1);
           dbg("UPDATER", "Download failed", { message: err?.message, stack: err?.stack });
           if (options.emitStatus) {
-            emitStatus({ phase: "error", message: err?.message || "The update could not be downloaded." });
+            emitStatus({
+              phase: "error",
+              message: err?.message || "The update could not be downloaded.",
+            });
           } else {
             const dialog = getElectronDialog();
             if (dialog?.showMessageBox) {
@@ -252,6 +244,16 @@ function createUpdateController({ getWindow, sendStatus }) {
 
       if (response !== 0) {
         clearCheckOptions();
+        currentDownloadProgress = null;
+        return;
+      }
+      if (downloadInFlight) {
+        await dialog.showMessageBox(activeWindow(), {
+          type: "info",
+          title: "Update Downloading",
+          message: "The update is already downloading.",
+        buttons: ["OK"],
+      });
         return;
       }
 
@@ -261,15 +263,13 @@ function createUpdateController({ getWindow, sendStatus }) {
         await downloadInFlight;
       } catch (err) {
         setProgress(-1);
-        dbg("UPDATER", "Download failed (prompted)", { message: err?.message, stack: err?.stack });
-        if (dialog?.showMessageBox) {
-          await dialog.showMessageBox(activeWindow(), {
-            type: "error",
-            title: "Update Download Failed",
-            message: err?.message || "The update could not be downloaded.",
-            buttons: ["OK"],
-          });
-        }
+        dbg("UPDATER", "Download failed", { message: err?.message, stack: err?.stack });
+        await dialog.showMessageBox(activeWindow(), {
+          type: "error",
+          title: "Update Download Failed",
+          message: err?.message || "The update could not be downloaded.",
+          buttons: ["OK"],
+        });
         clearCheckOptions();
         currentDownloadProgress = null;
       } finally {
@@ -280,17 +280,23 @@ function createUpdateController({ getWindow, sendStatus }) {
     autoUpdater.on("update-not-available", async () => {
       const options = getCheckOptions();
       clearCheckOptions();
+      currentUpdateInfo = null;
+      currentDownloadProgress = null;
       dbg("UPDATER", "No update available");
       if (options.emitStatus) {
-        emitStatus({ phase: "up-to-date", message: "IRFlow Timeline is up to date." });
+        emitStatus({
+          phase: "no-update",
+          version: getCurrentVersion(),
+          message: `You already have the latest version (${getCurrentVersion()}).`,
+        });
       }
       if (!options.showNoUpdateMessage) return;
       const dialog = getElectronDialog();
       if (!dialog?.showMessageBox) return;
       await dialog.showMessageBox(activeWindow(), {
         type: "info",
-        title: "No Update Available",
-        message: "IRFlow Timeline is up to date.",
+        title: "No Updates Available",
+        message: `You already have the latest version (${getCurrentVersion()}).`,
         buttons: ["OK"],
       });
     });
@@ -332,15 +338,13 @@ function createUpdateController({ getWindow, sendStatus }) {
       clearCheckOptions();
       setProgress(-1);
       dbg("UPDATER", "Update downloaded", { version: info?.version });
-
       if (options.emitStatus) {
         emitStatus({
           phase: "downloaded",
           version: downloadedUpdateInfo.version,
           releaseNotes: downloadedUpdateInfo.releaseNotes,
           message: `IRFlow Timeline ${downloadedUpdateInfo.version || ""} has been downloaded.`.trim(),
-          // Windows: installer runs on quit — wording matches Windows UX
-          detail: "Restart the app to apply the update.",
+          detail: "Restart the app to apply the update to the app currently open.",
         });
         return;
       }
@@ -356,7 +360,6 @@ function createUpdateController({ getWindow, sendStatus }) {
         cancelId: 1,
       });
       if (response === 0) {
-        // On Windows this triggers the NSIS installer on quit
         autoUpdater.quitAndInstall();
       }
     });
@@ -368,7 +371,10 @@ function createUpdateController({ getWindow, sendStatus }) {
       currentDownloadProgress = null;
       dbg("UPDATER", "Updater error", { message: err?.message, stack: err?.stack });
       if (options.emitStatus) {
-        emitStatus({ phase: "error", message: err?.message || "The update check failed." });
+        emitStatus({
+          phase: "error",
+          message: err?.message || "The update check failed.",
+        });
       }
       if (!options.showErrors) return;
       const dialog = getElectronDialog();
@@ -405,7 +411,7 @@ function createUpdateController({ getWindow, sendStatus }) {
           version: downloadedUpdateInfo.version,
           releaseNotes: downloadedUpdateInfo.releaseNotes,
           message: `IRFlow Timeline ${downloadedUpdateInfo.version || ""} has already been downloaded.`.trim(),
-          detail: "Restart the app to apply the update.",
+          detail: "Restart the app to apply the update to the app currently open.",
         });
       }
       return { ok: false, reason: "downloaded" };
@@ -440,7 +446,10 @@ function createUpdateController({ getWindow, sendStatus }) {
     }
     if (checkInFlight) {
       if (checkOptions.emitStatus) {
-        emitStatus({ phase: "checking", message: "Checking for updates..." });
+        emitStatus({
+          phase: "checking",
+          message: "Checking for updates...",
+        });
       }
       if (checkOptions.showBusyMessage) {
         const dialog = getElectronDialog();
@@ -461,7 +470,10 @@ function createUpdateController({ getWindow, sendStatus }) {
     currentDownloadProgress = null;
     errorPromptHandled = false;
     if (checkOptions.emitStatus) {
-      emitStatus({ phase: "checking", message: "Checking for updates..." });
+      emitStatus({
+        phase: "checking",
+        message: "Checking for updates...",
+      });
     }
     try {
       checkInFlight = autoUpdater.checkForUpdates();
@@ -472,7 +484,10 @@ function createUpdateController({ getWindow, sendStatus }) {
       dbg("UPDATER", "checkForUpdates threw", { message: err?.message, stack: err?.stack });
       currentDownloadProgress = null;
       if (checkOptions.emitStatus) {
-        emitStatus({ phase: "error", message: err?.message || "The update check failed." });
+        emitStatus({
+          phase: "error",
+          message: err?.message || "The update check failed.",
+        });
       }
       if (checkOptions.showErrors && !errorPromptHandled) {
         const dialog = getElectronDialog();
@@ -496,10 +511,12 @@ function createUpdateController({ getWindow, sendStatus }) {
   const installUpdate = async () => {
     ensureInitialized();
     if (!downloadedUpdateInfo) {
-      emitStatus({ phase: "error", message: "No downloaded update is ready to install." });
+      emitStatus({
+        phase: "error",
+        message: "No downloaded update is ready to install.",
+      });
       return { ok: false, reason: "no-downloaded-update" };
     }
-    // On Windows, quitAndInstall() launches the NSIS installer and quits the app
     getAutoUpdater().quitAndInstall();
     return { ok: true };
   };

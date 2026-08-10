@@ -9,7 +9,7 @@ IRFlow Timeline can merge multiple open tabs into a single unified timeline, cre
 ## How to Merge
 
 1. Open two or more files in separate tabs
-2. **Menu:** View > Merge Tabs
+2. **Menu:** View → Merge Tabs
 3. Select which tabs to merge
 4. A new tab is created containing all rows from the selected sources
 

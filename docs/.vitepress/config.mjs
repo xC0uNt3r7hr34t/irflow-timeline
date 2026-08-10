@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: 'IRFlow Timeline',
-  description: 'High-performance DFIR timeline analysis tool for macOS',
+  description: 'Native macOS DFIR timeline analysis with expanded AI application forensics for Grok Build, Claude, Codex, ChatGPT, Copilot, Gemini, Cursor, and more',
   base: '/irflow-timeline/',
   lastUpdated: true,
   cleanUrls: true,
@@ -17,23 +17,25 @@ export default defineConfig({
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/irflow-timeline/logo.svg' }],
     ['meta', { property: 'og:title', content: 'IRFlow Timeline' }],
-    ['meta', { property: 'og:description', content: 'High-performance DFIR timeline analysis tool for macOS — search, visualize, and investigate 30GB+ forensic timelines' }],
-    ['meta', { property: 'og:image', content: 'https://r3nzsec.github.io/irflow-timeline/IRFlow-Timeline-Github.png' }],
+    ['meta', { property: 'og:description', content: 'IRFlow Timeline 1.0.9 adds bounded native chunk parsing for large EVTX files while retaining expanded AI application forensics.' }],
+    ['meta', { property: 'og:image', content: 'https://r3nzsec.github.io/irflow-timeline/IRFlow-Timeline-Home.png' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:url', content: 'https://r3nzsec.github.io/irflow-timeline/' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: 'IRFlow Timeline' }],
-    ['meta', { name: 'twitter:description', content: 'High-performance DFIR timeline analysis tool for macOS — search, visualize, and investigate 30GB+ forensic timelines' }],
-    ['meta', { name: 'twitter:image', content: 'https://r3nzsec.github.io/irflow-timeline/IRFlow-Timeline-Github.png' }],
+    ['meta', { name: 'twitter:description', content: 'IRFlow Timeline 1.0.9 adds bounded native chunk parsing for large EVTX files while retaining expanded AI application forensics.' }],
+    ['meta', { name: 'twitter:image', content: 'https://r3nzsec.github.io/irflow-timeline/IRFlow-Timeline-Home.png' }],
     ['script', { 'data-goatcounter': 'https://irflowtimeline.goatcounter.com/count', async: '', src: '//gc.zgo.at/count.js' }],
     ['script', { type: 'application/ld+json' }, JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
       name: 'IRFlow Timeline',
-      description: 'High-performance DFIR timeline analysis tool for macOS. Handles 30GB+ forensic timelines with SQLite-backed virtual scrolling.',
+      description: 'Native macOS DFIR timeline analysis with local AI application forensics for Grok Build, Claude, Codex, ChatGPT, Copilot, Gemini, Cursor, and other assistants.',
+      softwareVersion: '1.0.9',
       operatingSystem: 'macOS',
       applicationCategory: 'SecurityApplication',
       url: 'https://r3nzsec.github.io/irflow-timeline/',
+      downloadUrl: 'https://github.com/r3nzsec/irflow-timeline/releases/tag/v1.0.9',
       author: {
         '@type': 'Person',
         name: 'Renzon Cruz',
@@ -55,11 +57,14 @@ export default defineConfig({
       { text: 'Features', link: '/features/virtual-grid' },
       { text: 'Workflows', link: '/workflows/kape-integration' },
       { text: 'DFIR Tips', link: '/dfir-tips/ransomware-investigation' },
+      { text: 'Blog', link: '/blog/' },
       { text: 'Reference', link: '/reference/keyboard-shortcuts' },
       { text: 'Author', link: '/about/author' },
       {
-        text: 'v1.0.5',
+        text: 'v1.0.9',
         items: [
+          { text: 'What’s New in v1.0.9', link: '/blog/v1.0.9-large-evtx-imports' },
+          { text: 'What’s New in v1.0.8', link: '/blog/v1.0.8-ai-application-forensics' },
           { text: 'Changelog', link: '/about/changelog' },
           { text: 'Roadmap', link: '/about/roadmap' },
           { text: 'Credits', link: '/about/credits' }
@@ -74,6 +79,7 @@ export default defineConfig({
           items: [
             { text: 'Interactive Demo', link: '/getting-started/demo' },
             { text: 'Installation', link: '/getting-started/installation' },
+            { text: 'Auto-Update', link: '/getting-started/auto-update' },
             { text: 'Quick Start', link: '/getting-started/quick-start' },
             { text: 'Supported Formats', link: '/getting-started/supported-formats' },
             { text: 'Architecture', link: '/getting-started/architecture' }
@@ -95,9 +101,12 @@ export default defineConfig({
           text: 'Analytics',
           items: [
             { text: 'Histogram', link: '/features/histogram' },
+            { text: 'Sigma Detection', link: '/features/sigma-detection' },
+            { text: 'AI Artifacts', link: '/features/ai-artifacts' },
             { text: 'Process Inspector', link: '/features/process-tree' },
             { text: 'Analyst Profiles', link: '/features/analyst-profiles' },
             { text: 'Lateral Movement Tracker', link: '/features/lateral-movement' },
+            { text: 'RDP Bitmap Cache', link: '/features/rdp-bitmap-cache' },
             { text: 'Persistence Analyzer', link: '/features/persistence-analyzer' },
             { text: 'Gap & Burst Analysis', link: '/features/gap-burst-analysis' },
             { text: 'IOC Matching', link: '/features/ioc-matching' },
@@ -136,6 +145,7 @@ export default defineConfig({
         {
           text: 'DFIR Tips & Tricks',
           items: [
+            { text: 'AI Query History & AI App Artifacts', link: '/dfir-tips/ai-query-history' },
             { text: 'Ransomware Investigation', link: '/dfir-tips/ransomware-investigation' },
             { text: 'Lateral Movement Tracing', link: '/dfir-tips/lateral-movement-tracing' },
             { text: 'Malware Execution Analysis', link: '/dfir-tips/malware-execution-analysis' },
@@ -146,6 +156,16 @@ export default defineConfig({
             { text: 'KAPE Triage Workflow', link: '/dfir-tips/kape-triage-workflow' },
             { text: 'Threat Intel IOC Sweeps', link: '/dfir-tips/threat-intel-ioc-sweeps' },
             { text: 'Building the Final Report', link: '/dfir-tips/building-final-report' }
+          ]
+        }
+      ],
+      '/blog/': [
+        {
+          text: 'IRFlow Timeline Blog',
+          items: [
+            { text: 'All Posts', link: '/blog/' },
+            { text: 'v1.0.9 — Large EVTX Reliability', link: '/blog/v1.0.9-large-evtx-imports' },
+            { text: 'v1.0.8 — AI Application Forensics', link: '/blog/v1.0.8-ai-application-forensics' }
           ]
         }
       ],

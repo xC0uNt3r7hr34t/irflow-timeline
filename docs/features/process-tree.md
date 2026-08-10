@@ -1,241 +1,216 @@
 ---
-description: Process Inspector — visualize parent-child process trees from Sysmon and Security logs with threat detection scoring.
+description: Process Inspector — parent-child process trees, multi-pass detection, sequences, graph view, rule health coverage, and grid pivots from Sysmon and Security process telemetry.
 ---
 
 # Process Inspector
 
-The Process Inspector visualizes parent-child process relationships from Sysmon Event ID 1 and Windows Security Event ID 4688 (Process Create) logs, providing a hierarchical view of execution chains with automatic suspicious pattern detection and detailed process analysis.
+The Process Inspector builds parent-child process trees from **Sysmon Event ID 1** and **Windows Security Event ID 4688**, then scores execution chains with chain rules, standalone detections, prevalence, binary trust, lifetime, injection, and privilege-use correlation. Results open as **Story / Triage / Hunt / Graph / Raw** views plus a **Rules** health report, with analyst suppressions, custom rules, and one-click pivots into the main grid and other IRFlow features.
 
-![Process Inspector showing GUID-linked parent-child process hierarchy with cmd.exe and powershell.exe execution chains](/dfir-tips/Process-Tree-Analyzer-Sysmon.png)
+![Process Inspector graph view with parent-child execution chains](/dfir-tips/Process-Tree-Analyzer-Sysmon.png)
 
 ## Opening the Process Inspector
 
-- **Menu:** Tools > Process Inspector
-- Supports Sysmon Event ID 1 and Windows Security Event ID 4688 (from EVTX or CSV export)
-- Default filter: `1,4688` — both event IDs are queried automatically
-- Configurable max processes limit (default: 200,000)
+- **Menu:** **Tools → Platforms → Windows → Process Inspector**
+- **Home:** Process Inspector capability tile (when a tab is ready)
+- Supports Sysmon EID 1 and Security EID 4688 from EVTX, EvtxECmd CSV, Hayabusa, Chainsaw process exports, and similar timeline imports
+- Default event filter: `1,4688`
+- Configurable max processes (default **200,000**)
 
-## How It Works
+## Supported formats
 
-The Process Inspector builds a hierarchy by linking processes through their parent-child relationships:
+| Format | How PI maps fields |
+|--------|-------------------|
+| **Raw Sysmon / Security** | Direct columns (`Image`, `ProcessGuid`, `CommandLine`, …) |
+| **Security 4688** | Reversed PID semantics (`NewProcessId` = child, `ProcessId` = parent); `NewProcessName`, `TargetUserName`, elevation / integrity labels |
+| **EvtxECmd (KAPE)** | Real PID/GUID extracted from `PayloadData1` / `PayloadData5`; image/cmdline from `ExecutableInfo`. Provider filter keeps Sysmon + Security only |
+| **Hayabusa** | Compact KV in `Details` / `ExtraFieldInfo` |
+| **Chainsaw process** | Nested `Event.EventData.*` aliases |
 
-1. **GUID-preferred linking** — uses `ProcessGuid` and `ParentProcessGuid` when available, which correctly handles PID reuse (a common forensic challenge). A green "GUID-linked" badge appears in the header when GUIDs are used
-2. **PID-based re-linking** — when GUIDs are not available, builds a `pid → [nodes]` lookup and re-links parent-child relationships by matching PPIDs to PIDs. For each child, selects the best parent: the latest process with a matching PID whose timestamp is before the child's creation time
-3. **Root detection** — processes without a known parent become root nodes
+Auto-detected columns include PID/PPID, GUIDs, Image/ParentImage, CommandLine, User, UtcTime, EventID, Provider, Hostname, elevation/integrity, hashes, OriginalFileName, signer metadata, and ProcessAccess privilege fields when present.
 
-### Security Event 4688 Support
+## How the tree is built
 
-Windows Security Event 4688 uses reversed PID semantics compared to Sysmon: `ProcessId` is the parent and `NewProcessId` is the child. The tree automatically detects 4688 format and maps `NewProcessName` to the image path, `TargetUserName` to the user, and `TokenElevationType`/`MandatoryLabel` to elevation and integrity fields.
+1. **GUID-preferred linking** — `ProcessGuid` ↔ `ParentProcessGuid` (survives PID reuse). Header shows **GUID-linked** when this is the primary mode.
+2. **Scoped PID fallback** — when GUIDs are missing, re-link by host + LogonId/SessionId + PID with time ordering (parent must precede child). Link provenance is stored per node (`guid` / `pid-logon` / `pid-session` / `pid-host` / `unresolved` / `root`).
+3. **Parent image backfill** — 4688 rows without ParentImage inherit the linked parent’s path.
+4. **Enrichment passes** (best-effort, same table):
+   - **Terminate** — Sysmon EID **5** / Security **4689** → duration
+   - **Process Access** — Sysmon EID **10** → injection / hollowing indicators (`VM_WRITE` near create)
+   - **Privilege use** — Security **4673** / **4674** → SeDebug, SeLoadDriver, multi-priv concentration
+   - **Network** — Sysmon EID **3** → outbound connection counts / destinations
+   - **DNS** — Sysmon EID **22** → query counts / sample names
+   - **Image load** — Sysmon EID **7** → unsigned / writable-path module counts
+   - **File create** — Sysmon EID **11** → PE/script drops in user-writable paths
 
-## Auto-Detected Columns
+Missing enrichment EIDs do not fail the build; the verdict hero reports telemetry completeness.
 
-IRFlow Timeline automatically identifies the relevant columns from your data:
+## Detection engine
 
-| Column | Purpose | Patterns Matched |
-|--------|---------|-----------------|
-| `ProcessId` | Process identifier | `ProcessId`, `pid`, `process_id`, `NewProcessId` |
-| `ParentProcessId` | Parent process identifier | `ParentProcessId`, `ppid`, `parent_process_id`, `CreatorProcessId` |
-| `ProcessGuid` | Unique GUID (Sysmon) | `ProcessGuid`, `process_guid` |
-| `ParentProcessGuid` | Parent GUID (Sysmon) | `ParentProcessGuid`, `parent_process_guid` |
-| `Image` | Executable path | `Image`, `process_name`, `exe`, `FileName`, `ImagePath`, `NewProcessName` |
-| `ParentImage` | Parent executable path | `ParentImage`, `ParentProcessName` |
-| `CommandLine` | Full command line | `CommandLine`, `command_line`, `cmd`, `cmdline`, `ProcessCommandLine` |
-| `User` | Account context | `User`, `UserName`, `SubjectUserName`, `TargetUserName` |
-| `UtcTime` | Timestamp | `UtcTime`, `datetime`, `TimeCreated`, `timestamp` |
-| `EventID` | Event identifier | `EventID`, `event_id`, `eventid` |
-| `Provider` | Log source | `Provider`, `SourceName`, `Channel` |
-| `Hostname` | Computer name | `Computer`, `ComputerName`, `Hostname`, `MachineName` |
-| `Elevation` | Token elevation type | `TokenElevationType`, `Token_Elevation_Type` |
-| `Integrity` | Mandatory integrity level | `MandatoryLabel`, `Mandatory_Label`, `IntegrityLevel` |
+### Chain rules (~330 parent→child pairs)
 
-### EvtxECmd Support
+Indexed O(1) lookup from `src/detection-rules.js`, mapped to MITRE ATT&CK. Examples: Office → shell, web server → shell, LOLBins, WMI/PsExec lateral, browser → PowerShell.
 
-When working with EvtxECmd CSV output, the Process Inspector extracts real PID and GUID values from `PayloadData1` and `PayloadData5` fields. Hex PID values (e.g., `0x1a2c`) are automatically converted to decimal. This is important because EvtxECmd records the logging service PID by default — the tree uses the extracted values for accurate hierarchy building.
+Some interpreter chains are **gated**: benign `svchost→powershell` / `cmd→powershell` demote to **context** unless command-line corroboration exists. High-confidence chains (Office → shell, LSASS children) stay primary.
 
-## Table Columns
+### Standalone + context rules (PI rule catalog)
 
-The process tree table displays 11 columns:
+Implemented in `src/utils/process-inspector.js` (~60 `pi-*` rules, including path masquerade, binary trust, lifetime, and grandparent chains) across groups:
 
-| Column | Description |
-|--------|-------------|
-| **Timestamp** | Event timestamp |
-| **Detection** | Chain-based detection reason with MITRE ATT&CK ID (color-coded by severity) |
-| **Provider** | Abbreviated log source (e.g., "Sysmon", "Security") |
-| **Event ID** | Source event identifier |
-| **Parent Process** | Parent executable name |
-| **Process** | Executable name with process type icon and suspicious indicator |
-| **PID** | Process identifier |
-| **PPID** | Parent process identifier |
-| **User** | Account context |
-| **Command Line** | Full command line arguments |
-| **Integrity** | Process integrity level |
+| Group | Examples |
+|-------|----------|
+| **Execution** | Encoded / stealth PowerShell, download cradles, AMSI/ETW patch keywords |
+| **Defense evasion** | LOLBin download/decode, living-off-the-land staging |
+| **Credential access** | LSASS tools, procdump, secretsdump patterns |
+| **Persistence** | Scheduled task / service install patterns in cmdline |
+| **Lateral movement** | WinRM, WMI remote, PsExec |
+| **RMM / exfil** | AnyDesk, rclone, etc. (with sanctioned-path dampening) |
+| **Discovery** | whoami, AD recon tools |
+| **Trust** | Unsigned in trusted paths, OriginalFileName rename, cross-host hash mismatch |
+| **Lifetime** | Short-lived respawns, missing terminate on offensive tools |
+| **Misc** | Injection (EID 10), privilege concentration (4673/4674) |
 
-All columns are sortable (click header to toggle). PID, PPID, and Event ID sort numerically; all others sort as text. Default sort is by Timestamp ascending.
+**Allowlist** (`PI_ALLOWLIST`) dampens known-good EDR/AV/RMM/update agents under trusted roots (with `cmdUntrust` for abusive LOLBin shapes such as `MpCmdRun -DownloadFile`).
 
-### Process Type Icons
+**Prevalence** boosts rare host/command patterns. **Custom rules** are analyst-supplied regexes (with ReDoS guards) defined **inside Process Inspector** — not in the Persistence Analyzer.
 
-Each process receives an icon based on its category:
+### Grandparent multi-hop chains (pi-60)
 
-| Icon | Processes |
-|------|-----------|
-| **Folder** | Explorer |
-| **Document** | Office apps (Word, Excel, PowerPoint, Outlook, OneNote, Access, Acrobat) |
-| **Terminal** | Shells (cmd, powershell, pwsh, bash, sh, conhost) |
-| **Gear** | System services (svchost, services, lsass, csrss, smss, wininit, winlogon, spoolsv) |
-| **Globe** | Browsers (chrome, firefox, msedge, iexplore, opera, brave, safari) |
-| **Circle** | All other processes |
+Exact triples such as `winword → cmd → powershell` fire on the leaf even when intermediate hops were demoted by the chain FP gate. Walk uses `consistentParentKey` so PID-reuse edges do not invent false Office→shell paths.
 
-### Integrity Levels
+### Multi-stage sequences
 
-The integrity column decodes Windows mandatory integrity labels:
+Sliding ~10-minute windows promote multi-behavior attack stories, for example:
 
-| Value | Label | Color |
-|-------|-------|-------|
-| S-1-16-16384 | System | Red |
-| S-1-16-12288 | High | Orange |
-| S-1-16-8192 | Medium | Yellow |
-| S-1-16-4096 | Low | Gray |
-| S-1-16-0 | Untrusted | Purple |
+- Download → Execute  
+- Office/Script → LOLBin  
+- Recon → Lateral  
+- Credential Access → Lateral / LSASS dump → Lateral  
+- Multi-hop LOLBIN chain  
+- Office/Script → Download → RMM  
+- AMSI/ETW patch → Inject  
+- Disable Defender → Payload  
+- Download/Stage → Persistence  
+- Suspicious Exec → Network/DNS  
+- Drop File/Module → Execute  
 
-Token elevation types are also decoded: `%%1936` = Full (elevated), `%%1937` = Limited (not elevated), `%%1938` = Default.
+Sequences appear as **SEQ** badges and feed Story mode.
 
-## Suspicious Pattern Detection
+## View modes
 
-The Process Inspector uses a library of 342 parent-child chain rules mapped to MITRE ATT&CK techniques (`src/detection-rules.js`), plus 13 standalone regex patterns for command-line and path analysis. Chain rules are pre-indexed in a Map for O(1) lookup by `parent:child` pair. Each detection returns a human-readable reason string with ATT&CK technique ID displayed as a badge on the process node.
+| Mode | What you see |
+|------|----------------|
+| **Story** | Investigation stories (host/user narrative, techniques, steps) |
+| **Triage** | Suspicious chain clusters, risk-sorted |
+| **Hunt** | Medium+ clusters |
+| **Graph** | Spatial parent-child graph (multi-host swimlanes, pan/zoom). Seed severity filter; click node → detail panel |
+| **Raw** | Full hierarchical tree / flat list with column filters |
+| **Rules** | Rule health & coverage report (fired / silent / disabled built-in + custom + sequences) |
 
-The detection rules cover 12 ATT&CK tactic categories: Execution, Defense Evasion/LOLBins, C2/RATs, Persistence, Discovery/Recon, Credential Access, Lateral Movement, Impact/Ransomware, Collection/Staging, Exfiltration, Initial Access (web shells), and Browser Exploits. A safe process exclusion list (`SAFE_PROCS`) prevents false positives on legitimate Windows processes that run from temp/AppData paths.
+Toolbar: search, severity toggles, expand/depth (tree modes), copy/export, rare-process chips, **Rules** coverage toggle.
 
-### Standalone Detection Patterns
+### Rule health report
 
-In addition to chain rules, 13 standalone regex patterns detect suspicious behavior regardless of the parent-child relationship:
+After a build, open **Rules** in the results toolbar for a coverage brief:
 
-| Pattern | What It Detects |
-|---------|-----------------|
-| `SUS_PATHS` | Execution from suspicious paths (`\Temp\`, `\AppData\`, `\Downloads\`, `\ProgramData\`) |
-| `ENCODED_PS` | Encoded PowerShell execution (`-enc`, `-encodedcommand`) |
-| `CRED_DUMP_CMD` | Credential dumping commands (`comsvcs.dll`, `sekurlsa`, `mimikatz`) |
-| `NTDS_EXTRACT` | NTDS.dit extraction (`ntdsutil ifm`, `secretsdump`) |
-| `LSASS_TOOLS` | Tools that access LSASS memory (`procdump`, `processhacker`, `handlekatz`) |
-| `ACCOUNT_MANIP` | Account manipulation (`net user /add`, `net localgroup /add`) |
-| `DEFENSE_EVASION` | Defense evasion behaviors (`vssadmin delete`, `wevtutil cl`) |
-| `NETWORK_SCANNERS` | Network scanning tools (`netscan`, `masscan`, `nbtscan`) |
-| `AD_RECON_TOOLS` | AD reconnaissance (`adfind`, `sharphound`, `bloodhound`) |
-| `RMM_TOOLS` | Remote management tools (`anydesk`, `splashtop`, `rustdesk`) |
-| `EXFIL_TOOLS` | Exfiltration tools (`rclone`, `filezilla`, `winscp`) |
-| `ARCHIVE_SUSPECT` | Suspicious archive commands (`7z a -p`, password-protected archives) |
-| `SAFE_PROCS` | Known-safe process exclusion list (false-positive suppression) |
+- Coverage % of enabled built-in rules that fired on this tree  
+- Fired / silent / disabled counts, custom-rule hits, sequence hits  
+- Top fired rules, silent high-value (critical/high with zero hits), by-group breakdown  
+- Techniques seen; copy or download a plain-text report (`process-rule-health.txt`)  
 
-### Critical (Red)
+Use this to tune intents (Low-noise / Balanced / Broad), spot telemetry gaps (silent high-value rules on a clean-looking host), and document which detections applied to a case. Toggle **Rules** again to return to the previous view mode.
 
-| Detection | Reason | Example |
-|-----------|--------|---------|
-| Office app spawning shell | "Office spawning shell" | `WINWORD.EXE → cmd.exe` |
-| Web server spawning shell | "Webshell — shell from web server" | `w3wp.exe → powershell.exe` |
-| Suspicious child of LSASS | "Suspicious child of LSASS" | `lsass.exe → unknown.exe` |
-| Encoded PowerShell | "Encoded PowerShell" | `powershell -enc ...` |
-| Remote execution tools | "Remote execution tool" | `psexesvc.exe`, `wsmprovhost.exe` |
-| Credential dumping commands | "Credential dumping" | `comsvcs.dll`, `sekurlsa`, `mimikatz` |
-| NTDS extraction | "NTDS extraction" | `ntdsutil ifm`, `secretsdump` |
-| LSASS access tools | "LSASS access tool" | `procdump`, `processhacker`, `handlekatz` |
+### Config phase (before build)
 
-### High (Orange)
+Before the tree runs, the config panel surfaces:
 
-| Detection | Reason | Example |
-|-----------|--------|---------|
-| LOLBin from unusual parent | "LOLBin — certutil.exe via cmd.exe" | `explorer.exe` is normal; `mshta.exe` is not |
-| Svchost from unusual parent | "Svchost from unusual parent" | `svchost.exe` not under `services.exe` |
-| Script from user profile | "Script from user profile" | `wscript.exe` running from `\AppData\` |
-| Reconnaissance via shell | "Reconnaissance — whoami" | `cmd.exe → whoami.exe` |
-| Lateral movement commands | "Lateral movement command" | `wmic /node:`, `winrm` |
-| Account manipulation | "Account manipulation" | `net user /add`, `net localgroup /add` |
-| Defense evasion | "Defense evasion" | `vssadmin delete`, `wevtutil cl` |
-| RMM tool from unusual parent | "RMM tool — unusual parent" | `anydesk.exe` not from `explorer.exe` |
-| Exfiltration tools | "Exfiltration tool" | `rclone`, `winscp`, `megasync` |
-| Suspicious archive operations | "Suspicious archive operation" | `7z a -p archive.7z` |
-| PsExec service from shell | "PsExec service from shell" | `cmd.exe → psexesvc.exe` |
-| WMI lateral movement | "WMI lateral movement" | `wmiprvse.exe → cmd.exe` with `ADMIN$` |
+- **Readiness score** and detection capability chips (tree reconstruction, chain detections, standalone, sequences)
+- **Telemetry toggles** — Sysmon EID 1 and Security 4688, with live event counts from preview
+- **Intent presets** — Low-noise triage, Balanced, or Broad hunt (adjusts which `pi-*` groups are disabled)
+- **Technique groups** — enable/disable rule groups with partial-state support
+- **Custom rules** — parent/child name, path/cmdline contains, optional regex (ReDoS-guarded), severity, MITRE, behavior tag
+- **Column mapping** disclosure when auto-map needs override
+- Max process limit (default **200,000**)
 
-### Medium (Yellow)
+### Verdict hero (results)
 
-| Detection | Reason | Example |
-|-----------|--------|---------|
-| Suspicious execution path | "Suspicious path" | Running from `\Temp\`, `\AppData\`, `\Downloads\`, `\ProgramData\` |
-| Reconnaissance commands | "Reconnaissance — ipconfig" | `ipconfig`, `systeminfo`, `tasklist` without shell parent |
-| Network scanners | "Network scanner" | `netscan`, `masscan`, `nbtscan` |
-| AD recon tools | "AD recon tool" | `sharphound`, `bloodhound`, `rubeus`, `certify` |
-| Remote management tools | "Remote management tool" | `anydesk`, `teamviewer`, `screenconnect` |
+On build complete, a **verdict-first** banner shows:
 
-## Detail Panel
+- Worst severity + headline (top story or detection summary)
+- Counts (critical / high / medium / total processes)
+- Top stories (jump to Story view)
+- ATT&CK technique chips
+- Link quality (GUID vs PID)
+- Telemetry completeness (Process Create · Terminate · Process Access · Privilege Use)
+- Truncation warning when the max process limit was hit
+- **Scoped rebuild** — host and/or time window when the global max truncated the tree
 
-Click any process to open a resizable right-side detail panel. The panel shows:
+## Detail panel
 
-- **Process header** — process type icon, name, PID, and suspicious reason badge
-- **Field grid** with up to 13 fields: Timestamp, Process, Full Path, PID, PPID, Parent (clickable — navigates to parent), Parent Path, User, Integrity (color-coded), Elevation, Command Line (red text), Provider, Event ID
-- **Children chips** — clickable badges for up to 20 child processes, colored by suspicious level
+Select a process for:
 
-Drag the left edge to resize the panel.
+- Detection reason, confidence, triage score, evidence pills, MITRE badges  
+- Fields: path, parent, link provenance, prevalence, integrity, cmdline (token highlight + base64 decode)  
+- Source event, Related EVTX timeline, cross-telemetry pivots  
+- **Filter Grid** — ProcessGuid (or host+PID) ± time window, including child creates; optional scroll to create event  
+- **Graph** — focus this process in Graph mode  
+- **Open Lateral / Persistence / Sigma** — time+host context handoffs  
+- **VirusTotal** — in-app lookup when a VT API key is configured; otherwise opens the public VT page  
+- Baseline / Suppress (Analyst Profile)
 
-## Loading Screen
+## Grid pivot (Filter Grid)
 
-While the tree is building, an animated loading screen shows a multi-phase progress indicator:
+One click from a process:
 
-1. Querying database...
-2. Parsing process events...
-3. Building parent-child relationships...
-4. Computing tree depth...
-5. Finalizing...
-6. Complete
+1. Prefer **ProcessGuid contains** (and ParentProcessGuid for children)  
+2. Else **PID** (decimal + hex) + PPID, scoped by hostname when available  
+3. Always apply **±N minutes** on the timestamp column when parseable (5m / 15m / 1h / 6h)  
+4. Clears competing search/column filters so the pivot is deterministic  
+5. Sets the proximity pill and, when possible, **scrolls to the create event**
 
-A cancel button is available to abort long-running queries.
+Works with EvtxECmd/Hayabusa blob columns via `contains` on the payload field.
 
-## Navigation
+## Cross-feature handoffs
 
-### Expand / Collapse
+From the detail panel (time window default ±30m, host-scoped when possible):
 
-- Click the arrow next to any process to expand or collapse its children
-- Use the depth limit control to set maximum visible tree depth
-- Expand All / Collapse All buttons in the toolbar
-- **Suspicious only** filter — shows only flagged processes in a flat (non-hierarchical) list sorted by timestamp, making it easy to review all detections without navigating the tree
+| Action | Behavior |
+|--------|----------|
+| **Open Lateral Movement** | Applies host + time filters on the tab, opens LM, auto-runs analysis |
+| **Search Persistence** | Same context window, opens Persistence Analyzer, auto-runs |
+| **Sigma around selection** | Same context window, opens Sigma wizard on **current tab** (tune profile and run) |
 
-### Ancestor Chain Highlighting
+## Analyst Profile
 
-Click any process node to highlight its full ancestor chain from root to the selected process. This shows the complete execution path that led to the selected process.
+Suppressions and baselines (process, parent, host, user, image, cmdline contains, reason). Save/Load JSON profiles. See [Analyst Profiles](/features/analyst-profiles).
 
-### Filter to Process
+**Custom detection rules** live in the Process Inspector config panel under **Custom Rules**. Each rule can match any combination of:
 
-Click the filter icon on a process node to filter the main data grid to rows matching that process's PID. This lets you see all events associated with a specific process.
+- Parent process name  
+- Process name  
+- Image path contains  
+- Command line contains  
+- Optional regex (process / cmdline / path)  
+- Severity, MITRE technique, and **behavior tag** (so the rule participates in sequence detection)
 
-### Checkbox Selection
+## Exports
 
-Each process row has a checkbox for multi-selection. Selected processes can be:
+- CSV / JSON of visible processes (with link provenance and detection fields)  
+- Copy chain / tree / selected rows / stories  
+- Linked evidence export from Related EVTX pivots  
 
-- **Copy Selected** — copies only the checked rows as tab-separated data to the clipboard
-- **Copy Tree** — copies all visible processes (ignoring selection) as tab-separated data
+## Scale & rebuild
 
-Both copy operations include columns: Hostname, ParentProcessName, Provider, EventID, and all original process fields.
+- Tree build runs in an **analyzer worker** (job-backed).  
+- Detection scoring runs **chunked asynchronously** after the tree returns (progress bar in the hero on large sets) so the UI stays responsive.  
+- When the process limit truncates results, the hero offers a **scoped rebuild**: pick host and/or time window and re-run without raising the global max.  
 
-### EvtxECmd Provider Filtering
+## Limitations
 
-When EvtxECmd data is detected, the Process Inspector automatically filters by Sysmon and Security providers using the `Provider` column. This ensures only process creation events are included, excluding noise from other event sources that share the same Event IDs.
-
-## Footer
-
-The footer bar displays:
-
-- **Left:** Visible process count, suspicious count, tree depth, and chain size (when a node is selected)
-- **Right:** Data pipeline description showing providers, event IDs, and linking method
-
-## Modal Header
-
-The header displays contextual information about the loaded data:
-
-- Hostname (from process data or user domain prefix)
-- Provider names (abbreviated: "Microsoft-Windows-Sysmon" → "Sysmon")
-- Event IDs included
-- Total event count
-- Date range of the data
-- GUID-linked badge (green) when GUID linking is active
-- Truncated warning (red) when the max process limit was reached
+- Windows process-create focused (Sysmon 1 / Security 4688). Linux/macOS process telemetry is not modeled.  
+- Graph and detection score **cap** large trees (default 200k processes; graph seeds ~220 nodes). Truncation is warned in the hero and header.  
+- EID 10 / 5 / 3 / 22 / 7 / 11 / 4673 enrichment requires those events in the **same** imported table.  
+- PID-only linking remains best-effort under logon/session scope; prefer Sysmon GUIDs.  
+- Sigma handoff opens the wizard with tab + filters prepared; it does not auto-start a Hayabusa scan.
 
 ## View Modes
 
@@ -292,22 +267,23 @@ Beyond the built-in detection library, you can extend detection coverage by defi
 
 ## Tips
 
-::: tip Sysmon Configuration
-For best results, ensure Sysmon is configured to log Event ID 1 (Process Create) with command line logging enabled. The more data available, the richer the analysis.
+::: tip Sysmon configuration
+Log Process Create (1) with command lines, hashes, and (where licensed) Process Access (10). Include terminate (5) for lifetime rules.
 :::
 
-::: tip Large Datasets
-For datasets with thousands of processes, use the depth limit control to start with a shallow view (depth 3-4) and expand specific branches of interest. The default max processes limit is 200,000.
+::: tip Large fleets
+Use Story/Triage first, then Graph for spatial chains. When truncated, raise max processes or filter the tab by host/time before opening PI.
 :::
 
-::: tip Combine with Persistence Analyzer
-After identifying a suspicious persistence mechanism, use the Process Inspector to trace what process installed it and what the persisted binary spawns on execution.
+::: tip Pivot, don’t re-hunt
+**Filter Grid** + Related EVTX is usually faster than re-importing for process-scoped review.
 :::
 
 ## See Also
 
-- [Persistence Analyzer](/features/persistence-analyzer) — detect persistence mechanisms installed by suspicious processes
-- [Lateral Movement Tracker](/features/lateral-movement) — trace execution chains that follow lateral movement hops
-- [IOC Matching](/features/ioc-matching) — match process names, hashes, and paths against threat intel
-- [NTFS Analysis](/features/ntfs-analysis) — correlate process execution with MFT and USN Journal activity
-- [Search & Filtering](/features/search-filtering) — find specific processes across the full timeline
+- [Analyst Profiles](/features/analyst-profiles)  
+- [Persistence Analyzer](/features/persistence-analyzer)  
+- [Lateral Movement Tracker](/features/lateral-movement)  
+- [Sigma Detection](/features/sigma-detection)  
+- [IOC Matching](/features/ioc-matching) / VirusTotal  
+- [Search & Filtering](/features/search-filtering)  

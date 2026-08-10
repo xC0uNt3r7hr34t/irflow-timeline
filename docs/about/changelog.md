@@ -4,6 +4,119 @@ description: IRFlow Timeline changelog — version history, new features, perfor
 
 # Changelog
 
+## v1.0.9 — July 27, 2026
+
+### Large EVTX Imports
+
+- **Fixed issue #22** — Raw EVTX files no longer use Node's whole-file read path, eliminating the 2 GiB Buffer failure seen on large `Security.evtx` files
+- **Bounded 64 KiB parsing** — Reads the EVTX header once and processes one native EVTX chunk at a time, keeping memory use stable as the source grows
+- **Approximately 4 GiB support** — Supports the EVTX format's 65,535-chunk ceiling, including the reported 4,109,438,976-byte (~3.83 GiB) log
+- **Better progress reporting** — Large-file progress tracks physical chunk offsets
+
+### Import Reliability
+
+- Duplicate requests for the same pending file are suppressed without blocking distinct workbook-sheet or AI-history-scope imports
+- Repeated identical failures collapse into one retryable notification instead of stacking across the screen
+- Added an exact-size issue #22 regression plus real multi-gigabyte EVTX validation
+
+## v1.0.8 — July 27, 2026
+
+### AI Application Forensics
+
+- **Grok Build support (new)** — Parses `.grok` prompt history and session stores into AI Query History:
+  - Timestamped prompts, responses, reasoning, exact terminal-command inputs, completion output, and token usage
+  - Session/model/workspace/Git context plus file-hunk records
+  - Credential-bearing Grok configuration files are deliberately excluded from timeline text
+- **Claude expanded** — Recursively parses Claude Code projects and subagents plus Claude Desktop/Cowork session metadata, isolated transcripts, audit JSONL, tool calls, and actual shell commands
+- **Codex expanded** — Adds current/archived dated rollouts and version-aware `state*.sqlite` discovery; snapshots SQLite with WAL/SHM companions to preserve recent thread, spawn-edge, and dynamic-tool metadata
+- **Modernized AI evidence model** — Preserves `InvokedTool`, exact `ToolCommand`, structured `ToolInput`, descriptions, and bounded tool results across modern JSONL formats
+- **Broader app coverage** — Improves ChatGPT Desktop, GitHub Copilot CLI and VS Code, Gemini CLI, Cursor, Windsurf, and Continue extraction
+- **AI Secret Hunt safeguards** — Sensitive-value reveal now uses the managed confirmation workflow
+
+### Collection and Investigation Workflows
+
+- **Open Triage Collection** — Inventory KAPE/triage folders, attribute artifacts to likely hosts, choose import lanes, and optionally hand EVTX to Sigma analysis
+- **Process Inspector overhaul** — Verdict-first results, Story/Triage/Hunt/Graph/Raw modes, rule-health coverage, enrichment passes, Filter Grid pivots, and cross-analyzer handoffs
+- **Persistence Analyzer** — Multi-source scanning, KAPE collection analysis, incident clustering, registry-shape hardening, and remote-origin scoring
+- **Lateral Movement Tracker** — Multi-source detection, normalized endpoints, raw Terminal Services evidence, stronger RDP scoring, graph layout, campaign triage, and stage isolation
+- **Timeline workflow** — Command palette, keyboard navigation, selection bar, multi-row bulk actions, and grid/filter polish
+
+### Performance, Stability, and Release Quality
+
+- Streams heavy query results and bounds worker memory/lifecycle to prevent JavaScript heap exhaustion on large evidence sets
+- Uses bounded JSONL readers and explicit per-row evidence caps while retaining useful tool output
+- Gates macOS packaging on automated tests plus renderer and VitePress documentation builds
+- Ships as a signed and notarized universal macOS release for Apple Silicon and Intel
+
+---
+
+## v1.0.7 — June 4, 2026
+
+### New Features
+
+- **AI Artifacts / AI Query History** — New **Tools → Analysis → AI Artifacts → Collect AI Artifacts** workflow for turning local AI assistant activity into timeline evidence
+  - Parses prompts, assistant responses, invoked tool/action records, timestamps, sessions, workspace paths, source files, models, and endpoint user/host attribution when available
+  - Supports Claude Code, OpenAI Codex, ChatGPT Desktop, Gemini CLI, Cursor, GitHub Copilot, Windsurf, and Continue
+  - Scans the current Mac or a selected KAPE / triage / mounted-disk folder across Windows, Linux, and macOS profile layouts
+  - Merges discovered sources into one **AI Query History** tab with consistent columns and provenance fields
+
+- **AI Secret Hunt** — New **Tools → Detection → AI Secret Hunt** workflow for finding sensitive data exposed through AI history
+  - Detects API keys, private keys, tokens, credentials, and high-confidence secret patterns across prompts, responses, and tool output
+  - Groups repeated evidence by fingerprint, redacts cleartext by default (cleartext is never written to disk), and supports analyst tagging for triage
+  - Group findings by tool or session, then export a redacted PDF / HTML exposure brief or a redacted CSV of findings
+
+### Data Quality
+
+- **AI history parser hardening** — Improved timestamp normalization, `Summary` versus `FullText` handling, `Tool` versus `InvokedTool` column naming, and source-row attribution across AI app parsers
+- **False-positive reduction** — Tightened credit-card and high-entropy secret detection so placeholder identifiers, directory paths, and non-secret strings are less likely to appear as findings
+- **Private key evidence handling** — Multi-line PEM-style findings preserve expanded block context instead of collapsing to a one-line preview
+
+### Performance and Stability
+
+- **Large AI History tabs** — Scroll-window handling and streamed import behavior were hardened for 100k+ row AI History tabs
+- **Extraction UI polish** — Progress, expanded evidence rows, tag controls, source paths, and reveal/copy controls were cleaned up to reduce renderer jank during long AI artifact scans
+
+---
+
+## v1.0.6 — June 1, 2026
+
+### New Features
+
+- **Sigma Detection (dual engine)** — Rule-based detection built directly into the app, accessible from **Tools → Detection → Sigma Scan**
+  - **Hayabusa engine** — the bundled Hayabusa binary scans raw `.evtx` folders at full speed; self-updating rule set with in-app binary/rule maintenance
+  - **In-app JS Sigma engine** — compiles Sigma detection YAML to a JS predicate and scans imported data (current tab) or EvtxECmd CSV/XLS/XLSX output when raw `.evtx` is unavailable
+  - Three scan targets: EVTX Folder (Hayabusa), EvtxECmd Output Files (JS Sigma), and Current Timeline Tab (JS Sigma) with automatic format detection (EvtxECmd / Hayabusa / raw EVTX / CSV)
+  - Detection profile with scan presets (Fast high-confidence, Full hunt, Critical/high only) plus custom saveable presets, severity/status filters, and JS Sigma rule-category selection
+  - Hayabusa rule sets: Core, Core+, Core++, Emerging Threats, Threat Hunting, All; output profiles (minimal → super-verbose, Timesketch) and CSV/JSON/JSONL modes
+  - Scan options: record recovery, UTC, proven-only, noisy/deprecated/unsupported toggles, EID filter, `-A`/`-a`, GeoIP enrichment (MaxMind GeoLite2 auto-download), and include/exclude filters for MITRE tags, computers, and Event IDs
+  - **Triage dashboard** ("Look Here First") with priority findings, MITRE ATT&CK technique/tactic badges, affected/rare host-user-process panels, per-rule reviewed/false-positive state, and Open Exact Hits / Tag / Bookmark actions
+  - **Disabled / Noisy Rules** suppression manager (global + case-specific, synced to Hayabusa `noisy_rules.txt`), compatibility rule downloads, and custom YAML rule import
+  - Raw-EVTX triage tools (log metrics, computers, event IDs, logons, pivot IOCs, Base64 decode) and a keyword/regex EVTX search utility
+  - Persistent scan history with reopenable results; cancellable scans
+
+- **RDP Bitmap Cache** — New **Tools → Platforms → Windows → RDP Bitmap Cache** workflow wrapping ANSSI-FR `bmc-tools`
+  - Recovers bitmap tiles and collages from `bcache*.bmc` / `cache????.bin` Windows profile artifacts
+  - Preflight summary (cache file count, size, detected profiles), recursive directory scanning, and image preview
+  - Exportable evidence package with `manifest.json`, source/output SHA-256 hashes, copied images, and recorded command line
+
+- **Lateral Movement Tracker expansion** — Seven sub-tabs and operator-centric triage
+  - **Accounts** tab — per-identity aggregation with suspicion scoring, PRIV/ADMIN/MACHINE/SERVICE/USER classification, and per-row pivots (created even from Kerberos-only DC events)
+  - **Exec Sessions** tab — first-class non-RDP lateral movement (WMI, WinRM, PsExec, Impacket, remote services, scheduled tasks, admin shares, RMM, Cobalt Strike) with Table and Timeline (Gantt) views
+  - **Incidents** — pair-based grouping of findings within a 30-minute window
+  - **Campaigns** — multi-hop storyline clustering across shared host/user within 2 hours, with hop-path breadcrumbs and auto-generated narratives
+  - **Telemetry Coverage** panel surfacing present event categories and detections gated by missing data
+
+### Architecture
+
+- **Codebase refactor (v1.0.5 → v1.0.6)** — The monolithic `App.jsx` and `electron/parser.js` were decomposed into ~200 focused modules across the renderer and main process: per-format `parsers/`, per-domain `ipc/` handlers, `worker_threads`-backed `jobs/`, and modular `analyzers/` (sigma, lateral-movement, process-tree, persistence, rdp-bitmap-cache, network)
+- **External tools bundling** — `npm run bundle:tools` now bundles both Hayabusa and `bmc-tools` as `extraResources`
+
+### UI Improvements
+
+- **Tools menu restructure** — Reorganized into Analysis, Detection (Sigma Scan), Platforms (Windows tools, with Linux/macOS/Cloud teasers), and Export sections (v1.0.7 adds **AI Artifacts** under Analysis and **AI Secret Hunt** under Detection)
+
+- **Lateral Movement Tracker** — **15** configurable built-in event rules (added RMM / Remote Access + Scheduled Task execution presets)
+
 ## v1.0.5 — March 17, 2026
 
 ### New Features
@@ -81,7 +194,7 @@ description: IRFlow Timeline changelog — version history, new features, perfor
   - File menu: Open, Export, Save/Load Session, Open Recent (with submenu), Close Tab
   - View menu: Columns, Color Rules, Tags, Filter Presets, Edit Filter, Merge Tabs
   - Actions menu: Select All/Deselect All/Invert Selection, Copy/Export Selected Rows, IOC Matching, Bulk Tag, Pivot, Find Duplicates
-  - Tools menu: Stack Values, Gap Analysis, Log Sources, Burst Detection, Lateral Movement Tracker, Process Inspector, Persistence Analyzer, Generate Report
+  - Tools menu (v1.0.3 flat layout; reorganized in v1.0.6 into **Analysis** / **Detection** / **Platforms** / **Export** — see [Virtual Grid — Tools](/features/virtual-grid#tools))
   - Help menu: Quick Help, Keyboard Shortcuts, Website, About
   - Glassmorphism styling with backdrop blur and semi-transparent backgrounds
 
@@ -162,7 +275,7 @@ description: IRFlow Timeline changelog — version history, new features, perfor
 
 - **Lateral Movement Expansion** — 16 event IDs with RDP session correlation
   - TerminalServices parsing (LocalSessionManager EIDs 21-25, 39, 40; RemoteConnectionManager EID 1149)
-  - 13 built-in detection rules with custom rule support
+  - 13 built-in lateral-movement detection rules with custom rule support (expanded to 15 in v1.0.6)
   - RDP session correlation engine with lifecycle tracking (connecting → active → disconnected → ended)
   - New RDP Sessions tab with expandable event timelines
   - Event breakdown per edge (pill-shaped EID × count chips)
@@ -219,7 +332,7 @@ description: IRFlow Timeline changelog — version history, new features, perfor
 
 ### New Features
 
-- **Persistence Analyzer** — Automated detection of 30+ persistence techniques with risk scoring
+- **Persistence Analyzer** — Automated EVTX and registry persistence detection with risk scoring (expanded to 36 EVTX + 33 registry rules in later releases)
   - Supports EVTX event logs and registry exports (auto-detect mode)
   - 18 EVTX detection rules: Services (7045/4697), Scheduled Tasks (4698/4699/106/141/118/119), WMI subscriptions (5861, Sysmon 19/20/21), Registry autorun (Sysmon 12/13/14), Startup folder drops (Sysmon 11), DLL hijacking (Sysmon 7), Driver loading (Sysmon 6), ADS (Sysmon 15), Process tampering (Sysmon 25), Timestomping (Sysmon 2)
   - 15 registry persistence locations: Run/RunOnce, Services, Winlogon, AppInit_DLLs, IFEO, COM hijacking, Shell extensions, Boot Execute, BHO, LSA packages, Print Monitors, Active Setup, Startup folders, Scheduled Tasks, Network Providers

@@ -27,7 +27,7 @@ IRFlow Timeline is distributed as a **Universal Binary** that runs natively on b
 4. Launch IRFlow Timeline from Applications or Spotlight
 
 ::: tip First Launch
-On first launch, macOS may show a security prompt because the app is not notarized through the App Store. Right-click the app and select **Open** to bypass Gatekeeper, or go to **System Settings > Privacy & Security** and click **Open Anyway**.
+Official [GitHub release](https://github.com/r3nzsec/irflow-timeline/releases) builds are signed and notarized. If macOS still quarantines the download, right-click **IRFlow Timeline** in Applications and choose **Open** once, or use **System Settings → Privacy & Security → Open Anyway**.
 :::
 
 ## Build from Source
@@ -37,13 +37,13 @@ If you prefer to build from source:
 ```bash
 # Clone the repository
 git clone https://github.com/r3nzsec/irflow-timeline.git
-cd irflow-timeline/tle-app
+cd irflow-timeline
 
 # Install dependencies
 npm install
 
 # Rebuild native modules for Electron
-npx electron-rebuild -f -w better-sqlite3
+npm run rebuild
 
 # Run in development mode
 npm run dev
@@ -54,6 +54,8 @@ npm run dist:dmg
 # Build universal binary (Intel + Apple Silicon)
 npm run dist:universal
 ```
+
+Release build commands automatically bundle external analyzer tools used by IRFlow Timeline, including Hayabusa and ANSSI-FR `bmc-tools`.
 
 ### Build Script
 

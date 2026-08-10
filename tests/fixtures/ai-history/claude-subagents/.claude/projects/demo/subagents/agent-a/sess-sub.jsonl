@@ -1,0 +1,1 @@
+{"type":"user","timestamp":"2024-01-01T12:01:00.000Z","uuid":"u2","sessionId":"sub-1","message":{"role":"user","content":[{"type":"text","text":"subagent thread"}]}}

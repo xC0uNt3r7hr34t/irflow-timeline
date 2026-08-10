@@ -13,7 +13,9 @@ IRFlow Timeline includes six specialized tools for analyzing raw NTFS artifacts 
 | **$MFT** | `.mft` | Raw Master File Table from NTFS volumes |
 | **$J** | `.$J`, `.usn` | Raw USN Journal (change journal) |
 
-Both formats are imported as regular tabs and are available alongside CSV, EVTX, XLSX, and Plaso timelines. Once imported, the NTFS analysis tools appear in the **Tools** menu.
+Both formats are imported as regular tabs and are available alongside CSV, EVTX, XLSX, and Plaso timelines. Once imported, open **Tools → Platforms → Windows** and use the **Master File Table** or **USN Journal** submenus for the tools below.
+
+![Tools menu Platforms section expanded to show Windows with Master File Table and USN Journal submenus](/dfir-tips/Analysis-Button-NewUI.png)
 
 ## Ransomware Analysis
 
@@ -22,14 +24,18 @@ Scans MFT records for indicators of ransomware activity — encrypted file exten
 ### How to Use
 
 1. Import a raw `$MFT` file
-2. Open **Tools > Ransomware Analysis**
+2. Open **Tools → Platforms → Windows → Master File Table → Ransomware Analysis**
 3. Configure analysis parameters:
    - **Encrypted extension** — the ransomware file extension to scan for (e.g., `.locked`, `.encrypted`, `.ryuk`)
    - **Ransom note pattern** — filename pattern for ransom notes (e.g., `README`, `DECRYPT`, `RECOVER`)
    - **Match mode** — contains, exact, or regex
    - **USN cross-reference** — optionally select an imported `$J` tab for enrichment
 
+![Ransomware Analysis setup showing encrypted extension and ransom note pattern configuration with detection preview](/dfir-tips/MFT-Ransomware-Analysis-DetectingEncryption.png)
+
 ### Results
+
+![Ransomware Analysis dashboard with encryption metrics, ransom notes, and timeline summary](/dfir-tips/MFT-Ransomware-Analysis-Dashboard.png)
 
 | Metric | Description |
 |--------|-------------|
@@ -45,6 +51,8 @@ Scans MFT records for indicators of ransomware activity — encrypted file exten
 
 When a USN Journal tab is cross-referenced, the analysis correlates rename, overwrite, and delete events within a 5-minute window of encryption activity, providing timing evidence for the attack sequence.
 
+![Ransomware Analysis file impact view showing top affected directories and encryption velocity](/dfir-tips/MFT-Ransomware-Analysis-FileImpact.png)
+
 ### PDF Export
 
 Click **Export PDF** to generate a formatted ransomware analysis report including all metrics, timelines, and directory breakdowns.
@@ -52,6 +60,8 @@ Click **Export PDF** to generate a formatted ransomware analysis report includin
 ## Timestomping Detection
 
 Detects files where `$STANDARD_INFORMATION` timestamps have been manipulated by comparing them against the immutable `$FILE_NAME` timestamps in MFT records.
+
+Open via **Tools → Platforms → Windows → Master File Table → Timestomping Detector** after importing a raw `$MFT` tab with SI/FN timestamp columns.
 
 ### Detection Logic
 
@@ -74,9 +84,15 @@ Each detection includes the file path, both SI and FN timestamps, the delta, and
 
 Timestomped files are auto-tagged with `Timestomp Indicator` for filtering and reporting.
 
+![Timestomping Detection results with SI vs FN deltas, severity scores, and Timestomp Indicator tags](/dfir-tips/MFT-Timestomp-Indicator.png)
+
 ## File Activity Heatmap
 
 Visualizes MFT file creation and modification activity as a calendar heatmap, revealing temporal patterns in filesystem activity.
+
+![File Activity Heatmap showing hourly and daily buckets with day-of-week activity matrix](/dfir-tips/MFT-File-Activity-Heatmap.png)
+
+Open via **Tools → Platforms → Windows → Master File Table → File Activity Heatmap** after importing a raw `$MFT` tab.
 
 ### Visualizations
 
@@ -89,6 +105,10 @@ This is useful for identifying after-hours activity, automated processes (consis
 ## ADS Analyzer
 
 Scans MFT records for Alternate Data Streams (ADS), which attackers use to hide data, store payloads, or bypass detection.
+
+![ADS Analyzer dashboard with Zone.Identifier, suspicious ADS, and executable stream categories](/dfir-tips/MFT-ADS-Analyzer.png)
+
+Open via **Tools → Platforms → Windows → Master File Table → ADS Analyzer** after importing a raw `$MFT` tab with ADS-related columns.
 
 ### What It Detects
 
@@ -105,6 +125,12 @@ Downloaded files identified through Zone.Identifier ADS are auto-tagged with `Do
 ## USN Journal Analysis
 
 The USN (Update Sequence Number) Journal records every change to files and directories on an NTFS volume. This tool performs 11 targeted forensic analyses on raw `$J` data with full path reconstruction powered by the UsnJrnl Rewind methodology.
+
+Open via **Tools → Platforms → Windows → USN Journal → USN Journal Analysis** after importing a raw `$J` tab.
+
+### Setup
+
+![USN Journal Analysis setup with time range, path filter, and optional MFT cross-reference tab](/dfir-tips/USN-Journal-Setup.png)
 
 ### UsnJrnl Rewind Path Resolution
 
@@ -144,6 +170,8 @@ When an `$MFT` tab is also loaded, IRFlow Timeline combines both resolution meth
 
 ### Results
 
+![USN Journal Analysis dashboard with category breakdown, likely findings, timeline, and reconstructed paths](/dfir-tips/USN-Journal-Dashboard.png)
+
 Each analysis category returns relevant entries with timestamps, full reconstructed paths, file references, reason flags, and source information. The tool also generates:
 
 - **Timeline** — chronological view of all significant events
@@ -168,7 +196,7 @@ This is a high-value capability for incident response: when a threat actor drops
 ### How to Use
 
 1. Import a raw `$MFT` file
-2. Open **Tools > Extract Resident Data**
+2. Open **Tools → Platforms → Windows → Master File Table → Extract Resident Data**
 3. Select an output folder
 4. The tool scans MFT records and writes resident files to the output directory, preserving the original file paths as subdirectories
 

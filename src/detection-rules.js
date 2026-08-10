@@ -183,9 +183,12 @@ const CHAIN_RULES = [
 ["anydesk.exe","powershell.exe",2,"AnyDesk \u2192 PS \u2014 RAT abuse [T1219]"],
 ["teamviewer.exe","cmd.exe",2,"TeamViewer \u2192 cmd \u2014 remote tool abuse [T1219]"],
 ["teamviewer.exe","powershell.exe",2,"TeamViewer \u2192 PS \u2014 TeamViewer \u2192 PS exec [T1219]"],
+["teamviewer_service.exe","cmd.exe",2,"TeamViewer service \u2192 cmd \u2014 remote tool abuse [T1219]"],
+["teamviewer_service.exe","powershell.exe",2,"TeamViewer service \u2192 PS \u2014 remote tool abuse [T1219]"],
 ["screenconnect.clientservice.exe","cmd.exe",2,"ScreenConnect \u2192 cmd \u2014 RAT abuse (ransomware) [T1219]"],
 ["screenconnect.clientservice.exe","powershell.exe",2,"ScreenConnect \u2192 PS \u2014 ScreenConnect \u2192 PS exec [T1219]"],
 ["screenconnect.windowsclient.exe","cmd.exe",2,"SCClient \u2192 cmd \u2014 SCClient \u2192 cmd exec [T1219]"],
+["screenconnect.windowsclient.exe","powershell.exe",2,"SCClient \u2192 PS \u2014 SCClient \u2192 PS exec [T1219]"],
 ["ateraagent.exe","cmd.exe",2,"Atera \u2192 cmd \u2014 RMM abuse [T1219]"],
 ["ateraagent.exe","powershell.exe",2,"Atera \u2192 PS \u2014 Atera RMM \u2192 PS exec [T1219]"],
 ["splashtop.exe","cmd.exe",2,"Splashtop \u2192 cmd \u2014 Splashtop \u2192 cmd exec [T1219]"],
@@ -367,17 +370,27 @@ for (const [p, c, sev, desc] of CHAIN_RULES) {
 }
 
 // Standalone detection patterns — command-line, path, and process-name based (not parent→child)
-export const SUS_PATHS = /(\\temp\\|\\tmp\\|\\appdata\\|\\downloads\\|\\public\\|\\recycle|\\perflogs\\|\\videos\\|\\music\\|\\pictures\\)/i;
+export const SUS_PATHS = /(\\temp\\|\\tmp\\|\\appdata\\|\\downloads\\|\\public\\|\\recycle|\\perflogs\\)/i;
 // Known-safe Windows processes that legitimately run from \Temp, \AppData, etc.
 export const SAFE_PROCS = /^(mpcmdrun|msmpeng|dismhost|monagentcore|monagenthost|monagentmanager|monagentlauncher|metricsextension\.native|cleanmgr|tiworker|wuauclt|setup|msiexec|drvinst|trustedinstaller|taskhostw|backgroundtaskhost|runtimebroker|searchprotocolhost|searchindexer|searchfilterhost|microsoftedgeupdate|googleupdate|onedrive|onedriveupdater|wermgr|werfault|compattelrunner)(\.exe)?$/i;
 export const ENCODED_PS = /\s+(-e\s|-enc\s|-encodedcommand\s|-en\s|-ec\s)/i;
-export const CRED_DUMP_CMD = /(comsvcs\.dll|sekurlsa|lsadump|procdump.*lsass|mimikatz|pypykatz|nanodump)/i;
+export const CRED_DUMP_CMD = /(comsvcs\.dll|sekurlsa|lsadump|procdump.*lsass|mimikatz|pypykatz|nanodump|dcsync|drsuapi)/i;
 export const NTDS_EXTRACT = /(ntdsutil.*ifm|wbadmin.*ntds|secretsdump|ntds\.dit)/i;
 export const LSASS_TOOLS = /^(processhacker|procdump|sqldumper|avdump|handlekatz)(\.exe)?$/i;
 export const ACCOUNT_MANIP = /net\s+(user|group|localgroup)\s+.*(\/add|\/domain\s+\/add)/i;
 export const DEFENSE_EVASION = /(vssadmin.*delete|wevtutil\s+cl|bcdedit.*safeboot|bcdedit.*recoveryenabled)/i;
 export const NETWORK_SCANNERS = /^(netscan|netscan64|advanced_ip_scanner|rustscan|masscan|angry_ip_scanner|nbtscan)(\.exe)?$/i;
 export const AD_RECON_TOOLS = /^(adfind|sharphound|bloodhound|sharpview|seatbelt|rubeus|certify|certipy)(\.exe)?$/i;
-export const RMM_TOOLS = /^(anydesk|splashtop|rustdesk|atera|screenconnect|teamviewer|supremo)(\.exe)?$/i;
-export const EXFIL_TOOLS = /^(rclone|filezilla|winscp|megasync|megacmd)(\.exe)?$/i;
-export const ARCHIVE_SUSPECT = /\b(7z|7za|winrar|rar)\b.*(-p| a .*\.(7z|zip|rar))/i;
+// RMM_TOOLS / EXFIL_TOOLS / TUNNEL_TOOLS are derived from the canonical alias
+// table (Finding #5). Adding a new tool variant means editing one place — the
+// previous hand-maintained regexes drifted from chain rules and the PI allowlist
+// and silently missed names like screenconnect.clientservice.exe and ateraagent.exe.
+import { buildCategoryRegex } from "./detection-rules/tool-aliases.js";
+export { TOOL_ENTRIES, TOOL_BY_ALIAS, lookupTool, _toolAliasKey } from "./detection-rules/tool-aliases.js";
+export const RMM_TOOLS = buildCategoryRegex("rmm");
+export const EXFIL_TOOLS = buildCategoryRegex("exfil");
+export const TUNNEL_TOOLS = buildCategoryRegex("tunnel");
+// Password-protected archive creation is the strong exfil-staging signal. The bare
+// "create an archive" verb (7z a out.7z files) alone is everyday backup/packaging and
+// floods FPs, so it no longer fires — only an explicit password flag (-p / -hp) does.
+export const ARCHIVE_SUSPECT = /\b(7z|7za|winrar|rar)\b.*\s-h?p\S*/i;

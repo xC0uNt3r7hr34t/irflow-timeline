@@ -10,13 +10,23 @@ Get up and running with your first timeline analysis in under a minute.
 
 There are three ways to open a file:
 
-1. **Menu:** File > Open (`Cmd+O`)
+1. **Menu:** File → Open (`Cmd+O`)
 2. **Drag and drop:** Drag a file onto the application window
 3. **Double-click:** Double-click a supported file in Finder
 
 IRFlow Timeline will automatically detect the file format and begin streaming the import.
 
+## Capability Launcher
+
+When no timeline tab is active, the home view shows **capability cards** — shortcuts into the main investigation workflows without hunting through menus first.
+
+![Capability launcher with cards for Process Inspector, Lateral Movement, Persistence, Sigma, Collect AI Artifacts, Master File Table, USN Journal, and Open & Explore](/dfir-tips/Home-Capability-Launcher-v107.png)
+
+Each card opens the relevant analyzer or file dialog. Cards that need an imported tab (for example Process Inspector or IOC Matching) guide you to load data first; **Sigma · Hayabusa** and **Open & Explore** work immediately.
+
 ## Import Progress
+
+![Import progress bar showing rows imported, file name, and streaming status while a large timeline loads](/dfir-tips/QuickStart-Import-Progress.png)
 
 During import you will see:
 
@@ -85,10 +95,26 @@ Click the **histogram toggle** button in the toolbar to open the timeline visual
 - Click and drag to brush-select a time range — the grid filters automatically
 - Color-coded by artifact source when using merged timelines
 
+## Run a Detection Scan
+
+Open the **Tools** menu to run analysis. Tools are grouped into four sections — **Analysis** (timeline-wide analytics and **AI Artifacts**), **Detection** (Sigma Scan and **AI Secret Hunt** on AI history tabs), **Platforms** (OS-specific forensics), and **Export** (HTML report and AI history packages).
+
+![Tools → Analysis → AI Artifacts with Collect AI Artifacts and the AI Apps submenu for per-tool imports](/dfir-tips/Tools-Menu-AI-Artifacts.png)
+
+![Tools → Detection with Sigma Scan and AI Secret Hunt (enabled on an AI Query History tab)](/dfir-tips/Tools-Menu-Detection-AI-Secret-Hunt.png)
+
+Under **Platforms → Windows** you will find Process Inspector, Lateral Movement Tracker, Persistence Analyzer, RDP Bitmap Cache, and nested **Master File Table** / **USN Journal** menus for raw NTFS artifacts. Linux, macOS, and Cloud groups list upcoming analyzers as placeholders.
+
+For AI-assisted activity, use **Tools → Analysis → AI Artifacts → Collect AI Artifacts** to merge local assistant stores into one tab, or open a single app under **AI Apps**. After import, run **Tools → Detection → AI Secret Hunt** on that tab. See [AI Query History](/dfir-tips/ai-query-history).
+
+For a fast first pass on event logs, choose **Tools → Detection → Sigma Scan**. Point it at a folder of raw `.evtx` files (bundled Hayabusa engine) or at your current timeline tab (in-app JS Sigma engine), pick the **Fast high-confidence only** preset, and run — findings open in a MITRE ATT&CK-mapped triage dashboard. See [Sigma Detection](/features/sigma-detection) for the full workflow.
+
 ## Next Steps
 
 - Learn about all [search modes and filters](/features/search-filtering)
 - Set up [color rules](/features/color-rules) for visual pattern matching
-- Explore the [Process Inspector](/features/process-tree) for Sysmon analysis
+- Run rule-based detection with [Sigma Detection](/features/sigma-detection)
+- Explore the [Process Inspector](/features/process-tree) for Sysmon analysis (Story / Graph / Rules health / Filter Grid)
+- Open a full KAPE folder with **File → Open Triage Collection…** ([KAPE workflow](/workflows/kape-integration#open-triage-collection))
 - Track lateral movement with the [Lateral Movement Tracker](/features/lateral-movement)
 - Configure [KAPE integration](/workflows/kape-integration) for auto-detection

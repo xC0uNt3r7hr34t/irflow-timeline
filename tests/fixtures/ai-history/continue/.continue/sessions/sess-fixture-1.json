@@ -1,0 +1,19 @@
+{
+  "sessionId": "sess-fixture-1",
+  "title": "Fixture chat",
+  "workspaceDirectory": "/tmp/demo-project",
+  "history": [
+    {
+      "message": {
+        "role": "user",
+        "content": "How do I list processes on Linux?"
+      }
+    },
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Use `ps aux` or `top` for a live view."
+      }
+    }
+  ]
+}

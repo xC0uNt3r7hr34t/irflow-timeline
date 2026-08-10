@@ -49,6 +49,8 @@ Each tab maintains its own:
 
 Use **Cmd+Shift+F** to search across all open tabs simultaneously:
 
+![Cross-Tab Search modal listing each open tab with match counts and a button to jump to hits](/dfir-tips/Cross-Tab-Search.png)
+
 1. Enter your search term
 2. Results show the match count per tab
 3. Click a result to jump to that tab with the search applied
@@ -62,11 +64,12 @@ This is useful for answering questions like:
 A common workflow for multi-source investigations:
 
 1. **Open all sources** — Security EVTX, Sysmon EVTX, MFTECmd CSV, etc.
-2. **Cross-tab search** — find a suspicious indicator across all sources
-3. **Correlate timestamps** — check the same time window in each source
-4. **Bookmark consistently** — star related events in each tab
-5. **Tag with categories** — use the same tags across tabs for consistency
-6. **Merge tabs** — combine into a unified timeline for the final report
+2. **Cross-tab search** — find a suspicious indicator across all sources (see screenshot in [Search & Filtering](/features/search-filtering#cross-tab-search))
+3. **Multi-source Lateral Movement** — run the [Lateral Movement Tracker](/features/lateral-movement#multi-source-correlation) across selected tabs without merging first
+4. **Correlate timestamps** — check the same time window in each source
+5. **Bookmark consistently** — star related events in each tab
+6. **Tag with categories** — use the same tags across tabs for consistency
+7. **Merge tabs** — combine into a unified timeline for the final report
 
 ## Tips
 

@@ -10,7 +10,7 @@ Stacking provides frequency analysis of unique values in any column, presented a
 
 ## Opening Stacking
 
-- **Menu:** Tools > Stack Values
+- **Menu:** **Tools → Analysis → Stack Values**
 - Or `Cmd+Click` a column header and select **Stack this column**
 
 ## How It Works

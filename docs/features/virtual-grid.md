@@ -17,6 +17,7 @@ The menu bar provides access to all application features through five dropdown m
 | Item | Shortcut | Description |
 |------|----------|-------------|
 | **Open** | `⌘O` | Open a file via the system dialog |
+| **Open Triage Collection…** | | Point at a KAPE / triage folder: inventory artifacts, import selected EVTX (and other ingestible kinds) as tabs, optional Lateral Movement or Sigma handoff — see [KAPE Integration](/workflows/kape-integration#open-triage-collection) |
 | **Export** | `⌘E` | Export filtered data as CSV, TSV, XLSX, or XLS |
 | **Save Session** | `⌘S` | Save all tabs, filters, bookmarks, tags, and color rules to a `.tle` file |
 | **Load Session** | `⇧⌘O` | Restore a previously saved session |
@@ -41,48 +42,96 @@ The menu bar provides access to all application features through five dropdown m
 | Item | Description |
 |------|-------------|
 | **Show Flagged Only** | Toggle between all rows and bookmarked-only view |
-| **Select All** | Select all rows (checkbox) |
+| **Select All** | Select all rows (checkbox); also available from the selection bar |
 | **Deselect All** | Clear checkbox selection |
 | **Invert Selection** | Toggle the selection state of every row |
 | **Copy Selected Rows** | Copy selected rows as tab-separated text to clipboard |
 | **Export Selected Rows** | Export selected rows as CSV via save dialog |
 | **IOC Matching** | Scan timeline data for Indicators of Compromise |
 | **Bulk Tag / Bookmark** | Apply tags or bookmarks to rows by time range |
-| **Pivot ±N Minutes** | Filter to a time window around the selected row |
+| **Pivot ±N Minutes** | Filter to a time window around the selected row (requires a selected row with a timestamp column) |
 | **Find Duplicates** | Identify repeated values in any column |
+
+![Proximity pivot dialog to filter the grid to a time window around a selected row](/dfir-tips/Proximity-pivot.png)
+
+Select a row, then choose **Actions → Pivot ±N Minutes** to open the proximity dialog. Pick a window (for example ±5 or ±15 minutes) and apply — a **Proximity** chip appears in the toolbar showing the active window around your pivot timestamp.
 
 ### Tools
 
-| Item | Description |
-|------|-------------|
-| **Stack Values** | Frequency analysis of unique values in any column |
-| **Gap Analysis** | Detect periods of unusual inactivity in the timeline |
-| **Log Sources** | Gantt-style heatmap of log source coverage across time |
-| **Burst Detection** | Identify abnormal spikes in event volume |
-| **Process Inspector** | Parent-child process hierarchy with MITRE ATT&CK detection |
-| **Lateral Movement Tracker** | Network graph of host-to-host logon activity with attack pattern detection |
-| **Persistence Analyzer** | Automated detection of 30+ persistence techniques with risk scoring |
-| **NTFS Analysis** | Ransomware analysis, timestomping detection, ADS analyzer, USN Journal analysis, file activity heatmap, resident data extraction (available when MFT/$J data is loaded) |
-| **Generate Report** | Create an HTML investigation report from bookmarks and tags |
+The **Tools** menu is organized into four sections so timeline-wide analytics stay separate from platform-specific forensics as IRFlow scales beyond Windows.
+
+![Tools → Analysis → AI Artifacts with Collect AI Artifacts and the AI Apps submenu](/dfir-tips/Tools-Menu-AI-Artifacts.png)
+
+#### Analysis
+
+Timeline-wide analytics that work on any imported tab (CSV, EVTX, XLSX, Plaso, etc.):
+
+| Menu path | Description |
+|-----------|-------------|
+| **Tools → Analysis → Stack Values** | Frequency analysis of unique values in any column |
+| **Tools → Analysis → Gap Analysis** | Detect periods of unusual inactivity in the timeline |
+| **Tools → Analysis → Log Sources** | Gantt-style heatmap of log source coverage across time |
+| **Tools → Analysis → Burst Detection** | Identify abnormal spikes in event volume |
+| **Tools → Analysis → AI Artifacts → Collect AI Artifacts** | Discover and merge local AI assistant stores (this Mac or a KAPE/triage folder) into one **AI Query History** tab |
+| **Tools → Analysis → AI Artifacts → AI Apps → …** | Per-app import for Claude Code, Codex, Grok Build, ChatGPT Desktop, Gemini CLI, Cursor, Copilot, Windsurf, and Continue |
+
+#### Detection
+
+![Tools → Detection with Sigma Scan and AI Secret Hunt](/dfir-tips/Tools-Menu-Detection-AI-Secret-Hunt.png)
+
+| Menu path | Description |
+|-----------|-------------|
+| **Tools → Detection → Sigma Scan** | Dual-engine Sigma detection — Hayabusa over raw EVTX folders or the in-app JS engine on imported timelines |
+| **Tools → Detection → AI Secret Hunt** | Scan an **AI Query History** tab for exposed API keys, tokens, private keys, and PII (redacted-by-default findings) |
+
+#### Platforms
+
+Platform-specific analyzers live under **Windows** (active today). A single collapsed **Coming soon** group lists planned Linux, macOS, and cloud analyzers.
+
+**Windows** includes:
+
+| Menu path | Description |
+|-----------|-------------|
+| **Tools → Platforms → Windows → Process Inspector** | Parent-child process trees, Story/Graph/Raw views, rule health, Filter Grid pivots — see [Process Inspector](/features/process-tree) |
+| **Tools → Platforms → Windows → Lateral Movement Tracker** | Network graph of host-to-host logon activity with multi-source correlation |
+| **Tools → Platforms → Windows → Persistence Analyzer** | EVTX + registry persistence rules; multi-source and KAPE collection modes |
+| **Tools → Platforms → Windows → RDP Bitmap Cache** | Recover bitmap tiles from RDP cache artifacts (`bmc-tools`) |
+| **Tools → Platforms → Windows → Master File Table → …** | Ransomware analysis, timestomping, file activity heatmap, ADS analyzer, extract resident data — requires a raw `$MFT` tab |
+| **Tools → Platforms → Windows → USN Journal → USN Journal Analysis** | USN Journal analysis with UsnJrnl Rewind path reconstruction — requires a raw `$J` tab |
+
+See [NTFS Analysis](/features/ntfs-analysis) for the MFT and USN Journal tools.
+
+#### Export
+
+| Menu path | Description |
+|-----------|-------------|
+| **Tools → Export → Generate Report** | Create an HTML investigation report from bookmarks and tags (also **File → Generate Report…** on the macOS menu bar, `Cmd+Shift+R`) |
 
 ### Help
 
 | Item | Shortcut | Description |
 |------|----------|-------------|
+| **Command Palette** | `⌘K` | Searchable list of File / View / Actions / Tools / Help commands |
 | **Quick Help** | | In-app guide covering supported formats, search modes, and shortcuts |
 | **Keyboard Shortcuts** | `⌘/` | Reference card of all keyboard shortcuts |
 | **Check for Updates** | | Check for new versions and install updates |
 | **Website** | | Open the IRFlow Timeline documentation site |
 | **About IRFlow Timeline** | | Version info, author, and social links |
 
+### Selection bar
+
+When one or more rows are checked, a compact **selection bar** appears above the grid with the selection count, copy, bulk tag/bookmark, and clear actions — so multi-row ops stay one click away without opening the Actions menu.
+
 ### Toolbar Controls
 
-In addition to the menu bar, the toolbar contains:
+To the right of the menu capsule, the **settings toolbar** mirrors common [Preferences](/reference/preferences):
 
-- **Date/time format** selector and **timezone** selector
-- **Theme toggle** (dark/light)
-- **Font size** controls (decrease/increase)
-- **Histogram toggle** — show or hide the timeline histogram visualization
+- **Datetime format** and **timezone** dropdowns (same options as macOS **Tools** menu)
+- **Theme toggle** — **☀ / 🌙** button (dark/light); also available as **Tools → Theme** on the macOS menu bar
+- **Font size** — **− / +** with live px readout; **Cmd+Plus** / **Cmd+-** via macOS **Tools → Font Size**
+- **Histogram** — bar-chart icon toggles the timeline panel (also **Tools → Toggle Histogram** on the macOS menu bar)
+
+Temp storage for large imports is configured only on the macOS menu bar: **Tools → Set Temp Storage Folder…** (see [Performance Tips](/reference/performance-tips#temp-storage-folder)).
 
 ## How It Works
 
@@ -260,7 +309,7 @@ Right-click any cell to open the full context menu:
 
 ## Find Duplicates
 
-Open **Actions > Find Duplicates** to find repeated values in any column. Select a column from the dropdown and click "Find Duplicates" to scan for values that appear more than once. Results show the duplicate value and occurrence count (capped at 100 displayed). Click "Filter to Duplicates" to apply a checkbox filter on the selected column showing only rows with duplicate values.
+Open **Actions → Find Duplicates** to find repeated values in any column. Select a column from the dropdown and click "Find Duplicates" to scan for values that appear more than once. Results show the duplicate value and occurrence count (capped at 100 displayed). Click "Filter to Duplicates" to apply a checkbox filter on the selected column showing only rows with duplicate values.
 
 ## Bookmarks and Tags
 

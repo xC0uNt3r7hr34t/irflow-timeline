@@ -1,14 +1,27 @@
+---
+description: In-app macOS updates with electron-updater — automatic checks, manual Check for Updates, and one-click install on restart.
+---
+
 # Auto Update
 
 IRFlow Timeline now supports in-app macOS updates with `electron-updater`.
 
-Current user flow:
+## User flow
 
 - First install still happens from the DMG
 - Packaged builds check for updates automatically a few seconds after launch
-- Users can also trigger `Help -> Check for Updates...`
-  Manual checks now use an in-app status popup that shows check/download progress and a restart prompt when the update is ready
+- Users can also trigger **Help → Check for Updates…** from the in-app menu bar
 - Downloaded updates install on restart
+
+### Check for Updates
+
+The manual check lives under **Help** in the menu bar:
+
+![Help menu showing Check for Updates… alongside Quick Help, Keyboard Shortcuts, and About](/dfir-tips/Check-For-Updates-Button.png)
+
+Selecting **Check for Updates…** opens an in-app status popup that reports whether you are up to date, shows download progress when an update is available, and prompts you to restart when the package is ready to install.
+
+![Check for Updates result dialog showing update status after a manual check](/dfir-tips/Check-For-Updates.png)
 
 ## Generic HTTPS Feed
 
@@ -54,13 +67,14 @@ For each macOS release, upload these files to the HTTPS/CDN path referenced by `
 
 - The `.zip` artifact
 - The `.dmg` artifact
+- The matching `.zip.blockmap` and `.dmg.blockmap` artifacts
 - `latest-mac.yml` for the default channel, or `<channel>-mac.yml` for a custom channel
 
 Requirements:
 
 - The app must be signed and notarized
 - The hosted files must be reachable over HTTPS
-- The `.zip` and `latest-mac.yml` must stay together at the same feed root
+- The `.zip`, its exact `.zip.blockmap`, and `latest-mac.yml` must stay together at the same feed root for differential updates
 
 ## Release Automation
 
@@ -133,5 +147,5 @@ updaterCacheDirName: irflow-timeline-updater
 Then run a packaged build against a real hosted feed and verify:
 
 - Startup update detection
-- Manual `Help -> Check for Updates...`
+- Manual **Help → Check for Updates…** (see screenshots above)
 - Popup progress during download and restart install prompt

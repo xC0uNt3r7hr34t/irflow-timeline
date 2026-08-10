@@ -1,32 +1,41 @@
 ---
-description: Persistence Analyzer — detect 30+ Windows persistence techniques with automated risk scoring and MITRE ATT&CK mapping.
+description: Persistence Analyzer — 36 EVTX and 33 registry detection rules with automated risk scoring and MITRE ATT&CK mapping.
 ---
 
 # Persistence Analyzer
 
-The Persistence Analyzer automatically scans your timeline data for Windows persistence mechanisms, scoring each finding by risk level and organizing results by category. It supports both EVTX event logs and registry exports, detecting over 30 distinct persistence techniques across services, scheduled tasks, WMI subscriptions, registry autorun keys, and more.
+The Persistence Analyzer automatically scans your timeline data for Windows persistence mechanisms, scoring each finding by risk level and organizing results by category. It supports both EVTX event logs and registry exports (RECmd CSV and similar), with **69 built-in rule definitions** — **36 EVTX event-log rules** and **33 registry key-family rules** — across services, scheduled tasks, WMI subscriptions, autorun keys, and related locations.
 
 ![Persistence Analyzer showing 8648 findings in Timeline view with severity scores, service installations, and category filtering](/dfir-tips/Persistence-Analyzer.png)
 
 ## Opening the Persistence Analyzer
 
-- **Menu:** Tools > Persistence Analyzer
+- **Menu:** **Tools → Platforms → Windows → Persistence Analyzer**
 
 ## Data Source Modes
 
-The analyzer supports three input modes, selectable in the configuration panel:
+The analyzer supports tab-level modes plus multi-source and whole-collection scans:
 
 | Mode | Input Data | Best For |
 |------|-----------|----------|
-| **Auto-detect** | Analyzes column names to determine type | Quick start -- let the tool decide |
+| **Auto-detect** | Analyzes column names to determine type | Quick start — let the tool decide |
 | **EVTX Logs** | EvtxECmd CSV or parsed EVTX output | Event-based persistence (services, tasks, WMI) |
 | **Registry Export** | RECmd or other registry CSV output | Registry-based persistence (Run keys, COM hijacks, LSA) |
+| **Multi-source** | Several open tabs in one run | Correlate EVTX + registry (or multiple hosts) without re-import |
+| **Analyze KAPE Collection** | A KAPE output **folder** | Folder-level EVTX + registry discovery, incident clustering, and unread-artifact warnings |
 
 In auto-detect mode, the analyzer examines your column headers to determine whether the data contains event log fields (`EventId`, `Channel`, `Provider`) or registry fields (`KeyPath`, `ValueName`, `ValueData`).
 
+### Multi-source and KAPE collection
+
+- **Multi-source** — enable in the config panel and select other open tabs to merge. Formats are detected per tab so service-install events and RECmd rows can cluster into the same incident when they describe the same host/key.
+- **Analyze KAPE Collection** — browse to a collection root; IRFlow scans for supported EVTX and registry exports, runs the matching rule packs, clusters findings into **incidents**, and reports coverage gaps (for example EVTX files present but not read). Prefer this when the evidence is still a folder rather than a single imported CSV.
+
+Handoffs from the [Process Inspector](/features/process-tree) detail panel (**Persistence**) open this analyzer with host + time context already applied.
+
 ## EVTX Detection Rules
 
-When analyzing event logs, the Persistence Analyzer scans for 27 indicator types across multiple log channels:
+When analyzing event logs, the Persistence Analyzer applies **36 EVTX rule definitions** across multiple log channels:
 
 ### Services
 
@@ -87,25 +96,20 @@ When analyzing event logs, the Persistence Analyzer scans for 27 indicator types
 
 ## Registry Detection Rules
 
-When analyzing registry exports, the analyzer checks 15 persistence locations:
+When analyzing registry exports, the analyzer applies **33 registry key-family rules**. Representative families include:
 
-| Location | Registry Path | Technique |
-|----------|--------------|-----------|
-| Run / RunOnce | `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run` | Autostart execution |
-| Services | `HKLM\SYSTEM\CurrentControlSet\Services\*\ImagePath` | Service DLL/binary |
-| Winlogon | `...\Winlogon\Shell`, `Userinit`, `Notify` | Logon persistence |
-| AppInit_DLLs | `...\Windows NT\CurrentVersion\Windows\AppInit_DLLs` | DLL injection |
-| IFEO Debugger | `...\Image File Execution Options\*\Debugger` | Debugger hijack |
-| COM Hijacking | `...\Classes\CLSID\*\InprocServer32`, `LocalServer32` | COM object redirect |
-| Shell Extensions | `...\ShellIconOverlayIdentifiers`, `ShellExtensions` | Explorer persistence |
-| BootExecute | `...\Session Manager\BootExecute` | Pre-logon execution |
-| BHO | `...\Browser Helper Objects` | Browser persistence |
-| LSA Packages | `...\LSA\Security Packages`, `Authentication Packages` | Security provider |
-| Print Monitors | `...\Print\Monitors\*\Driver` | Spoolsv persistence |
-| Active Setup | `...\Active Setup\Installed Components\*\StubPath` | Per-user execution |
-| Startup Folder | `...\Explorer\User Shell Folders\Startup` | Startup redirect |
-| Scheduled Tasks | `...\Schedule\TaskCache\Tasks` | Task registry entries |
-| Network Providers | `...\NetworkProvider\Order` | Network logon persistence |
+| Family | Examples | Technique |
+|--------|----------|-----------|
+| Run / RunOnce | `...\CurrentVersion\Run`, `RunOnce`, `Policies\Explorer\Run` | Autostart execution |
+| Services | `...\Services\*\ImagePath`, `ServiceDll` | Service DLL/binary |
+| Winlogon / LSA | `Shell`, `Userinit`, `Notify`, Security/Authentication packages | Logon / credential interception |
+| IFEO / AppInit / AppCert | Debugger hijack, `AppInit_DLLs`, `AppCertDlls` | DLL injection / API hooking |
+| COM / Shell / BHO | `InprocServer32`, shell handlers, Browser Helper Objects | COM / Explorer persistence |
+| Boot / Session Manager | `BootExecute`, `SetupExecute` | Pre-logon execution |
+| Tasks / GPO / Network | `TaskCache`, Group Policy scripts, `NetworkProvider\Order` | Scheduled / logon scripts |
+| Defender tampering | Exclusions, real-time protection disabled | AV weakening (T1562.001) |
+
+Additional rules cover screensaver hijack, Office add-ins, time providers, terminal-server `InitialProgram`, file-association hijacks, environment/COR_PROFILER abuse, and related DFIR-relevant paths. Each built-in registry rule can be toggled in the Detection Rules panel.
 
 ## Custom Rules Editor
 

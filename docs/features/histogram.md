@@ -10,7 +10,8 @@ The histogram provides a visual timeline of event distribution, helping you iden
 
 ## Opening the Histogram
 
-- Click the **Histogram** button in the main toolbar
+- Click the **Histogram** button in the main toolbar (bar-chart icon)
+- **macOS menu bar:** **Tools → Toggle Histogram**
 - The histogram panel appears above the data grid and can be resized by dragging its bottom edge (80px–500px range, default 160px)
 
 ## Granularity

@@ -75,9 +75,26 @@ Analytics tools run against the currently filtered dataset. Applying date range 
 
 ### Tips for Faster Import
 
+- **Restart IRFlow** before importing multi-GB files if the app has been open for hours — a high main-process memory footprint before import is a common crash trigger
 - **Close unused tabs** before importing large files to free memory
+- **Wait for "indexes ready"** before opening column filter dropdowns on files over 5 GB (filter value lists may be sampled until indexes finish). Large imports index timestamps plus EventID/Channel for Sigma pre-filters, not every column.
 - **Use CSV over XLSX** for very large datasets — CSV streaming is faster than Excel parsing
 - **Pre-filter with external tools** if you only need a subset of the data
+
+Files over **5 GB** skip the trigram FTS index (search uses LIKE). You need roughly **2–3× the file size** of free space on your temp volume for the SQLite database and indexes.
+
+## AI History Performance
+
+**Collect AI Artifacts** and large folder imports run in a worker thread so the UI stays responsive.
+
+| Tip | Why |
+|-----|-----|
+| **Main sessions only** on first pass | Skips `subagents/` and sidechain rows — much faster on hosts with 80k+ JSONL lines |
+| **Browse folder scope** | Point at the KAPE/triage root so discovery does not also read unrelated local Mac paths |
+| **Filter before export** | **Export AI History Package** respects active filters — narrow to tagged secret findings or a date window before writing the CSV |
+| **Scroll large AI tabs** | AI Query History tabs with 100k+ rows use the same virtual scroll window as EVTX timelines; avoid keeping many huge AI tabs open at once |
+
+Merged AI timelines stop at **3,000,000** rows and report truncation in the import notice. Malformed JSONL lines are skipped and counted so you know when a source may be incomplete.
 
 ## Search Performance
 
@@ -158,21 +175,49 @@ SQLite pragmas are tuned per-phase for maximum throughput:
 | **Cache size** | 256 MB | Query cache |
 | **MMAP size** | 512 MB | Memory-mapped reads |
 
-### Temporary Files
+### Temp storage folder
 
-Each tab creates a temporary SQLite database file. These are stored in the system temp directory and cleaned up when the tab is closed or the app exits.
+Each tab creates a temporary SQLite database plus column indexes and (after import) an FTS5 index. By default these files live under the macOS system temp directory. For large cases, point temp storage at an external or scratch volume so imports do not fill your boot disk.
 
-For large datasets, ensure you have sufficient disk space:
+**macOS menu bar → Tools → Set Temp Storage Folder…**
 
-| Dataset Size | Approximate DB Size |
-|-------------|-------------------|
-| 1 GB CSV | ~1.5 GB SQLite DB |
-| 10 GB CSV | ~15 GB SQLite DB |
-| 30 GB+ CSV | ~45 GB+ SQLite DB |
+- Applies to **new imports only** (existing tabs keep their current database path)
+- **Tools → Use Default Temp Folder** clears a custom path
+- The read-only **Temp Storage:** label shows the active setting
+
+IRFlow estimates required free space before import (roughly a few times the source file size) and blocks the import with a clear error if the temp volume is too full.
+
+See [Preferences — Temp storage folder](/reference/preferences#temp-storage-folder) for full details and the optional `TLE_TEMP_DIR` environment variable.
+
+#### Approximate on-disk size per tab
+
+| Dataset Size | Approximate DB + indexes |
+|-------------|-------------------------|
+| 1 GB CSV | ~1.5 GB |
+| 10 GB CSV | ~15 GB |
+| 30 GB+ CSV | ~45 GB+ |
+
+Temp databases are removed when you close the tab or quit the app.
 
 ### Search Result Caching
 
 The 4 most recent search queries per tab are cached in memory. This provides instant results when toggling between searches or switching tabs.
+
+## JS Sigma scan (imported tab / EvtxECmd CSV)
+
+The in-app **JS Sigma** engine scans rows already loaded into SQLite. On multi-million-row timelines it is CPU-heavy because each candidate row is checked against every rule in its logsource group.
+
+### Faster JS scans
+
+1. **Use the “Fast high-confidence only” preset** — fewer rules (`core` set, critical/high, stable/test) cuts evaluation time sharply versus “Full hunt” (~3,800+ rules).
+2. **Wait for indexes ready** — large imports now build **EventID** and **Channel** indexes (with timestamps) so logsource SQL pre-filters use indexes instead of full table scans.
+3. **Prefer Hayabusa on raw EVTX** when you have `.evtx` folders — the bundled Hayabusa binary is optimized for EVTX and usually beats re-scanning a giant EvtxECmd CSV inside the app.
+4. **Narrow the timeline first** — apply a date range filter on the tab before scanning so fewer rows match broad channel queries.
+5. **First scan after import** — if EventID/Channel indexes were not built at import time, the scan may spend a few minutes building them once; later scans on the same tab are faster.
+
+::: warning
+An 8 GB EvtxECmd CSV (~6M rows) with **all** severity levels and **all** rules can take a long time even after these optimizations. Treat full-rule JS scans as batch jobs; use presets or Hayabusa for interactive triage.
+:::
 
 ## Recommendations for Large Investigations
 
@@ -190,4 +235,4 @@ The 4 most recent search queries per tab are cached in memory. This provides ins
 | **RAM** | 8 GB | 16-32 GB |
 | **Storage** | SSD (any) | NVMe SSD |
 | **CPU** | Any 64-bit | Apple Silicon (M1+) |
-| **Free disk** | 2x largest file | 3x total evidence size |
+| **Free disk** | 2x largest file on temp volume | 3x total evidence size (use **Set Temp Storage Folder…** if needed) |

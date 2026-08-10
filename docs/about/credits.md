@@ -21,6 +21,7 @@ IRFlow Timeline is built on the shoulders of incredible open source projects and
 | **Vite** | Build tooling and hot-reload | [vitejs/vite](https://github.com/vitejs/vite) |
 | **VitePress** | Documentation site | [vuejs/vitepress](https://github.com/vuejs/vitepress) |
 | **electron-builder** | macOS DMG packaging | [electron-userland/electron-builder](https://github.com/electron-userland/electron-builder) |
+| **bmc-tools** | RDP Bitmap Cache recovery | [ANSSI-FR/bmc-tools](https://github.com/ANSSI-FR/bmc-tools) |
 
 ## Inspiration
 
@@ -28,6 +29,7 @@ IRFlow Timeline is built on the shoulders of incredible open source projects and
 - [KAPE](https://www.kroll.com/en/services/cyber-risk/incident-response-litigation-support/kroll-artifact-parser-extractor-kape) by Eric Zimmerman — artifact collection and parsing framework
 - [Plaso / log2timeline](https://plaso.readthedocs.io/) — forensic timeline generation framework
 - [Hayabusa](https://github.com/Yamato-Security/hayabusa) — Windows event log analysis tool
+- [bmc-tools](https://github.com/ANSSI-FR/bmc-tools) — RDP Bitmap Cache parser by ANSSI-FR
 - [Chainsaw](https://github.com/WithSecureLabs/chainsaw) — Windows event log detection tool
 
 ## DFIR Community

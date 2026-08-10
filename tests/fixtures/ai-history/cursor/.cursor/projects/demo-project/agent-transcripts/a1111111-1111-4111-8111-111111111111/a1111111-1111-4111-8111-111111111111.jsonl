@@ -1,0 +1,2 @@
+{"role":"user","message":{"content":[{"type":"text","text":"<user_query>\nExplain this function\n</user_query>"}]}}
+{"role":"assistant","message":{"content":[{"type":"text","text":"It sorts the array in place."},{"type":"tool_use","name":"Read","input":{"path":"foo.js"}},{"type":"tool_use","name":"Shell","input":{"command":"node --test tests/sort.test.js","working_directory":"/tmp/demo-project","description":"Run the sort tests"}}]}}

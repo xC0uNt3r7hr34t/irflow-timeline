@@ -12,6 +12,7 @@
     "bundle:hayabusa": "bash scripts/bundle-hayabusa.sh",
     "bundle:bmc-tools": "bash scripts/bundle-bmc-tools.sh",
     "bundle:tools": "npm run bundle:hayabusa && npm run bundle:bmc-tools",
+    "fix:scripts": "node scripts/fix-line-endings.cjs",
     "dist": "npm run bundle:tools && npm run build:renderer && electron-builder --config electron-builder.config.cjs --mac",
     "dist:release": "npm run dist",
     "dist:smoke": "npm run bundle:tools && npm run build:renderer && SKIP_NOTARIZE=1 CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --config electron-builder.config.cjs --mac",

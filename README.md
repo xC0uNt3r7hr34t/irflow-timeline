@@ -97,6 +97,9 @@ Output in `release/`.
 | `NODE_MODULE_VERSION mismatch` | Wrong Node version during rebuild — switch to v20 and run `npm run rebuild` again |
 | App loads blank screen | Run `npm run build:renderer` — `vite.config.js` `base: "./"` is required |
 | Hayabusa bundle fails | Run via Git Bash: `bash scripts/bundle-hayabusa.sh` |
+| `$'\\r': command not found` or `set: pipefail: invalid option` in WSL | Windows CRLF line endings in `.sh` files. Run `npm run fix:scripts`, then retry. Also check `git config core.autocrlf` — use `input` or `false` in WSL |
+| WSL `getpwnam(yourusername) failed` | Set default user in `/etc/wsl.conf` or run `wsl -u <your-linux-username>`. Replace any placeholder `yourusername` in WSL config files |
+| WSL `Unknown key 'wsl2.pageReporting'` | Remove that line from `C:\\Users\\<you>\\.wslconfig` — not supported on your WSL version |
 
 ---
 

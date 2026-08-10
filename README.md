@@ -64,8 +64,12 @@ npm run start
 #### Package as Windows installer
 
 ```bash
-# NSIS installer + portable exe (x64)
+# NSIS installer + portable exe (x64) — same as original fork workflow
 npm run dist:win
+
+# Full build with bundled Hayabusa + bmc-tools (Sigma Scan, RDP Bitmap Cache)
+# Requires Git Bash on Windows
+npm run dist:win:full
 
 # NSIS installer only
 npm run dist:win:nsis

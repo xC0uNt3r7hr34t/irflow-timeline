@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+
 const updateBaseUrlRaw =
   process.env.IRFLOW_UPDATE_BASE_URL ||
   process.env.TLE_UPDATE_BASE_URL ||
@@ -52,7 +55,8 @@ const config = {
       },
     ],
     icon: "assets/IRFlow-Timeline-Home.png",
-    signAndEditExecutable: false,
+    // Only disable on Linux CI cross-builds; native Windows builds embed icon/metadata normally.
+    signAndEditExecutable: process.platform !== "linux",
   },
   nsis: {
     oneClick: false,
@@ -78,16 +82,20 @@ const config = {
     "assets/**/*",
   ],
   extraResources: [
-    {
-      from: "hayabusa",
-      to: "hayabusa",
-      filter: ["**/*", "!logs/**"],
-    },
-    {
-      from: "tools/bmc-tools",
-      to: "tools/bmc-tools",
-      filter: ["**/*"],
-    },
+    ...(fs.existsSync(path.join(__dirname, "hayabusa"))
+      ? [{
+          from: "hayabusa",
+          to: "hayabusa",
+          filter: ["**/*", "!logs/**"],
+        }]
+      : []),
+    ...(fs.existsSync(path.join(__dirname, "tools", "bmc-tools"))
+      ? [{
+          from: "tools/bmc-tools",
+          to: "tools/bmc-tools",
+          filter: ["**/*"],
+        }]
+      : []),
   ],
   asarUnpack: [
     "node_modules/better-sqlite3/**",

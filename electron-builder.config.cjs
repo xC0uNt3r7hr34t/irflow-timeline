@@ -52,6 +52,7 @@ const config = {
       },
     ],
     icon: "assets/IRFlow-Timeline-Home.png",
+    signAndEditExecutable: false,
   },
   nsis: {
     oneClick: false,

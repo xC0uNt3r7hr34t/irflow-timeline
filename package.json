@@ -1,7 +1,7 @@
 {
   "name": "irflow-timeline",
   "version": "1.0.9",
-  "description": "IRFlow Timeline — High-performance DFIR timeline viewer for Windows with AI Artifacts, Sigma detection, and native EVTX/$MFT/$J support.",
+  "description": "IRFlow Timeline — High-performance DFIR timeline viewer for Windows with AI Artifacts, Sigma detection, and native EVTX, MFT, and USN Journal support.",
   "main": "electron/main.js",
   "author": "DFIR Community",
   "license": "Apache-2.0",
@@ -20,6 +20,7 @@
     "dist:win": "npm run bundle:tools && npm run build:renderer && electron-builder --config electron-builder.config.cjs --win",
     "dist:win:nsis": "npm run bundle:tools && npm run build:renderer && electron-builder --config electron-builder.config.cjs --win nsis",
     "dist:win:portable": "npm run bundle:tools && npm run build:renderer && electron-builder --config electron-builder.config.cjs --win portable",
+    "dist:win:ci": "npm run build:renderer && electron-builder --config electron-builder.config.cjs --win",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
     "postinstall": "patch-package && electron-rebuild -f -w better-sqlite3",
     "docs:dev": "vitepress dev docs",

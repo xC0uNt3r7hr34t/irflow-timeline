@@ -1674,8 +1674,8 @@ export default function App() {
   }, [markRightClickHandled, openGridContextMenuFromGeometry, setCellContextMenu, setContextMenu, setRowContextMenu]);
 
   // Supported grid context-menu shortcut: Command-click on macOS (Ctrl-click elsewhere).
-  // Plain secondary-click handling is intentionally disabled after unreliable
-  // external-trackpad behavior; this path is explicit and stable.
+  // Keep this path for accessibility/trackpad parity; standard secondary-click is handled
+  // by the dedicated contextmenu listener below.
   useEffect(() => {
     const onModifiedPrimaryPointer = (e) => {
       const modifiedPrimaryClick = e.button === 0 && (e.ctrlKey || e.metaKey);
@@ -1739,6 +1739,29 @@ export default function App() {
     const eventTypes = ["pointerdown", "mousedown", "pointerup", "mouseup"];
     eventTypes.forEach((type) => document.addEventListener(type, onModifiedPrimaryPointer, true));
     return () => eventTypes.forEach((type) => document.removeEventListener(type, onModifiedPrimaryPointer, true));
+  }, [handleNativeRightClick, markRightClickHandled]);
+
+  // Standard secondary-click context menu support.
+  useEffect(() => {
+    const onSecondaryContextMenu = (e) => {
+      if (rightClickFired.current) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      markRightClickHandled();
+      const x = e.clientX;
+      const y = e.clientY;
+      const target = e.target;
+      setTimeout(() => {
+        debugRightClick("document secondary context open", { x, y });
+        handleNativeRightClick(x, y, target);
+      }, 0);
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    document.addEventListener("contextmenu", onSecondaryContextMenu, true);
+    return () => document.removeEventListener("contextmenu", onSecondaryContextMenu, true);
   }, [handleNativeRightClick, markRightClickHandled]);
 
   useEffect(() => {

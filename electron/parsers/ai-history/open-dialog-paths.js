@@ -117,8 +117,19 @@ function defaultAiHistoryOpenPath() {
 
 /** macOS open dialog filter groups (files + folders via openDirectory). */
 function aiHistoryOpenDialogFilters() {
+  const supportedExtensions = [
+    "csv", "tsv", "txt", "log",
+    "xlsx", "xls", "xlsm",
+    "evtx",
+    "plaso", "timeline",
+    "mft", "bin",
+    "json", "jsonl",
+    "data", "ldb",
+    "db", "sqlite", "sqlite3", "vscdb",
+    "yaml", "yml", "md",
+  ];
   return [
-    { name: "All Supported Files", extensions: ["*"] },
+    { name: "All Supported Files", extensions: supportedExtensions },
     { name: "CSV / TSV / Logs", extensions: ["csv", "tsv", "txt", "log"] },
     { name: "Excel", extensions: ["xlsx", "xls", "xlsm"] },
     { name: "EVTX", extensions: ["evtx"] },
@@ -133,6 +144,7 @@ function aiHistoryOpenDialogFilters() {
     { name: "GitHub Copilot (VS Code / CLI artifacts)", extensions: ["json", "jsonl", "yaml", "yml", "md", "db", "log"] },
     { name: "VS Code / Windsurf (state.vscdb)", extensions: ["vscdb", "db"] },
     { name: "Continue (.continue sessions)", extensions: ["json"] },
+    { name: "All Files", extensions: ["*"] },
   ];
 }
 

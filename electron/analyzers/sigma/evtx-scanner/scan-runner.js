@@ -109,6 +109,13 @@ function quoteArg(arg) {
   return `"${text.replace(/(["\\$`])/g, "\\$1")}"`;
 }
 
+function shouldRetryLegacyTimelineCommand(error, outputMode) {
+  if (outputMode !== "csv") return false;
+  const message = String(error?.message || "");
+  return /unexpected argument ['"]csv-timeline['"]/i.test(message)
+    || /unrecognized subcommand ['"]csv-timeline['"]/i.test(message);
+}
+
 async function scanEvtxDirectory(dirPath, db, nextTabId, options = {}, onProgress) {
   const scanStartedAt = Date.now();
   const preflight = validateEvtxScanRequest(dirPath, options);
@@ -170,7 +177,7 @@ async function scanEvtxDirectory(dirPath, db, nextTabId, options = {}, onProgres
   const command = buildScanCommand({ dirPath, options, outputPaths, warnings });
   const { args, levels } = command;
   const { tmpOutput, tmpHtmlReport, actualOutput } = outputPaths;
-  const commandLine = [hayabusaPath, ...args].map(quoteArg).join(" ");
+  let commandLine = [hayabusaPath, ...args].map(quoteArg).join(" ");
   const hayabusaStatus = getHayabusaStatus();
 
   onProgress?.({
@@ -187,10 +194,12 @@ async function scanEvtxDirectory(dirPath, db, nextTabId, options = {}, onProgres
   dbg("SIGMA-EVTX", `Executing: ${commandLine}`);
   const progressParser = createHayabusaProgressParser({ onProgress, evtxFiles, totalBytes, startTime });
   let cancelResult;
+  let finalArgs = args;
+  let retriedLegacyTimeline = false;
   try {
     cancelResult = await runScanProcess({
       hayabusaPath,
-      args,
+      args: finalArgs,
       cwd: path.dirname(hayabusaPath),
       scanJobId,
       progressParser,
@@ -198,9 +207,27 @@ async function scanEvtxDirectory(dirPath, db, nextTabId, options = {}, onProgres
       actualOutput,
     });
   } catch (err) {
-    cleanupFiles([tmpOutput, actualOutput, tmpHtmlReport]);
-    if (scanJobId) unregisterScanProc(scanJobId);
-    throw err;
+    if (!shouldRetryLegacyTimelineCommand(err, outputMode)) {
+      cleanupFiles([tmpOutput, actualOutput, tmpHtmlReport]);
+      if (scanJobId) unregisterScanProc(scanJobId);
+      throw err;
+    }
+    // Compatibility fallback for older Hayabusa builds that do not expose
+    // subcommands (they expect timeline flags directly without csv-timeline).
+    retriedLegacyTimeline = true;
+    finalArgs = args.slice(1);
+    commandLine = [hayabusaPath, ...finalArgs].map(quoteArg).join(" ");
+    warnings.push("Hayabusa compatibility mode enabled: this binary does not support the csv-timeline subcommand.");
+    dbg("SIGMA-EVTX", "Retrying Hayabusa scan in legacy timeline mode");
+    cancelResult = await runScanProcess({
+      hayabusaPath,
+      args: finalArgs,
+      cwd: path.dirname(hayabusaPath),
+      scanJobId,
+      progressParser,
+      tempFiles: [tmpOutput, actualOutput, tmpHtmlReport],
+      actualOutput,
+    });
   }
 
   if (cancelResult?.cancelled) {
@@ -368,8 +395,8 @@ async function scanEvtxDirectory(dirPath, db, nextTabId, options = {}, onProgres
       hayabusaVersion: hayabusaStatus?.version || null,
       hayabusaPath,
       commandLine,
-      commandArgs: args,
-      command: command.subcommand,
+      commandArgs: finalArgs,
+      command: retriedLegacyTimeline ? "legacy-timeline" : command.subcommand,
       outputMode: command.outputMode,
       profile: command.profile,
       minLevel: command.minLevel,

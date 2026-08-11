@@ -22,6 +22,7 @@ const { createUpdateController } = require("./updater");
 const { JobManager } = require("./jobs/job-manager");
 const { resolveTempDir } = require("./utils/temp-dir");
 const { makeImportQueueKey, isDuplicatePendingImport } = require("./utils/import-queue");
+const { isTleSessionPath, loadSessionFromPath } = require("./session-file");
 const { buildMenu: _buildMenu } = require("./menu");
 const packageMeta = require("../package.json");
 
@@ -174,7 +175,28 @@ function _cleanupDbFiles(dbPath) {
   }
 }
 
+let _pendingSessionRestore = null;
+
+function deliverSessionRestore(session) {
+  if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
+    safeSend("restore-session", session);
+    return true;
+  }
+  _pendingSessionRestore = session;
+  return false;
+}
+
+function enqueueSessionRestore(filePath) {
+  const session = loadSessionFromPath(filePath);
+  deliverSessionRestore(session);
+  dbg("SESSION", "Queued session restore", { filePath, error: session.error || null, tabCount: session.tabs?.length });
+  return true;
+}
+
 function enqueueImport(filePath, opts) {
+  if (isTleSessionPath(filePath)) {
+    return enqueueSessionRestore(filePath);
+  }
   const queueKey = makeImportQueueKey(filePath, opts);
   if (isDuplicatePendingImport(_importQueue, _activeImportKey, queueKey)) {
     dbg("QUEUE", "Skipped duplicate pending import", { filePath, sheetName: opts?.sheetName });
@@ -527,7 +549,10 @@ function createWindow() {
   mainWindow.once("ready-to-show", () => {
     mainWindow.show();
 
-    if (process.platform === "darwin" && app.pendingFilePath) {
+    if (_pendingSessionRestore) {
+      deliverSessionRestore(_pendingSessionRestore);
+      _pendingSessionRestore = null;
+    } else if (process.platform === "darwin" && app.pendingFilePath) {
       enqueueImport(app.pendingFilePath);
       app.pendingFilePath = null;
     } else if (process.platform === "win32") {

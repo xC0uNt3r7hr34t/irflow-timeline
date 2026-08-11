@@ -9,6 +9,7 @@ const {
 } = require("../parsers/ai-history/open-dialog-paths");
 const { openDialogOptions } = require("../utils/open-dialog");
 const { authorizeAiArtifactPick, assertAiReadablePath } = require("../parsers/ai-history/path-auth");
+const { isTleSessionPath, loadSessionFromPath, resolveSessionPath } = require("../session-file");
 
 function enqueuePlannedImports(planned, enqueueImport) {
   const scopePending = [];
@@ -348,12 +349,14 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
       filters: [{ name: "TLE Session", extensions: ["tle"] }],
     }));
     if (result.canceled || !result.filePaths.length) return null;
-    try {
-      const raw = fs.readFileSync(result.filePaths[0], "utf-8");
-      return JSON.parse(raw);
-    } catch (e) {
-      return { error: e.message };
+    return loadSessionFromPath(result.filePaths[0]);
+  });
+
+  safeHandle("load-session-from-path", async (_event, { filePath } = {}) => {
+    if (!filePath || typeof filePath !== "string") {
+      return { error: "No session file path provided." };
     }
+    return loadSessionFromPath(filePath);
   });
 
   // Auto-save: write to a fixed path in userData, no dialog. Used by the
@@ -402,10 +405,14 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
 
   // Import file for session restore (no dialog)
   safeHandle("import-file-for-restore", async (event, { filePath, sheetName }) => {
-    if (!fs.existsSync(filePath)) return { error: `File not found: ${filePath}` };
+    if (isTleSessionPath(filePath)) {
+      return { error: "Use session restore for .tle files, not file import." };
+    }
+    const resolved = resolveSessionPath(filePath);
+    if (!fs.existsSync(resolved)) return { error: `File not found: ${filePath}` };
     const tabId = nextTabId();
-    let fileName; try { fileName = decodeURIComponent(path.basename(filePath)); } catch { fileName = path.basename(filePath); }
-    enqueueImport(filePath, { tabId, sheetName: sheetName || undefined, skipRecent: true });
+    let fileName; try { fileName = decodeURIComponent(path.basename(resolved)); } catch { fileName = path.basename(resolved); }
+    enqueueImport(resolved, { tabId, sheetName: sheetName || undefined, skipRecent: true });
     return { tabId, fileName };
   });
 

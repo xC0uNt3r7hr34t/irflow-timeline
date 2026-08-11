@@ -156,6 +156,7 @@ contextBridge.exposeInMainWorld("tle", {
   // Session operations
   saveSession: (data) => ipcRenderer.invoke("save-session", { sessionData: data }),
   loadSession: () => ipcRenderer.invoke("load-session"),
+  loadSessionFromPath: (filePath) => ipcRenderer.invoke("load-session-from-path", { filePath }),
   autoSaveSession: (data) => ipcRenderer.invoke("auto-save-session", { sessionData: data }),
   loadAutoSave: () => ipcRenderer.invoke("load-auto-save"),
   clearAutoSave: () => ipcRenderer.invoke("clear-auto-save"),
@@ -175,6 +176,7 @@ contextBridge.exposeInMainWorld("tle", {
   onImportComplete: (cb) => onIpc("import-complete", cb),
   onImportError: (cb) => onIpc("import-error", cb),
   onImportQueue: (cb) => onIpc("import-queue", cb),
+  onRestoreSession: (cb) => onIpc("restore-session", cb),
   onExportProgress: (cb) => onIpc("export-progress", cb),
   onExtractResidentProgress: (cb) => onIpc("extract-resident-progress", cb),
   onFtsProgress: (cb) => onIpc("fts-progress", cb),

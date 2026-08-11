@@ -383,6 +383,7 @@ export default function App() {
   // Auto-restore: null = not yet checked; false = no autosave found; object = autosave available
   const [autoRestorable, setAutoRestorable] = useState(null);
   const pendingRestoresRef = useRef({});
+  const pendingSessionRestoreRef = useRef(null);
   // Home-screen capability intent: set when the user clicks an analyzer tile, consumed
   // at import-complete to auto-open that analyzer. A ref (not state) so the import-complete
   // listener always reads the current value without re-registering.
@@ -1086,11 +1087,11 @@ export default function App() {
     tle.getRecentFiles().then((files) => setRecentFiles(files || [])).catch(() => {});
     listen(tle.onRecentFilesUpdated, (files) => setRecentFiles(files || []));
 
-    listen(tle.onImportStart, ({ tabId, fileName, filePath, fileSize }) => {
+    listen(tle.onImportStart, ({ tabId, fileName, filePath, fileSize, sheetName }) => {
       if (filePath) importPathsRef.current[tabId] = filePath;
       setImportingTabs((prev) => ({ ...prev, [tabId]: { fileName, rowsImported: 0, percent: 0, status: "importing", fileSize: fileSize || 0 } }));
       setTabs((prev) => [...prev, {
-        id: tabId, name: fileName, filePath, headers: [], rows: [], totalRows: 0, totalFiltered: 0,
+        id: tabId, name: fileName, filePath, sheetName: sheetName || null, headers: [], rows: [], totalRows: 0, totalFiltered: 0,
         tsColumns: new Set(), numericColumns: new Set(), searchTerm: "", searchMode: "mixed", searchCondition: "contains",
         columnFilters: {}, checkboxFilters: {}, sortCol: null, sortDir: "asc", colorRules: [],
         hiddenColumns: new Set(), bookmarkedSet: new Set(), showBookmarkedOnly: false, rowOffset: 0,
@@ -1253,10 +1254,31 @@ export default function App() {
         (async () => {
           if (saved.bookmarkedRowIds?.length) await tle.setBookmarks(tabId, saved.bookmarkedRowIds, true);
           if (saved.tags && Object.keys(saved.tags).length > 0) await tle.bulkAddTags(tabId, saved.tags);
-          setPendingRestores((prev) => { const next = { ...prev }; delete next[tabId]; return next; });
+          setPendingRestores((prev) => {
+            const next = { ...prev };
+            delete next[tabId];
+            if (Object.keys(next).length === 0) {
+              const pendingSession = pendingSessionRestoreRef.current;
+              if (pendingSession?.orderedTabIds?.length) {
+                const idx = Math.min(
+                  Math.max(0, pendingSession.activeTabIndex ?? 0),
+                  pendingSession.orderedTabIds.length - 1,
+                );
+                const targetTabId = pendingSession.orderedTabIds[idx];
+                if (targetTabId) setActiveTab(targetTabId);
+                pendingSessionRestoreRef.current = null;
+              }
+            }
+            return next;
+          });
         })().catch((err) => {
           console.error("Session restore error for tab", tabId, err);
-          setPendingRestores((prev) => { const next = { ...prev }; delete next[tabId]; return next; });
+          setPendingRestores((prev) => {
+            const next = { ...prev };
+            delete next[tabId];
+            if (Object.keys(next).length === 0) pendingSessionRestoreRef.current = null;
+            return next;
+          });
         });
       }
 
@@ -1393,6 +1415,7 @@ export default function App() {
     listen(tle.onTriggerCrossFind, () => setModal(openSimpleModal("crossfind")));
     listen(tle.onTriggerSaveSession, () => handleSaveSessionRef.current?.());
     listen(tle.onTriggerLoadSession, () => handleLoadSessionRef.current?.());
+    listen(tle.onRestoreSession, (session) => { handleLoadSessionRef.current?.(session); });
     listen(tle.onTriggerCloseTab, () => { const cur = ctRef.current; if (cur) closeTabRef.current?.(cur.id); });
     listen(tle.onTriggerCloseAllTabs, () => { setTabs((prev) => { prev.forEach((t) => tle.closeTab(t.id)); return []; }); setActiveTab(null); });
     listen(tle.onTriggerCheckForUpdates, () => {
@@ -1848,7 +1871,7 @@ export default function App() {
         tags[rowid].push(tag);
       }
       sessionTabs.push({
-        filePath: tab.filePath, name: tab.name,
+        filePath: tab.filePath, name: tab.name, sheetName: tab.sheetName || null,
         bookmarkedRowIds: bookmarkIds, tags, tagColors: tab.tagColors || {},
         columnFilters: tab.columnFilters, checkboxFilters: tab.checkboxFilters,
         colorRules: tab.colorRules, hiddenColumns: [...tab.hiddenColumns],
@@ -1875,12 +1898,23 @@ export default function App() {
     for (const tab of tabs) await tle.closeTab(tab.id);
     setTabs([]); setActiveTab(null);
     const restoreMap = {};
+    const orderedTabIds = [];
     for (const savedTab of session.tabs) {
       const result = await tle.importFileForRestore(savedTab.filePath, savedTab.sheetName);
       if (result.error) { toast.warning(`Skipping "${savedTab.name}"`, { detail: String(result.error) }); continue; }
+      orderedTabIds.push(result.tabId);
       restoreMap[result.tabId] = savedTab;
     }
+    pendingSessionRestoreRef.current = {
+      activeTabIndex: Number.isFinite(session.activeTabIndex) ? session.activeTabIndex : 0,
+      orderedTabIds,
+    };
     setPendingRestores(restoreMap);
+    if (orderedTabIds.length === 0) {
+      pendingSessionRestoreRef.current = null;
+      toast.error("Session restore failed", { detail: "No source files from the session could be opened." });
+      return false;
+    }
     return true;
   }, [tle, tabs]);
 
@@ -1890,10 +1924,10 @@ export default function App() {
     await tle.saveSession(payload);
   }, [tle, tabs, buildSessionPayload]);
 
-  const handleLoadSession = useCallback(async () => {
+  const handleLoadSession = useCallback(async (session) => {
     if (!tle) return;
-    const session = await tle.loadSession();
-    await restoreFromSession(session);
+    const payload = session || await tle.loadSession();
+    await restoreFromSession(payload);
   }, [tle, restoreFromSession]);
 
   // Keep native-menu handler refs current so the mount-only IPC effect always invokes

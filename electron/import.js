@@ -195,6 +195,7 @@ async function startImport(filePath, tabId, fileName, sheetName, preFileSize, de
     fileName,
     filePath,
     fileSize,
+    sheetName: sheetName || null,
   });
 
   try {

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { updateModal as buildModalUpdate } from "../modals/modalRegistry.js";
+import { PI_ANALYST_PROFILE_DEFAULT } from "../components/process-analyzer/constants.js";
 
 /**
  * useUIStore — Global UI preferences and transient menu/modal state.
@@ -124,7 +125,7 @@ const useUIStore = create((set) => ({
   setHistogramLoaded: (v) => set({ histogramLoaded: v }),
 
   // ── Process Inspector profile ─────────────────────────────────────
-  piAnalystProfile: null,
+  piAnalystProfile: PI_ANALYST_PROFILE_DEFAULT,
   setPiAnalystProfile: (v) => set((state) => ({
     piAnalystProfile: typeof v === "function" ? v(state.piAnalystProfile) : v,
   })),

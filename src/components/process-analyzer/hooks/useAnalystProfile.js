@@ -30,7 +30,7 @@ export default function useAnalystProfile() {
   }, [tle]);
 
   useEffect(() => {
-    if (!tle?.savePiAnalystProfile || !loadedRef.current) return;
+    if (!tle?.savePiAnalystProfile || !loadedRef.current || !piAnalystProfile) return;
     const timer = setTimeout(() => {
       tle.savePiAnalystProfile({
         suppressions: piAnalystProfile.suppressions || [],
@@ -38,7 +38,7 @@ export default function useAnalystProfile() {
       }).catch(() => {});
     }, 150);
     return () => clearTimeout(timer);
-  }, [tle, piAnalystProfile]);
+  }, [tle, piAnalystProfile, setPiAnalystProfile]);
 
   return { piAnalystProfile, setPiAnalystProfile };
 }

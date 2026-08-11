@@ -529,7 +529,7 @@ export default function App() {
 
   useEffect(() => { pendingRestoresRef.current = pendingRestores; }, [pendingRestores]);
 
-  // ── Export helpers ────────────────────────────────────────────────
+  // ── Tab updater ──────────────────────────────────────────────────
   const up = useTabStore((s) => s.up);
 
   const filterToAiSession = useCallback((sessionId) => {

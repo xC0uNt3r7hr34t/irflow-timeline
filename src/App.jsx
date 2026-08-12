@@ -26,6 +26,7 @@ import { getGridBodyViewportHeight, getGridContentWidth, getRowScrollTarget, get
 import { getSelectedRowCount, isRowSelected, selectRowIds, toggleRowSelection } from "./utils/row-selection.js";
 import { effectiveSearchTerm, isSearchTooShort } from "./utils/search.js";
 import { mod } from "./utils/shortcut-label.js";
+import { buildRowTagsMap, normalizeRowId, tagsForRow, mergeRowTagsForWindow } from "./utils/row-tags.js";
 
 // ── Extracted components ─────────────────────────────────────────
 import { BkmkIcon, CheckboxIcon } from "./components/icons.jsx";
@@ -757,9 +758,18 @@ export default function App() {
     const tabCache = searchCache.current[tab.id];
     if (tabCache && tabCache[cacheKey] && centerRow === 0) {
       const cached = tabCache[cacheKey];
-      setTabs((prev) => prev.map((t) =>
-        t.id === tab.id ? { ...t, rows: cached.rows, rowOffset: cached.rowOffset, totalFiltered: cached.totalFiltered, bookmarkedSet: cached.bookmarkedSet, rowTags: cached.rowTags, dataReady: true } : t
-      ));
+      setTabs((prev) => prev.map((t) => {
+        if (t.id !== tab.id) return t;
+        return {
+          ...t,
+          rows: cached.rows,
+          rowOffset: cached.rowOffset,
+          totalFiltered: cached.totalFiltered,
+          bookmarkedSet: cached.bookmarkedSet,
+          rowTags: mergeRowTagsForWindow(t.rowTags, cached.rows, cached.rowTags),
+          dataReady: true,
+        };
+      }));
       setSearchLoading(false);
       return;
     }
@@ -802,13 +812,40 @@ export default function App() {
       const tc = searchCache.current[tab.id];
       const keys = Object.keys(tc);
       if (keys.length >= 4) delete tc[keys[0]];
-      tc[cacheKey] = { rows: result.rows, rowOffset: fetchOffset, totalFiltered: result.totalFiltered, bookmarkedSet: new Set(result.bookmarkedRows), rowTags: result.rowTags || {} };
+      const mergedRowTags = mergeRowTagsForWindow(tab.rowTags, result.rows, result.rowTags || {});
+      tc[cacheKey] = { rows: result.rows, rowOffset: fetchOffset, totalFiltered: result.totalFiltered, bookmarkedSet: new Set(result.bookmarkedRows), rowTags: mergedRowTags };
+      setTabs((prev) => prev.map((t) =>
+        t.id === tab.id ? { ...t, rows: result.rows, rowOffset: fetchOffset, totalFiltered: result.totalFiltered, bookmarkedSet: new Set(result.bookmarkedRows), rowTags: mergedRowTags, dataReady: true } : t
+      ));
+    } else {
+      setTabs((prev) => prev.map((t) => {
+        if (t.id !== tab.id) return t;
+        return {
+          ...t,
+          rows: result.rows,
+          rowOffset: fetchOffset,
+          totalFiltered: result.totalFiltered,
+          bookmarkedSet: new Set(result.bookmarkedRows),
+          rowTags: mergeRowTagsForWindow(t.rowTags, result.rows, result.rowTags || {}),
+          dataReady: true,
+        };
+      }));
     }
-    setTabs((prev) => prev.map((t) =>
-      t.id === tab.id ? { ...t, rows: result.rows, rowOffset: fetchOffset, totalFiltered: result.totalFiltered, bookmarkedSet: new Set(result.bookmarkedRows), rowTags: result.rowTags || {}, dataReady: true } : t
-    ));
     setSearchLoading(false);
   }, [tle]);
+
+  const invalidateTabSearchCache = useCallback((tabId) => {
+    if (tabId) delete searchCache.current[tabId];
+  }, []);
+
+  const refreshTabRowTags = useCallback(async (tabId) => {
+    if (!tle || !tabId) return {};
+    invalidateTabSearchCache(tabId);
+    const tagData = await tle.getAllTagData(tabId);
+    const rowTags = buildRowTagsMap(tagData);
+    useTabStore.getState().updateTab(tabId, { rowTags });
+    return rowTags;
+  }, [tle, invalidateTabSearchCache]);
 
   // Expose fetchData to extracted modals via the UI store
   useEffect(() => { setRefreshCallback(fetchData); }, [fetchData, setRefreshCallback]);
@@ -4345,6 +4382,7 @@ export default function App() {
         {modal?.type === "bulkActions" && ct && (
           <BulkActionsModal
             fetchData={fetchData}
+            refreshTabRowTags={refreshTabRowTags}
             selectionFilterOptions={selectionFilterOptions}
             selectionCount={selectionCount}
           />
@@ -9069,39 +9107,59 @@ strong{color:${c.text}}
                   {/* Tags submenu */}
                   <div data-tag-sub="" style={{ display: "none", position: "absolute", left: "100%", top: -5, background: themeName === "dark" ? "rgba(28,31,36,0.97)" : "rgba(252,252,254,0.97)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)", border: `1px solid ${themeName === "dark" ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)"}`, borderRadius: 10, padding: "5px 0", boxShadow: themeName === "dark" ? "0 12px 40px rgba(0,0,0,0.55), 0 0 0 0.5px rgba(255,255,255,0.06) inset" : "0 12px 40px rgba(0,0,0,0.18), 0 0 0 0.5px rgba(255,255,255,0.5) inset", minWidth: 160, zIndex: 100000 }}>
                     {tagEntries.map(([tag, color]) => {
-                      const hasTg = rowContextMenu.currentTags.includes(tag);
+                      const targetIds = hasExplicitMultiSelection
+                        ? [...selectedRows].map(normalizeRowId)
+                        : [normalizeRowId(rowContextMenu.rowId)];
+                      const hasOnTarget = targetIds.some((id) => tagsForRow(ct.rowTags, id).includes(tag));
                       return (
                         <button key={tag} onClick={async () => {
-                          // Collect target row IDs — all selected rows if multi-selected, otherwise just the clicked row
-                          const targetIds = [];
-                          if (hasExplicitMultiSelection) {
-                            targetIds.push(...selectedRows);
-                          } else {
-                            targetIds.push(rowContextMenu.rowId);
-                          }
-                          const newTags = { ...ct.rowTags };
                           for (const rid of targetIds) {
-                            const rowTags = newTags[rid] || [];
-                            const rowHas = rowTags.includes(tag);
-                            if (rowHas) {
-                              await tle.removeTag(ct.id, rid, tag);
-                              newTags[rid] = rowTags.filter((t) => t !== tag);
-                            } else {
-                              await tle.addTag(ct.id, rid, tag);
-                              newTags[rid] = [...rowTags, tag];
-                            }
+                            const existing = tagsForRow(ct.rowTags, rid);
+                            if (existing.includes(tag)) await tle.removeTag(ct.id, rid, tag);
+                            else await tle.addTag(ct.id, rid, tag);
                           }
-                          up("rowTags", newTags);
-                          setRowContextMenu(null);
+                          if (!ct.tagColors?.[tag]) {
+                            up("tagColors", { ...(ct.tagColors || {}), [tag]: th.sev?.low || "#7d8590" });
+                          }
+                          const rowTags = await refreshTabRowTags(ct.id);
+                          const clickedId = normalizeRowId(rowContextMenu.rowId);
+                          setRowContextMenu((prev) => prev ? {
+                            ...prev,
+                            currentTags: rowTags[clickedId] || [],
+                          } : prev);
                         }}
                           onMouseEnter={(e) => { e.currentTarget.style.background = `${th.accent}22`; }}
                           onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                           style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "5px 14px", background: "none", border: "none", color: th.text, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", borderRadius: 6, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
-                          <span style={{ color, fontSize: 14 }}>{hasTg ? "●" : "○"}</span>
-                          <span>{tag}</span>
+                          <span style={{ color, fontSize: 14 }}>{hasOnTarget ? "●" : "○"}</span>
+                          <span>{hasOnTarget ? `Remove "${tag}"` : `Add "${tag}"`}</span>
                         </button>
                       );
                     })}
+                    {(() => {
+                      const targetIds = hasExplicitMultiSelection
+                        ? [...selectedRows].map(normalizeRowId)
+                        : [normalizeRowId(rowContextMenu.rowId)];
+                      const hasAnyTags = targetIds.some((id) => tagsForRow(ct.rowTags, id).length > 0);
+                      if (!hasAnyTags) return null;
+                      return (
+                        <button onClick={async () => {
+                          for (const rid of targetIds) {
+                            for (const tag of [...tagsForRow(ct.rowTags, rid)]) {
+                              await tle.removeTag(ct.id, rid, tag);
+                            }
+                          }
+                          await refreshTabRowTags(ct.id);
+                          setRowContextMenu((prev) => prev ? { ...prev, currentTags: [] } : prev);
+                        }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = `${th.danger}22`; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                          style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "5px 14px", background: "none", border: "none", color: th.danger, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", borderRadius: 6, margin: "0 4px", maxWidth: "calc(100% - 8px)" }}>
+                          <span style={{ width: 14, textAlign: "center", fontSize: 11 }}>✕</span>
+                          <span>Remove all tags{hasExplicitMultiSelection ? ` (${selectionCount} rows)` : ""}</span>
+                        </button>
+                      );
+                    })()}
                     <div style={{ height: 1, background: themeName === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)", margin: "4px 8px" }} />
                     <button onClick={() => { setRowContextMenu(null); setModal(openSimpleModal("tags")); }}
                       onMouseEnter={(e) => { e.currentTarget.style.background = `${th.accent}22`; }}

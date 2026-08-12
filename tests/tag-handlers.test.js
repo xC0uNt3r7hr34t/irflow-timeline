@@ -17,6 +17,7 @@ function setupHandlers() {
     bulkAddTags(...args) { calls.push(["bulkAddTags", args]); },
     bulkTagByTimeRange(...args) { calls.push(["bulkTagByTimeRange", args]); return { taggedCount: 3 }; },
     bulkTagFiltered(...args) { calls.push(["bulkTagFiltered", args]); return { tagged: 4 }; },
+    bulkRemoveTagFiltered(...args) { calls.push(["bulkRemoveTagFiltered", args]); return { removed: 2 }; },
     bulkBookmarkFiltered(...args) { calls.push(["bulkBookmarkFiltered", args]); return { affected: 5 }; },
   };
   registerTagHandlers((channel, handler) => { handlers[channel] = handler; }, () => {}, { db });
@@ -39,6 +40,7 @@ test("tag IPC handlers destructure preload object payloads", () => {
   assert.equal(handlers["bulk-add-tags"](null, { tabId: "tab-1", tagMap }), true);
   assert.deepEqual(handlers["bulk-tag-by-time-range"](null, { tabId: "tab-1", colName: "datetime", ranges }), { taggedCount: 3 });
   assert.deepEqual(handlers["bulk-tag-filtered"](null, { tabId: "tab-1", tag: "Important", options }), { tagged: 4 });
+  assert.deepEqual(handlers["bulk-remove-tag-filtered"](null, { tabId: "tab-1", tag: "Important", options }), { removed: 2 });
   assert.deepEqual(handlers["bulk-bookmark-filtered"](null, { tabId: "tab-1", add: false, options }), { affected: 5 });
 
   assert.deepEqual(calls, [
@@ -52,6 +54,7 @@ test("tag IPC handlers destructure preload object payloads", () => {
     ["bulkAddTags", ["tab-1", tagMap]],
     ["bulkTagByTimeRange", ["tab-1", "datetime", ranges]],
     ["bulkTagFiltered", ["tab-1", "Important", options]],
+    ["bulkRemoveTagFiltered", ["tab-1", "Important", options]],
     ["bulkBookmarkFiltered", ["tab-1", false, options]],
   ]);
 });

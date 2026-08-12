@@ -43,6 +43,10 @@ module.exports = function registerTagHandlers(safeHandle, safeSend, { db }) {
     return db.bulkTagFiltered(tabId, tag, options);
   });
 
+  safeHandle('bulk-remove-tag-filtered', (_e, { tabId, tag, options }) => {
+    return db.bulkRemoveTagFiltered(tabId, tag, options);
+  });
+
   safeHandle('bulk-bookmark-filtered', (_e, { tabId, add, options }) => {
     return db.bulkBookmarkFiltered(tabId, add, options);
   });

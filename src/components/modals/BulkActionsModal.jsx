@@ -8,6 +8,7 @@ import { Modal, Button, Input, Card } from "../primitives/index.js";
 
 export default function BulkActionsModal({
   fetchData,
+  refreshTabRowTags,
   selectionFilterOptions = null,
   selectionCount = 0,
 }) {
@@ -58,8 +59,22 @@ export default function BulkActionsModal({
       const res = await tle.bulkTagFiltered(ct.id, tagName.trim(), filterOpts);
       if (res?.error) throw new Error(res.error);
       up("tagColors", { ...(ct.tagColors || {}), [tagName.trim()]: tagColor });
-      await fetchData(ct);
+      if (refreshTabRowTags) await refreshTabRowTags(ct.id);
+      else await fetchData(ct);
       setModal((p) => p?.type === "bulkActions" ? { ...p, busy: false, result: { type: "success", msg: `Tagged ${formatNumber(res.tagged)} rows as "${tagName.trim()}"` } } : p);
+    } catch (e) {
+      setModal((p) => p?.type === "bulkActions" ? { ...p, busy: false, result: { type: "error", msg: e.message } } : p);
+    }
+  };
+  const handleRemoveTag = async () => {
+    if (!tagName.trim() || busy) return;
+    setModal((p) => p?.type === "bulkActions" ? { ...p, busy: true, result: null } : p);
+    try {
+      const res = await tle.bulkRemoveTagFiltered(ct.id, tagName.trim(), filterOpts);
+      if (res?.error) throw new Error(res.error);
+      if (refreshTabRowTags) await refreshTabRowTags(ct.id);
+      else await fetchData(ct);
+      setModal((p) => p?.type === "bulkActions" ? { ...p, busy: false, result: { type: "success", msg: `Removed "${tagName.trim()}" from ${formatNumber(res.removed)} rows` } } : p);
     } catch (e) {
       setModal((p) => p?.type === "bulkActions" ? { ...p, busy: false, result: { type: "error", msg: e.message } } : p);
     }
@@ -124,6 +139,9 @@ export default function BulkActionsModal({
           />
           <Button onClick={handleTag} disabled={!tagName.trim()} loading={busy}>
             Apply Tag
+          </Button>
+          <Button variant="dangerSoft" onClick={handleRemoveTag} disabled={!tagName.trim()} loading={busy}>
+            Remove Tag
           </Button>
         </div>
       </Card>

@@ -135,6 +135,7 @@ contextBridge.exposeInMainWorld("tle", {
   getBookmarkedIds: (tabId) => ipcRenderer.invoke("get-bookmarked-ids", { tabId }),
   bulkAddTags: (tabId, tagMap) => ipcRenderer.invoke("bulk-add-tags", { tabId, tagMap }),
   bulkTagFiltered: (tabId, tag, options) => ipcRenderer.invoke("bulk-tag-filtered", { tabId, tag, options }),
+  bulkRemoveTagFiltered: (tabId, tag, options) => ipcRenderer.invoke("bulk-remove-tag-filtered", { tabId, tag, options }),
   bulkBookmarkFiltered: (tabId, add, options) => ipcRenderer.invoke("bulk-bookmark-filtered", { tabId, add, options }),
 
   // IOC matching

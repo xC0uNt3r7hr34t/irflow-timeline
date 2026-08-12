@@ -650,7 +650,7 @@ export default function VirtualGrid({
                   const rowDepth = isGrouped ? (item.depth || 0) : 0;
                   const row = isGrouped ? item.data : item;
                   if (!row || !row.__idx) return null;
-                  const rTags = ct.rowTags[row.__idx] || [];
+                  const rTags = ct.rowTags?.[row.__idx] || [];
                   const cm = applyColors(row, compiledColors);
                   const bm = ct.bookmarkedSet?.has(row.__idx);
                   const sel = isRowSelected(selectedRows, allRowsSelected, row.__idx);

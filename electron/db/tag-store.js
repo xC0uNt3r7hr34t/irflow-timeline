@@ -75,15 +75,19 @@ class TagStoreMethods {
   addTag(tabId, rowId, tag) {
     const meta = this.databases.get(tabId);
     if (!meta || this._isBuilding(tabId)) return;
+    const id = Number(rowId);
+    if (!Number.isInteger(id) || id <= 0 || !tag) return;
     this._invalidateCountCache(tabId);
-    meta.tagInsertStmt.run(rowId, tag);
+    meta.tagInsertStmt.run(id, tag);
   }
 
   removeTag(tabId, rowId, tag) {
     const meta = this.databases.get(tabId);
     if (!meta || this._isBuilding(tabId)) return;
+    const id = Number(rowId);
+    if (!Number.isInteger(id) || id <= 0 || !tag) return;
     this._invalidateCountCache(tabId);
-    meta.tagDeleteStmt.run(rowId, tag);
+    meta.tagDeleteStmt.run(id, tag);
   }
 
   getTagsForRows(tabId, rowIds) {
@@ -309,6 +313,38 @@ class TagStoreMethods {
    * Bulk tag all rows matching current filters.
    * Uses INSERT...SELECT — never materializes rowIds in JS.
    */
+  bulkRemoveTagFiltered(tabId, tag, options = {}) {
+    const meta = this.databases.get(tabId);
+    if (!meta || !tag) return { removed: 0 };
+
+    try {
+      const db = meta.db;
+      const params = [tag];
+      const whereConditions = [];
+      this._applyStandardFilters(options, meta, whereConditions, params);
+
+      if (whereConditions.length === 0) {
+        const RECOGNIZED = new Set(["columnFilters", "checkboxFilters", "bookmarkedOnly", "tagFilter", "dateRangeFilters", "advancedFilters", "searchTerm", "searchMode", "searchCondition", "rowIdFilter", "excludedRowIds"]);
+        const unknown = Object.keys(options || {}).filter((k) => !RECOGNIZED.has(k));
+        if (unknown.length > 0) {
+          return { removed: 0, error: `Refused to remove tag: unrecognized filter option(s) [${unknown.join(", ")}] matched no rows (would have removed the tag from the entire tab).` };
+        }
+      }
+
+      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
+      const result = db.prepare(`
+        DELETE FROM tags
+        WHERE tag = ?
+          AND rowid IN (SELECT data.rowid FROM data ${whereClause})
+      `).run(...params);
+      this._invalidateCountCache(tabId);
+      return { removed: result.changes };
+    } catch (e) {
+      dbg("DB", `bulkRemoveTagFiltered error`, { tabId, error: e.message });
+      return { removed: 0, error: e.message };
+    }
+  }
+
   bulkTagFiltered(tabId, tag, options = {}) {
     const meta = this.databases.get(tabId);
     if (!meta || !tag) return { tagged: 0 };

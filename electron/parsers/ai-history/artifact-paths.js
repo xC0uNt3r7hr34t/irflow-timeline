@@ -17,6 +17,7 @@ const os = require("os");
 const path = require("path");
 
 const { defaultCodexHome, isCodexDir } = require("./codex");
+const { defaultComputerHistoryRoots, isComputerHistoryDir } = require("./computer-history");
 const { defaultGrokHome, isGrokBuildRoot } = require("./grok-build");
 const { isChatgptAppDir } = require("./chatgpt");
 const { isCursorUserDataDir } = require("./cursor-composer");
@@ -134,14 +135,23 @@ const CLAUDE_DESKTOP_SESSION_DIR_NAMES = [
   "local-agent-mode-sessions", // Cowork isolated sessions; older builds also used it as metadata-only
 ];
 
+/**
+ * Roots to scan for Claude Desktop.
+ *
+ * Prefer the app-support directory itself when it exists: pending-uploads/, plan-usage-history.json
+ * and git-worktrees.json are SIBLINGS of claude-code-sessions, so a scan aimed at the session dirs
+ * alone cannot see them. Scanning the parent reaches the session trees below it as well, so this
+ * replaces the child roots rather than adding to them — listing both would parse every transcript
+ * twice and leave dedupe to clean up after us.
+ */
 function listClaudeDesktopSessionRoots() {
   const support = appSupportDir();
   const claudeBase = path.join(support, "Claude");
-  const roots = [];
-  for (const name of CLAUDE_DESKTOP_SESSION_DIR_NAMES) {
-    roots.push(path.join(claudeBase, name));
-  }
-  return roots.filter((p) => fs.existsSync(p));
+  const children = CLAUDE_DESKTOP_SESSION_DIR_NAMES
+    .map((name) => path.join(claudeBase, name))
+    .filter((p) => fs.existsSync(p));
+  if (children.length && fs.existsSync(claudeBase)) return [claudeBase];
+  return children;
 }
 
 /** Candidate paths to probe before validation (may not exist). */
@@ -242,6 +252,13 @@ function getLocalAiHistoryCandidates() {
     out.push({ tool: "chatgpt", path: p });
   }
 
+  // ChatGPT Computer History (Skysight) — raw event stream + derived activity summaries.
+  {
+    const { segmentsDir, resourcesDir } = defaultComputerHistoryRoots();
+    out.push({ tool: "computer-history", path: segmentsDir });
+    out.push({ tool: "computer-history", path: resourcesDir });
+  }
+
   out.push({ tool: "copilot", path: defaultCopilotCliHome() });
   for (const p of listCopilotWorkspaceStorageCandidates()) {
     out.push({ tool: "copilot", path: p });
@@ -270,6 +287,15 @@ function dirHasClaudeDesktopMetadata(rootDir, maxDepth = 8) {
 function isClaudeDesktopSessionsRoot(dirPath) {
   if (!dirPath || !fs.existsSync(dirPath)) return false;
   const base = path.basename(dirPath);
+  // The app-support directory itself (the PARENT of claude-code-sessions) is a valid root, because
+  // several state artifacts are its direct children rather than living under the sessions tree:
+  // pending-uploads/, plan-usage-history.json and git-worktrees.json are siblings of
+  // claude-code-sessions. Accepting the parent lets a scan reach them without ever walking UP out
+  // of the folder the user authorized — which scope confinement forbids. Selecting the sessions
+  // directory alone still works; it just cannot see its own siblings.
+  if (CLAUDE_DESKTOP_SESSION_DIR_NAMES.some((n) => {
+    try { return fs.statSync(path.join(dirPath, n)).isDirectory(); } catch { return false; }
+  })) return true;
   if (!CLAUDE_DESKTOP_SESSION_DIR_NAMES.includes(base)
     && !CLAUDE_DESKTOP_SESSION_DIR_NAMES.some((n) => String(dirPath).includes(`${path.sep}${n}${path.sep}`))) {
     return false;
@@ -384,6 +410,8 @@ const FORENSIC_AI_PATH_HINTS = {
     "Users/<user>/Library/Application Support/Claude/claude-code-sessions/",
     "Users/<user>/Library/Application Support/Claude/local-agent-mode-sessions/",
     "Users/<user>/Library/Application Support/com.openai.chat/",
+    "Users/<user>/Library/Group Containers/2DC432GLL2.com.openai.sky.CUAService/Library/Caches/ComputerUse/Skysight/segments/",
+    "Users/<user>/.codex/memories/extensions/skysight/resources/",
     "Users/<user>/Library/Application Support/Code/User/workspaceStorage/",
     "Users/<user>/Library/Application Support/Cursor/User/globalStorage/conversation-search.db",
     "Users/<user>/Library/Application Support/Windsurf/User/workspaceStorage/",
@@ -405,7 +433,29 @@ const ARTIFACT_PATH_REFERENCES = {
     label: "OpenAI Codex",
     paths: [
       { platform: "all", path: "$CODEX_HOME or ~/.codex/ (history.jsonl, sessions/**/rollout-*.jsonl, archived_sessions/, state*.sqlite + WAL/SHM)" },
+      { platform: "all", path: "~/.codex/sqlite/codex-dev.db (local_thread_catalog — thread surface + missing-rollout flag; automations — scheduled agent runs)" },
+      { platform: "all", path: "~/.codex/logs*.sqlite + WAL/SHM (tracing log; Submission/UserInput bodies carry prompt text independently of history.jsonl)" },
+      { platform: "all", path: "~/.codex/memories/rollout_summaries/*.md (per-thread summaries that outlive the rollouts they describe)" },
+      { platform: "all", path: "~/.codex/hooks.json (commands executed on SessionStart/PreToolUse/Stop — execution persistence)" },
     ],
+    notes: "Thread summaries and the thread catalog can evidence a thread whose rollout JSONL is gone. "
+      + "Not yet parsed: thread_history*.sqlite (a rolling projection of the rollouts), goals/queue/memories*.sqlite, "
+      + "and clipboard image pastes under $TMPDIR/codex-clipboard-*.png (outside the .codex root, so out of scan scope).",
+  },
+  "computer-history": {
+    label: "ChatGPT Computer History",
+    paths: [
+      { platform: "macOS", path: "~/Library/Group Containers/2DC432GLL2.com.openai.sky.CUAService/Library/Caches/ComputerUse/Skysight/segments/<YYYY-MM-DDTHH-MM-SSZ>/{events.jsonl,metadata.json}" },
+      { platform: "macOS", path: "~/.codex/memories/extensions/skysight/resources/*-(10min|6h)-*.md (derived activity summaries)" },
+      { platform: "macOS", path: "~/.codex/config.toml → [plugins.\"computer-history@openai-bundled\"] enabled (feature on/off state); [mcp_servers.computer-use] is the separate Computer Use agent" },
+      { platform: "macOS", path: "~/Library/Preferences/com.openai.chat.StatsigService.plist (email / account UUID, no tokens)" },
+      { platform: "macOS", path: "~/Library/Group Containers/2DC432GLL2.com.openai.sky.CUAService/Library/Application Support/Software/ComputerUseAppApprovals.json (Computer Use AGENT approvals — NOT recording scope)" },
+    ],
+    notes: "Opt-in, off by default. Raw events are advertised as a ~48h rolling window while the recorder "
+      + "is running (Library/Caches — commonly excluded from backup/EDR); a stopped recorder can leave "
+      + "segments longer. Derived summaries persist until deleted. Event kinds include terminal.value_changed "
+      + "(visible terminal scrollback during Secure Input / SSH prompts). Capture depth tracks the UI toolkit, "
+      + "not the app category: Electron Slack can expose channel bodies; native Telegram may expose little.",
   },
   "grok-build": {
     label: "Grok Build",
@@ -492,4 +542,6 @@ module.exports = {
   isGeminiCliRoot,
   isCopilotWorkspaceStorageRoot,
   isCopilotCliRoot,
+  defaultComputerHistoryRoots,
+  isComputerHistoryDir,
 };

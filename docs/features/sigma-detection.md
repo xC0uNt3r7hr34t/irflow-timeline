@@ -24,7 +24,7 @@ The modal has three top-level views, selectable from the toggle at the top:
 - **Previous Scans** — persisted scan history you can reopen
 - **Detection Settings** — engine maintenance, rule sources, and advanced defaults
 
-![Sigma Scan configuration wizard showing the New Scan / Previous Scans / Detection Settings toggle, the three-step Configure → Scan → Findings flow, the EVTX Folder / EvtxECmd Output Files / Current Timeline Tab scan targets, and a green Scan Ready panel summarizing target, engine, severity, and rule counts](/dfir-tips/Sigma-Scan-Home.png)
+![Sigma Scan ready on the WKS2390 EvtxECmd tab — Current Timeline Tab target, JS Sigma engine, 4,916 cached rules, 214,100 rows](/dfir-tips/Sigma-Scan-Home.png)
 
 The wizard walks through three steps — **Configure** (target + detection profile), **Scan** (progress), and **Findings** (results) — with a **Scan Ready** panel summarizing the chosen target, engine, severity, statuses, rule count, and row cap before you run.
 
@@ -153,7 +153,7 @@ A keyword/regex hunt over raw EVTX events, available in the wizard's **Setup det
 
 After a scan completes, results open into the **Look Here First** triage dashboard.
 
-![Sigma Scan triage dashboard showing 16 rules matched and 120 events flagged, with Dashboard / Findings / Timeline / Report tabs, Critical-High / Affected Hosts / First Seen / Last Seen summary cards, a ranked Look Here First findings list with Open Exact Hits / Tag / Bookmark / Mark Reviewed / Mark False Positive actions, Top Rules by Hits and Affected Hosts panels, and ATT&CK techniques, tactics, rare hosts, rare users, and rare processes panels](/dfir-tips/Sigma-Scan-Dashboard.png)
+![Sigma Scan triage on WKS2390 — 4 rules matched, 2,398 events flagged, Look Here First with Proc Exec and Defender hits](/dfir-tips/Sigma-Scan-Dashboard.png)
 
 The results screen has **Dashboard**, **Findings**, **Timeline**, and **Report** tabs, with export options (Export Timeline CSV, Export JSON, Export Report) and **Open All Results as Tab**.
 

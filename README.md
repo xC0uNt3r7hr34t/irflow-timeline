@@ -1,17 +1,21 @@
 # IRFlow Timeline (Windows)
 
-A high-performance native Windows application for DFIR timeline analysis. Built on Electron + SQLite to handle large forensic files (CSV, TSV, XLSX, EVTX, Plaso, raw $MFT, $J) without breaking a sweat.
+A high-performance native Windows application for DFIR timeline analysis. Built on Electron + SQLite to handle large forensic files (CSV, TSV, XLSX, EVTX, Plaso, generic SQLite, raw $MFT, $J) without breaking a sweat.
 
 This fork tracks [r3nzsec/irflow-timeline](https://github.com/r3nzsec/irflow-timeline) and adapts it for native Windows builds. Inspired by Eric Zimmerman's Timeline Explorer for Windows.
 
-**Current version: v1.0.9** — merged from upstream with Windows packaging and platform-specific UI/runtime changes.
+**Current version: v1.0.12** — merged from upstream with Windows packaging, native dependencies, and generic SQLite import.
 
 ---
 
-## What's New (merged from upstream v1.0.6–v1.0.9)
+## What's New (merged from upstream v1.0.6–v1.0.12)
+
 
 | Version | Highlights |
 |---|---|
+| **v1.0.12** | Diff Tabs, tag/bookmark correctness, Computer History re-audit, generic SQLite multi-table import |
+| **v1.0.11** | Computer History verified artifacts |
+| **v1.0.10** | ChatGPT Computer History |
 | **v1.0.9** | Large EVTX import fix — bounded 64 KiB chunk parsing supports ~4 GiB logs without Node Buffer limits |
 | **v1.0.8** | AI Application Forensics expansion (Grok Build, Claude/Codex improvements), Open Triage Collection, Process Inspector overhaul, multi-source Persistence/Lateral Movement analyzers |
 | **v1.0.7** | AI Artifacts / AI Query History, AI Secret Hunt |
@@ -35,7 +39,7 @@ A portable build (`IRFlow-Timeline-Portable-x.x.x.exe`) is also available — no
 
 ### Prerequisites
 
-- **Node.js v20** (required — v21+ is not compatible with the native module build)
+- **Node.js 22.14+** (required — `better-sqlite3` 13 needs Node 22.14; CI uses 22.17.0)
 - **Python 3.x** — required for compiling `better-sqlite3` and bundling `bmc-tools`
 - **Visual Studio Build Tools** — workload: **Desktop development with C++**
 - **Git Bash** (or WSL) — required for `bundle:hayabusa` and `bundle:bmc-tools` scripts
@@ -91,10 +95,10 @@ Output in `release/`.
 | Problem | Fix |
 |---|---|
 | `Cannot find module '@electron/rebuild/lib/cli.js'` | Run `npm install` first, then `npm run rebuild` |
-| `node --version` shows wrong version | Use nvm-windows to switch: `nvm use 20` |
+| `node --version` shows wrong version | Use nvm-windows to switch: `nvm use 22.17.0` |
 | Python not found during rebuild | Install Python 3.x and add to PATH |
 | `MSBuild` or `VCBuild` error | Install Visual Studio Build Tools with "Desktop development with C++" |
-| `NODE_MODULE_VERSION mismatch` | Wrong Node version during rebuild — switch to v20 and run `npm run rebuild` again |
+| `NODE_MODULE_VERSION mismatch` | Wrong Node version during rebuild — switch to v22.17.0 and run `npm run rebuild` again |
 | App loads blank screen | Run `npm run build:renderer` — `vite.config.js` `base: "./"` is required |
 | Hayabusa bundle fails | Run via Git Bash: `bash scripts/bundle-hayabusa.sh` |
 | `$'\\r': command not found` or `set: pipefail: invalid option` in WSL | Windows CRLF line endings in `.sh` files. Run `npm run fix:scripts`, then retry. Also check `git config core.autocrlf` — use `input` or `false` in WSL |
@@ -111,6 +115,7 @@ Output in `release/`.
 | **XLSX / XLS / XLSM** | Excel files with multi-sheet picker |
 | **EVTX** | Windows Event Logs (native parsing, supports multi-GB files in v1.0.9+) |
 | **Plaso** | Plaso SQLite databases |
+| **SQLite / .db** | Generic SQLite databases with Plaso-first detection and a multi-table picker |
 | **Raw $MFT** | NTFS Master File Table — direct binary parsing |
 | **Raw $J / UsnJrnl** | NTFS USN Change Journal |
 

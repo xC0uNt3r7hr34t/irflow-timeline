@@ -17,13 +17,13 @@ export default defineConfig({
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/irflow-timeline/logo.svg' }],
     ['meta', { property: 'og:title', content: 'IRFlow Timeline' }],
-    ['meta', { property: 'og:description', content: 'IRFlow Timeline 1.0.9 adds bounded native chunk parsing for large EVTX files while retaining expanded AI application forensics.' }],
+    ['meta', { property: 'og:description', content: 'IRFlow Timeline 1.0.12 adds Diff Tabs — compare any two imported files into an Added / Removed / Changed timeline with field-level before/after — and fixes a tag and bookmark layer that was silently discarding annotations.' }],
     ['meta', { property: 'og:image', content: 'https://r3nzsec.github.io/irflow-timeline/IRFlow-Timeline-Home.png' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:url', content: 'https://r3nzsec.github.io/irflow-timeline/' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: 'IRFlow Timeline' }],
-    ['meta', { name: 'twitter:description', content: 'IRFlow Timeline 1.0.9 adds bounded native chunk parsing for large EVTX files while retaining expanded AI application forensics.' }],
+    ['meta', { name: 'twitter:description', content: 'IRFlow Timeline 1.0.12 adds Diff Tabs — compare any two imported files into an Added / Removed / Changed timeline with field-level before/after — and fixes a tag and bookmark layer that was silently discarding annotations.' }],
     ['meta', { name: 'twitter:image', content: 'https://r3nzsec.github.io/irflow-timeline/IRFlow-Timeline-Home.png' }],
     ['script', { 'data-goatcounter': 'https://irflowtimeline.goatcounter.com/count', async: '', src: '//gc.zgo.at/count.js' }],
     ['script', { type: 'application/ld+json' }, JSON.stringify({
@@ -31,11 +31,11 @@ export default defineConfig({
       '@type': 'SoftwareApplication',
       name: 'IRFlow Timeline',
       description: 'Native macOS DFIR timeline analysis with local AI application forensics for Grok Build, Claude, Codex, ChatGPT, Copilot, Gemini, Cursor, and other assistants.',
-      softwareVersion: '1.0.9',
+      softwareVersion: '1.0.12',
       operatingSystem: 'macOS',
       applicationCategory: 'SecurityApplication',
       url: 'https://r3nzsec.github.io/irflow-timeline/',
-      downloadUrl: 'https://github.com/r3nzsec/irflow-timeline/releases/tag/v1.0.9',
+      downloadUrl: 'https://github.com/r3nzsec/irflow-timeline/releases/tag/v1.0.12',
       author: {
         '@type': 'Person',
         name: 'Renzon Cruz',
@@ -61,10 +61,11 @@ export default defineConfig({
       { text: 'Reference', link: '/reference/keyboard-shortcuts' },
       { text: 'Author', link: '/about/author' },
       {
-        text: 'v1.0.9',
+        text: 'v1.0.12',
         items: [
-          { text: 'What’s New in v1.0.9', link: '/blog/v1.0.9-large-evtx-imports' },
-          { text: 'What’s New in v1.0.8', link: '/blog/v1.0.8-ai-application-forensics' },
+          { text: 'What’s New in v1.0.12', link: '/blog/v1.0.12-diff-tabs-and-triage' },
+          { text: 'What’s New in v1.0.11', link: '/blog/v1.0.11-computer-history-verified' },
+          { text: 'What’s New in v1.0.10', link: '/blog/v1.0.10-computer-history' },
           { text: 'Changelog', link: '/about/changelog' },
           { text: 'Roadmap', link: '/about/roadmap' },
           { text: 'Credits', link: '/about/credits' }
@@ -125,7 +126,8 @@ export default defineConfig({
             { text: 'Sessions', link: '/workflows/sessions' },
             { text: 'Export & Reports', link: '/workflows/export-reports' },
             { text: 'Multi-Tab Analysis', link: '/workflows/multi-tab' },
-            { text: 'Merging Timelines', link: '/workflows/merge-tabs' }
+            { text: 'Merging Timelines', link: '/workflows/merge-tabs' },
+            { text: 'Diff Tabs', link: '/workflows/diff-tabs' }
           ]
         }
       ],
@@ -145,7 +147,18 @@ export default defineConfig({
         {
           text: 'DFIR Tips & Tricks',
           items: [
-            { text: 'AI Query History & AI App Artifacts', link: '/dfir-tips/ai-query-history' },
+            {
+              text: 'AI Query History',
+              collapsed: false,
+              items: [
+                { text: 'Overview', link: '/dfir-tips/ai-query-history' },
+                { text: 'Claude Desktop', link: '/dfir-tips/ai-apps/claude-desktop' },
+                { text: 'ChatGPT / Codex', link: '/dfir-tips/ai-apps/chatgpt-codex' },
+                { text: 'Grok AI', link: '/dfir-tips/ai-apps/grok-ai' },
+                { text: 'Cursor', link: '/dfir-tips/ai-apps/cursor' },
+                { text: 'Gemini', link: '/dfir-tips/ai-apps/gemini' }
+              ]
+            },
             { text: 'Ransomware Investigation', link: '/dfir-tips/ransomware-investigation' },
             { text: 'Lateral Movement Tracing', link: '/dfir-tips/lateral-movement-tracing' },
             { text: 'Malware Execution Analysis', link: '/dfir-tips/malware-execution-analysis' },
@@ -164,6 +177,9 @@ export default defineConfig({
           text: 'IRFlow Timeline Blog',
           items: [
             { text: 'All Posts', link: '/blog/' },
+            { text: 'v1.0.12 — Diff Tabs & Triage', link: '/blog/v1.0.12-diff-tabs-and-triage' },
+            { text: 'v1.0.11 — Computer History Verified', link: '/blog/v1.0.11-computer-history-verified' },
+            { text: 'v1.0.10 — ChatGPT Computer History', link: '/blog/v1.0.10-computer-history' },
             { text: 'v1.0.9 — Large EVTX Reliability', link: '/blog/v1.0.9-large-evtx-imports' },
             { text: 'v1.0.8 — AI Application Forensics', link: '/blog/v1.0.8-ai-application-forensics' }
           ]

@@ -6,7 +6,7 @@ description: Process Inspector — parent-child process trees, multi-pass detect
 
 The Process Inspector builds parent-child process trees from **Sysmon Event ID 1** and **Windows Security Event ID 4688**, then scores execution chains with chain rules, standalone detections, prevalence, binary trust, lifetime, injection, and privilege-use correlation. Results open as **Story / Triage / Hunt / Graph / Raw** views plus a **Rules** health report, with analyst suppressions, custom rules, and one-click pivots into the main grid and other IRFlow features.
 
-![Process Inspector graph view with parent-child execution chains](/dfir-tips/Process-Tree-Analyzer-Sysmon.png)
+![Process Inspector Story view on WKS2390 Sysmon — 81 stories, GUID-linked tree, DumpIt.exe and cmd.exe chains](/dfir-tips/Process-Inspector-Story.png)
 
 ## Opening the Process Inspector
 
@@ -108,6 +108,36 @@ Sequences appear as **SEQ** badges and feed Story mode.
 
 Toolbar: search, severity toggles, expand/depth (tree modes), copy/export, rare-process chips, **Rules** coverage toggle.
 
+### Story
+
+Grouped investigation narratives — host, user, ATT&CK techniques, and the steps that make up each story. Open a row for Event Details and pivot into Graph or Raw.
+
+![Process Inspector Story — 81 stories on WKS2390, OneDriveSetup and DumpIt.exe leads, Event Timeline](/dfir-tips/Process-Inspector-Story.png)
+
+### Triage
+
+Suspicious chain clusters, risk-sorted. Use this after Story when you want every high/medium parent→child cluster without the narrative grouping.
+
+![Process Inspector Triage — 61 chains, DumpIt.exe, gkape→kape, cmd→andromeda, skype.exe](/dfir-tips/Process-Inspector-Triage.png)
+
+### Hunt
+
+Medium+ clusters plus **Rare processes** chips (prevalence leads). Toggle **Show Rare Only** to hide common noise.
+
+![Process Inspector Hunt — 38 high chains with Rare processes chips for DumpIt, OneDrive, kape, andromeda](/dfir-tips/Process-Inspector-Hunt.png)
+
+### Graph
+
+Spatial parent-child graph. Seed by severity (Med+ / High+ / Critical / All), pan/zoom, click a node for Event Details. Ancestry and descendants stay in view even when they fall below the seed filter.
+
+![Process Inspector Graph — WINWORD.EXE → masqueraded IMG-387470302099.jpg.exe → cmd.exe, svc.exe, and ping on GFUA-WKS01, with Event Details](/dfir-tips/Process-Inspector-Graph.png)
+
+### Raw
+
+Full hierarchical tree (or flat list) with column filters, expand/depth, **Suspicious Only**, and the Event Details pane. **Filter Grid**, **Graph**, **Lateral**, **Persistence**, and **Sigma** sit on the selected node.
+
+![Process Inspector Raw — GUID-linked tree of cortex-xdr-payload.exe → cmd.exe with Event Details and Filter Grid / Sigma handoffs](/dfir-tips/Process-Inspector-Raw.png)
+
 ### Rule health report
 
 After a build, open **Rules** in the results toolbar for a coverage brief:
@@ -119,7 +149,11 @@ After a build, open **Rules** in the results toolbar for a coverage brief:
 
 Use this to tune intents (Low-noise / Balanced / Broad), spot telemetry gaps (silent high-value rules on a clean-looking host), and document which detections applied to a case. Toggle **Rules** again to return to the previous view mode.
 
+![Process Inspector Rules — 15% coverage, fired vs silent high-value rules, by-group breakdown, and sequence hits](/dfir-tips/Process-Inspector-Rules.png)
+
 ### Config phase (before build)
+
+![Process Inspector config — tree-ready mapping, Balanced intent, technique-group toggles, Sysmon 1,258 events, GUID linking](/dfir-tips/Process-Inspector-Config.png)
 
 Before the tree runs, the config panel surfaces:
 
@@ -145,6 +179,8 @@ On build complete, a **verdict-first** banner shows:
 - **Scoped rebuild** — host and/or time window when the global max truncated the tree
 
 ## Detail panel
+
+The Event Details pane is shared across Story, Triage, Hunt, Graph, and Raw. Graph and Raw screenshots above show it populated.
 
 Select a process for:
 

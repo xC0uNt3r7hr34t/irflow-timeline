@@ -20,7 +20,7 @@ features:
     details: SQLite engine with sub-100ms queries on 10M+ rows. Streams 30GB+ files with zero-copy CSV parsing, memory-capped background indexing, and single-query analytics — no loading into memory.
   - icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#E85D2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4"/><path d="M12 17v4"/><path d="M3 12h4"/><path d="M17 12h4"/><rect x="7" y="7" width="10" height="10" rx="2" fill="rgba(232,93,42,0.18)"/><path d="M10 11h4M10 14h2"/></svg>'
     title: AI Artifacts
-    details: Scan local AI history from ChatGPT Desktop, Claude Code, Codex, Grok Build, Cursor, Copilot, Gemini CLI, Windsurf, and Continue. Preserve prompts, responses, tool calls, workspaces, and secret exposure evidence.
+    details: Scan local AI history from ChatGPT Desktop, Claude Code, Codex, Grok Build, Cursor, Copilot, Gemini CLI, Windsurf, and Continue — plus ChatGPT Computer History interaction telemetry. Preserve prompts, responses, tool calls, workspaces, and secret exposure evidence.
   - icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#E85D2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="11" y1="8" x2="11" y2="14"/></svg>'
     title: 5 Search Modes
     details: Mixed, FTS, LIKE, Fuzzy, and Regex. Full-text search, substring matching, typo-tolerant fuzzy, and pattern matching across millions of rows.
@@ -35,7 +35,7 @@ features:
     details: Network graph with multi-hop chain reconstruction and RDP session correlation. Detects brute force, password spray, Impacket, 33 RMM tools, and 7 network tunnels.
   - icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#E85D2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="rgba(232,93,42,0.15)"/><path d="M9 12l2 2 4-4"/></svg>'
     title: Persistence Analyzer
-    details: 36 EVTX + 33 registry persistence rules with risk scoring across services, scheduled tasks, WMI subscriptions, and autorun keys.
+    details: 39 EVTX + 33 registry persistence rules with risk scoring across services, scheduled tasks, WMI subscriptions, and autorun keys.
   - icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#E85D2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8" rx="0.5" fill="rgba(232,93,42,0.3)"/><rect x="12" y="6" width="3" height="12" rx="0.5" fill="rgba(232,93,42,0.3)"/><rect x="17" y="13" width="3" height="5" rx="0.5" fill="rgba(232,93,42,0.3)"/></svg>'
     title: Rich Analytics
     details: Histogram with brush-to-filter, gap and burst detection, log source coverage maps, and value frequency stacking.
@@ -47,13 +47,25 @@ features:
     details: Bookmarks, color-coded tags, conditional formatting with KAPE-aware presets, and full session save/restore.
 ---
 
-## What's New · v1.0.9
+## What's New · v1.0.12
 
-- **Multi-gigabyte EVTX imports fixed** — Raw Windows Event Logs no longer hit Node's 2 GiB whole-file Buffer ceiling.
-- **Bounded native EVTX parsing** — IRFlow reads one 64 KiB EVTX chunk at a time, supporting logs up to the format's approximately 4 GiB ceiling with stable parser memory.
-- **Cleaner import recovery** — Duplicate pending imports are suppressed and identical failures collapse into one retryable notification.
+- **Diff Tabs** — View → Diff Tabs compares any two imported files (EVTX, MFT, Prefetch, AI history, Computer History, or any CSV). The result is a color-coded Added / Removed / Changed timeline with field-level before/after and clickable status counts. Merge is a union; Diff is a comparison.
+- **Tags and bookmarks stopped losing work** — annotations written during the post-import index build were being silently discarded; bulk tagging from the Actions menu ignored your selection and could tag the whole file; multi-row tagging untagged half a mixed selection; and select-all tagged exactly one row. Bulk Tag / Bookmark now leads with an explicit scope and its real row count, Manage Tags can rename, merge and truly delete a tag, and tags now survive CSV/XLSX export.
+- **Signed disk image** — the DMG itself is now signed, notarized and stapled. Every release through 1.0.11 shipped an unsigned image that tripped Gatekeeper on download; that workaround is no longer needed.
+- **Hayabusa v2 / v3 / v4** — the Sigma scanner detects the installed binary's version and builds the matching command line. Plus Select All / Clear for multi-source tab pickers, contributed by [@Yuds16](https://github.com/Yuds16).
+- **Computer History re-audit** — `terminal.value_changed` (visible iTerm2 scrollback), Statsig account identity, and a corrected 48-hour purge caveat.
 
-[Read the v1.0.9 announcement →](/blog/v1.0.9-large-evtx-imports) · [AI application forensics in v1.0.8 →](/blog/v1.0.8-ai-application-forensics) · [Full changelog →](/about/changelog)
+[Read the v1.0.12 announcement →](/blog/v1.0.12-diff-tabs-and-triage) · [Diff Tabs workflow →](/workflows/diff-tabs) · [Full changelog →](/about/changelog)
+
+## What's New · v1.0.11
+
+- **Computer History analysis verified against a live capture** — Credential rows are time anchors, not recovered passwords; capture fidelity is measured per application rather than assumed from the app's category; and gaps spanning a recorder restart are reported as unassessed instead of falsely cleared.
+- **The copy that outlives the evidence** — Activity consolidated into `~/.codex/memories/` is neither purged at 48 hours nor cleared with Computer History, and is now collected. On a stale host it can be the only surviving record.
+- **More of each summary** — The model-inferred user profile and carried-forward prior context become their own rows instead of being flattened into one blob.
+- **Grok Build and Claude Desktop stores that outlive the conversation** — Deletion tombstones that date a removed chat, the files staged for upload to it, the Grok search index that mirrors a deleted session's text, and the app log that timestamps tool executions independently of it.
+- **Sharper grid** — Mouse modifiers reach `KeyChord` (a command-click opens a link in a background tab), and click multiplicity is named by meaning rather than producing ten numeric Activity values.
+
+[Read the v1.0.11 announcement →](/blog/v1.0.11-computer-history-verified) · [Computer History in v1.0.10 →](/blog/v1.0.10-computer-history) · [Full changelog →](/about/changelog)
 
 ## What is IRFlow Timeline?
 
@@ -91,6 +103,7 @@ If you've hit Excel's 1M-row limit on a super-timeline, or you're tired of spinn
 | **Raw $MFT** | `.mft` | NTFS Master File Table — direct import for NTFS analysis tools |
 | **Raw $J** | `.$J`, `.usn` | NTFS USN Journal (change journal) |
 | **AI app artifacts** | folders / JSONL / SQLite / LevelDB | Scan local AI history from supported desktop, CLI, and editor assistants |
+| **ChatGPT Computer History** | Skysight `events.jsonl` segments + summary `.md` | macOS interaction telemetry — focus, clicks, keystrokes, selections, drags (own tab, 54-column schema) |
 
 ### Built for Scale
 

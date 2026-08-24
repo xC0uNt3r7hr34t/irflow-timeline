@@ -8,6 +8,7 @@ const { severityHistogram, sortMatchesBySeverity } = require("../match-utils");
 const { validateEvtxScanRequest } = require("../scan-preflight");
 const {
   findHayabusa,
+  detectHayabusaVersion,
   downloadHayabusa,
   getHayabusaStatus,
 } = require("./binary-manager");
@@ -136,11 +137,25 @@ async function scanEvtxDirectory(dirPath, db, nextTabId, options = {}, onProgres
   }
 
   if (scanJobId) registerScanProc(scanJobId, null, []);
+  try {
+    return await runRegisteredScan({
+      dirPath,
+      options,
+      onProgress,
+      scanStartedAt,
+      errors,
+      warnings,
+      scanJobId,
+    });
+  } finally {
+    if (scanJobId) unregisterScanProc(scanJobId);
+  }
+}
 
+async function runRegisteredScan({ dirPath, options, onProgress, scanStartedAt, errors, warnings, scanJobId }) {
   onProgress?.({ phase: "discovering", text: "Scanning directory for EVTX files..." });
   const evtxFiles = findEvtxFiles(dirPath);
   if (evtxFiles.length === 0) {
-    if (scanJobId) unregisterScanProc(scanJobId);
     return { matches: [], eventRows: [], stats: {}, errors: ["No .evtx files found in directory"], warnings, evtxFiles: [] };
   }
   const totalBytes = evtxFiles.reduce((sum, file) => sum + file.size, 0);
@@ -154,7 +169,6 @@ async function scanEvtxDirectory(dirPath, db, nextTabId, options = {}, onProgres
         onProgress?.({ phase: "installing", text: detail });
       });
     } catch (err) {
-      if (scanJobId) unregisterScanProc(scanJobId);
       return {
         matches: [],
         eventRows: [],
@@ -167,18 +181,19 @@ async function scanEvtxDirectory(dirPath, db, nextTabId, options = {}, onProgres
   }
 
   if (isCancelled(scanJobId)) {
-    unregisterScanProc(scanJobId);
     return cancelledScanResult({ evtxFiles, totalBytes });
   }
 
   dbg("SIGMA-EVTX", `Using Hayabusa: ${hayabusaPath}`);
   const outputMode = options.outputMode || "csv";
   const outputPaths = createScanOutputPaths(outputMode);
-  const command = buildScanCommand({ dirPath, options, outputPaths, warnings });
+  const hayabusaStatus = options.hayabusaStatus || getHayabusaStatus();
+  const hayabusaVersion = (hayabusaStatus?.path === hayabusaPath ? hayabusaStatus?.version : null)
+    || detectHayabusaVersion(hayabusaPath);
+  const command = buildScanCommand({ dirPath, options: { ...options, version: hayabusaVersion }, outputPaths, warnings });
   const { args, levels } = command;
   const { tmpOutput, tmpHtmlReport, actualOutput } = outputPaths;
   let commandLine = [hayabusaPath, ...args].map(quoteArg).join(" ");
-  const hayabusaStatus = getHayabusaStatus();
 
   onProgress?.({
     phase: "hayabusa-running",
@@ -232,7 +247,6 @@ async function scanEvtxDirectory(dirPath, db, nextTabId, options = {}, onProgres
 
   if (cancelResult?.cancelled) {
     cleanupFiles([tmpOutput, actualOutput, tmpHtmlReport]);
-    if (scanJobId) unregisterScanProc(scanJobId);
     return cancelledScanResult({ evtxFiles, totalBytes });
   }
 
@@ -243,7 +257,6 @@ async function scanEvtxDirectory(dirPath, db, nextTabId, options = {}, onProgres
   if (cancelResult.errorLines?.length) errors.push(...cancelResult.errorLines);
 
   if (!fs.existsSync(actualOutput)) {
-    if (scanJobId) unregisterScanProc(scanJobId);
     return {
       matches: [],
       eventRows: [],
@@ -278,7 +291,6 @@ async function scanEvtxDirectory(dirPath, db, nextTabId, options = {}, onProgres
     SigmaResultStore.destroy(resultStorePath);
     if (err?.cancelled) {
       cleanupFiles([actualOutput, tmpOutput, tmpHtmlReport]);
-      if (scanJobId) unregisterScanProc(scanJobId);
       return cancelledScanResult({ evtxFiles, totalBytes });
     }
     throw err;
@@ -378,7 +390,6 @@ async function scanEvtxDirectory(dirPath, db, nextTabId, options = {}, onProgres
 
   dbg("SIGMA-EVTX", `Done: ${persistedSummary.rowCount} events, ${matches.length} rules matched${truncated ? " (capped)" : ""}`);
 
-  if (scanJobId) unregisterScanProc(scanJobId);
   return {
     matches,
     eventRows,

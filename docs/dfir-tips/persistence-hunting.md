@@ -7,7 +7,7 @@ description: Hunt for persistence mechanisms — registry keys, scheduled tasks,
 Persistence is one of the most critical phases of an intrusion to identify. Adversaries establish persistence to maintain access across reboots, credential changes, and partial remediation. This guide walks through a systematic approach to hunting for persistence mechanisms using IRFlow Timeline, covering registry run keys, scheduled tasks, services, WMI subscriptions, and DLL hijacking.
 
 ::: info Features Used
-- [Persistence Analyzer](/features/persistence-analyzer) — 36 EVTX + 33 registry detection rules with risk scoring
+- [Persistence Analyzer](/features/persistence-analyzer) — 39 EVTX + 33 registry detection rules with risk scoring
 - [Search (Regex)](/features/search-filtering) -- pattern matching across parsed artifacts
 - [Process Inspector](/features/process-tree) -- trace parent-child relationships for persistence installers
 - [Color Rules](/features/color-rules) -- highlight known persistence paths automatically
@@ -22,12 +22,12 @@ Persistence is one of the most critical phases of an intrusion to identify. Adve
 
 Before diving into manual hunting, run the [Persistence Analyzer](/features/persistence-analyzer) for an automated first pass. Navigate to **Tools → Platforms → Windows → Persistence Analyzer** and let it auto-detect your data mode (EVTX or Registry).
 
-The analyzer applies 69 built-in rule definitions (36 EVTX + 33 registry) across services, scheduled tasks, WMI subscriptions, registry autorun keys, and more. Each finding is assigned a risk score (0-10) based on technique severity, suspicious paths, and command-line indicators.
+The analyzer applies 72 built-in rule definitions (39 EVTX + 33 registry) across services, scheduled tasks, WMI subscriptions, registry autorun keys, Defender tampering, and remote-execution corroboration. Each finding is assigned a risk score (0-10) based on technique severity, suspicious paths, and command-line indicators.
 
 **Recommended workflow:**
 
 1. Filter results by **Critical** and **High** severity to prioritize the most suspicious findings
-2. Switch to **Timeline View** to see the chronological order of persistence installations
+2. Switch to **Timeline → Chronology** to see the chronological order of persistence installations (use **Triage** first if you only want suspicious items)
 3. Use the checkbox selection to bulk-tag high-priority findings in the source timeline
 4. Click any finding to expand its details -- full registry path, command line, timestamp, and user account
 

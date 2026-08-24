@@ -45,11 +45,10 @@ export function openAiSecretsModal({ tabId, tabName, ...extra } = {}) {
     tabId: tabId || null,
     tabName: tabName || "",
     scanMode: "quick",
-    redact: true,
     showFilters: false,
     data: null,
     error: null,
-    reveal: {},
+    reveal: null,
     fSev: "all",
     fCat: "all",
     fConf: "all",
@@ -413,4 +412,28 @@ export function openFindDuplicatesModal(selCol, extra = {}) {
 
 export function openMergeTabsModal(tabOptions, extra = {}) {
   return { type: "mergeTabs", tabOptions, ...extra };
+}
+
+export function openDiffTabsModal(tabOptions, extra = {}) {
+  const tabs = tabOptions || [];
+  const { compareTabId: extraCompare, baselineTabId: extraBaseline, ...rest } = extra;
+  const compareId = extraCompare || tabs[1]?.tabId || tabs[0]?.tabId || "";
+  const baselineId = extraBaseline
+    || tabs.find((t) => t.tabId !== compareId)?.tabId
+    || "";
+  return {
+    type: "diffTabs",
+    tabOptions: tabs,
+    baselineTabId: baselineId,
+    compareTabId: compareId,
+    matchMode: "auto",
+    matchKeys: null,
+    includeUnchanged: false,
+    keyQuery: "",
+    ...rest,
+  };
+}
+
+export function openDiffExplorerModal(extra = {}) {
+  return { type: "diffExplorer", tabId: extra.tabId || null, ...extra };
 }

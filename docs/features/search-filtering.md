@@ -6,7 +6,7 @@ description: Five search modes — full-text, regex, fuzzy, LIKE, and mixed — 
 
 IRFlow Timeline provides multiple search modes and filter types to help you find exactly what you need in massive timelines.
 
-![Search and Filtering interface showing a search for cmd.exe with forensic regex patterns panel](/dfir-tips/Search-Filtering.png)
+![Mixed-mode search for cmd.exe on the WKS2390 EvtxECmd timeline — 7,719 hits, condition radios, and histogram](/dfir-tips/Search-Filtering.png)
 
 ## Search Modes
 

@@ -4,6 +4,151 @@ description: IRFlow Timeline changelog — version history, new features, perfor
 
 # Changelog
 
+## v1.0.12 — August 24, 2026
+
+### Diff Tabs
+
+View → **Diff Tabs** compares any two imported files — not a Computer History special case. Pick a baseline and a compare tab, match on auto-detected identity columns or entire-row content, and get a result timeline of Added / Removed / Changed rows with field-level before/after, clickable status counts, and schema-delta highlighting.
+
+### Tags and bookmarks
+
+A triage layer that was losing work in several places. Every item below is a fix, not a new feature.
+
+- **Bulk Tag / Bookmark leads with an explicit scope** — Selected rows / Filtered view / Entire tab — defaulting to the selection whenever one exists, with the real row count for each option resolved in SQLite. Opened from the Actions menu it previously ignored the selection entirely and, on an unfiltered tab, tagged every row in the file on a single click. Writing to a whole tab now asks first, and the store refuses an unscoped write that has not been confirmed
+- **Tags written during the post-import index build are no longer discarded.** Single- and multi-row tag and bookmark writes were dropped for the minutes that build takes, while the grid showed the tag as applied. The guard was unnecessary — the build runs on the same connection and touches only the data tables
+- **Multi-row tagging applies one direction uniformly.** The right-clicked row is the anchor: its ● / ○ state decides add-versus-remove and that decision applies to every selected row. Previously each row decided for itself, so one click on a mixed selection tagged some rows and untagged others
+- **"Select all" plus tag writes the whole filtered population** in SQL, honouring deselected rows. It used to write exactly one row while the status bar reported the full count
+- **Cached query windows no longer repaint pre-tag state.** A filter round-trip could restore the tag snapshot from before an edit, making a successful write look like it had reverted
+- **Manage Tags is backed by live row counts** and can rename a tag (merging into the destination on collision), collapse tags that differ only by case or spacing, and delete a tag from the rows that carry it. Deleting previously removed only the colour swatch — every row kept the tag, still filterable and still in the report, and could no longer be untagged from the row menu because the palette no longer listed it. Analyzer-written tags (`IOC:`, `VT:`, Sigma, `Encrypted`) now appear alongside manual ones
+- **Tags and bookmarks survive export.** CSV, TSV and XLSX exports carry `Tags` and `Bookmarked` columns when the tab has any
+- **`⌘⇧1`–`⌘⇧9` apply palette tag 1–9** to the current selection, under the same scope rules as the context menu
+- Multi-row tag writes go through a single transaction instead of one IPC round trip per row
+
+### ChatGPT Computer History — live re-audit (this Mac, 16,173 events)
+
+The 1.0.10 catalog and the 1.0.11 verification both missed a later recorder kind, and overstated how hard 48-hour purge is.
+
+- **`terminal.value_changed` is now parsed.** Nine events on the measured host, all while Secure Input was engaged. Content is the visible iTerm2 scrollback (`keyboard.target.value`): SSH targets, `rsync`/`scp` command lines, first-seen host-key acceptance. The typed password is still withheld. Previously the kind fell through to an empty `Content` field. Activity values: `Terminal Buffer`, `SSH Session`, and the Secure Input variants
+- **Visible-range truncation is labelled.** Records prefixed `[truncated to visible range]` are the on-screen AX slice, not full scrollback
+- **`com.openai.chat.StatsigService.plist`** is collected as `identity.statsig_account` — email / user id / account UUID with no tokens
+- **Computer History plugin vs Computer Use MCP** are recorded separately. They share a container; they are not the same feature
+- **48-hour purge caveat.** Advertised rolling window applies while the recorder is running. A stopped recorder left 90 segment buckets on disk three days after the last write
+
+### Signed and notarized disk image
+
+Every release through v1.0.11 shipped a DMG that was **never signed or submitted to Apple**. The application inside was notarized and stapled, so it ran cleanly once installed — but the downloaded disk image itself failed Gatekeeper (`no usable signature`), which is the *"Apple could not verify…"* dialog on first open and the reason the install page advised right-click → Open.
+
+Notarization ran as an `afterSign` step, which fires on the `.app` before any DMG exists; the build then wrapped that stapled app in a disk image and did nothing further to the wrapper. The build now signs, notarizes and staples the DMG itself, and asserts with `spctl` that Gatekeeper accepts it before the build is allowed to succeed.
+
+### Hayabusa v2 / v3 / v4 compatibility
+
+Hayabusa v4 merged `csv-timeline` and `json-timeline` into a single `dfir-timeline` subcommand with an explicit `-t` output type, and rejects the old form before scanning a single event.
+
+- **The scanner detects the installed binary's version and builds the matching command line**, keeping v2 and v3 on the legacy subcommands. Contributed by [@Yuds16](https://github.com/Yuds16) in [#27](https://github.com/r3nzsec/irflow-timeline/pull/27)
+- **The output file extension matches the requested type.** `json` and `jsonl` both landed on `.jsonl`, so a JSON run wrote a JSON document into a file named `.jsonl`
+- **Version detection requires a real version token.** A loose digit match meant an unparsable version string could route a v4 binary down the legacy path; anything unrecognised now falls back to the modern CLI
+- **Hayabusa's abbreviated level names (`crit`, `med`) map to full severities.** Left unmapped they became their own severity buckets, so critical detections dropped out of the severity histogram
+
+Known limitation: the `JSON` output mode still cannot be read by the result parser, which is line-delimited. Use `CSV` or `JSONL`.
+
+### Multi-tab selection controls
+
+- **Lateral Movement Tracker** gains **Select All** and **Clear** for its multi-source tab list
+- **Persistence Analyzer** gains **Clear** alongside its existing **Select all**
+
+Both contributed by [@Yuds16](https://github.com/Yuds16) in [#27](https://github.com/r3nzsec/irflow-timeline/pull/27).
+
+## v1.0.11 — August 16, 2026
+
+Computer History correctness release. Every claim in the 1.0.10 analysis was re-tested against a live 9,000-event capture; four were wrong, and three artifacts were not being collected at all.
+
+### Corrected analysis
+
+- **Credential rows no longer claim to recover passwords.** macOS Secure Input Mode blocks the recorder's event tap, so keystrokes consume event ids without ever being written — zero text-bearing input events under secure input across the measured capture. A credential row is now presented as a timing anchor: that a password was entered, in which field and app, at what second
+- **Recorder restarts are detected instead of clearing the gap.** `EventId` restarts at 1 with each recorder session, and the previous continuity check subtracted ids across that boundary — yielding a negative shortfall that read as reassurance. On the measured capture it cleared 183 of 186 gap rows with "ids run continuously (17169 → 1)". Restart-spanning gaps are now reported as unassessed
+- **Capture fidelity is measured, not assumed.** `resolveFidelityTier` takes the more capable of the known-app table and what the application actually produced, so a stale table entry can be corrected by evidence while a thin sample can never argue capability away. Slack, previously pinned to metadata-only on category reasoning, exposed 53,590 characters of channel content including message bodies
+- **`ComputerUseAppApprovals.json` is no longer presented as the recording scope.** It belongs to the separate Computer Use agent feature; on the measured host it listed one bundle against 38 actually recorded, with an mtime predating the feature. Recording scope is account-side and is now reported as unknown
+
+### New evidence collected
+
+- **Consolidated Codex memory.** Skysight summaries are mined by the Codex memory consolidator into `~/.codex/memories/`, which is neither purged at 48 hours nor cleared with Computer History — on a stale host it can be the only surviving copy. Lines carrying the `[skysight memory]` provenance tag, and blocks citing a Skysight resource, are collected as `memory.consolidated` rows
+- **Summary bodies are split into their distinct assertions.** `summary.profile` carries the model-inferred user dossier — the largest section, naming documents, typed search terms and application roles, and surviving the raw purge. `summary.priorcontext` carries text describing activity from outside its own window and is labelled so it is never used to date evidence
+- **Mouse modifiers.** `mouse.modifiers` was dropped entirely. A command-click on a link opens it in a background tab — deliberate non-navigation, the bulk-open pattern — and now reaches the `KeyChord` column alongside keyboard chords
+- **Secure Input as a second credential signal.** `app.secureInput` fires on any system-wide password prompt, including those exposing no secure-field subrole, and surfaces as `Password Prompt`
+
+### Grok Build and Claude Desktop — stores that outlive the conversation
+
+Six stores sitting outside the session trees were unread. All of them survive deletion of the conversation, which is what makes them worth having.
+
+- **Grok `sessions/session_search.sqlite`** — the FTS5 index over session transcripts (`session_id`, `cwd`, `title`, `updated_at`, indexed body). The same artifact class as Cursor's `conversation-search.db`; it mirrors the transcript and survives deleting the session directory
+- **Grok `logs/unified.jsonl`** — tool executions with outcome and duration, plus turn boundaries, written independently of the session tree. Records *that* a tool ran, never the command string
+- **Grok `active_sessions.json`** — sessions open at acquisition, with pid and working directory
+- **Claude Desktop `deleted_<session-uuid>` tombstones** — a 13-byte file whose content is the epoch-ms deletion time and whose filename is the deleted session id. Dated proof a conversation existed and was removed
+- **Claude Desktop `pending-uploads/`** — files staged for upload, inventoried by path, size and staging time. File content is never read
+- **Claude Desktop `plan-usage-history.json`** — usage samples collapsed into contiguous "application in use" windows, labelled as derived rather than as recorded session boundaries
+- **Claude Desktop `scheduled-tasks.json` and `git-worktrees.json`** — agent runs configured to fire without user interaction, and workspaces with last-seen timestamps
+- Discovery now prefers `~/Library/Application Support/Claude` over its `claude-code-sessions` child, because three of those stores are siblings of that directory. It replaces the child roots rather than adding to them, so no transcript is parsed twice, and nothing walks up out of a folder you selected
+- `~/.grok/memtrace/` is **deliberately not parsed**: despite the name it is a memory profiler trace, not agent memory, and carries no conversation content
+
+### Grid quality
+
+- Click multiplicity is named by meaning — `Click`, `Double-Click`, `Triple-Click`, `Multi-Click` — instead of ten numeric `Click (xN)` values. The exact count remains in the `ClickCount` column, where a numeric dimension belongs
+- Open (in-progress) segments are excluded from count reconciliation rather than scored as a shortfall
+- Fidelity table corrections: Cursor's real bundle identifier added, a mislabelled entry removed, Slack and Discord tiered from evidence
+
+### Naming
+
+- The artifact family is **ChatGPT Computer History** everywhere — menu, tab title and the `Tool` column previously disagreed
+
+The column schema is unchanged at 54 columns; existing saved tabs and sessions need no migration.
+
+## v1.0.10 — August 14, 2026
+
+### ChatGPT Computer History
+
+- Added ChatGPT "Computer History" (Skysight) as a new macOS artifact family: the raw interaction-event stream retained for about 48 hours, plus the derived activity summaries that persist until cleared
+- Dedicated 54-column schema for user-activity telemetry — app, window and URL context, accessibility target role and subrole, typed content, cross-app drag origin and destination, capture fidelity, and segment provenance
+- Password-field entry is identified and labelled as a timing anchor — macOS Secure Input Mode withholds the field value *and* suppresses the keystrokes, so a credential row evidences that a password was entered, not what it was
+- Finder file selections and menu commands are captured instead of landing as empty rows
+- Typed input is collapsed into completed prompts, while terminal scrollback is preserved as a command timeline
+- Segments are reconciled against their own metadata so that records removed after the fact — the effect of the "clear last 10 minutes / hour / day" control — are surfaced as a deletion lead
+- Activity summaries the user cleared are recovered read-only from the Codex memories git history, with the time they were removed
+- Attribution rows collect the ChatGPT account, the signed-in identity, and the per-app device identifiers, each labelled with how strongly it identifies an account; no token material is stored or exported
+- Codex conversations are dated from their identifiers and joined to the timeline, with deleted conversations flagged — the prompt typed into a deleted conversation is often still recorded
+
+### Crash and Worker Reliability
+
+- Fixed a one-shot worker lifecycle leak that could accumulate hundreds of worker threads during long sessions
+- Moved recurring autosave bookmark snapshots onto the main SQLite connection instead of creating a worker for every loaded tab
+- Added exactly-once job settlement for clean exits without results, abnormal exits, startup failures, cancellation races, and duplicate terminal events
+- Kept live worker accounting active until the operating-system thread actually exits, with bounded forced retirement for stragglers
+
+### Crash-Safe Session Recovery
+
+- Serialized autosaves and prevented overlapping snapshots
+- Replaced direct autosave overwrites with synced temporary files and atomic rename
+- Retained the previous valid snapshot as a backup and automatically falls back to it when the primary is missing or corrupt
+- Validated session structure before writing or restoring recovery data
+
+### Application and Resource Resilience
+
+- Closing the last macOS window hides and preserves the live workspace; Dock activation restores it without orphaning workers or SQLite tabs
+- Fatal main-process errors, unhandled rejections, and unexpected renderer exits now clean up runtime resources and relaunch once, with a 30-second crash-loop guard
+- Enabled local-only Electron crash dumps and child-process exit logging
+- Added a memory-aware global worker ceiling plus a separate heavy-work ceiling across every worker-backed feature; live and queued usage is available through job diagnostics
+
+### Hayabusa Process Reliability
+
+- EVTX scan cancellation now waits for Hayabusa to close and escalates from `SIGTERM` to `SIGKILL` when required
+- Temporary scan output is removed only after the child process stops, and scan registration is cleared on every terminal path
+- Hayabusa diagnostic capture is capped at 256 KiB, with progress-parser errors contained safely in the scan promise
+
+### Runtime Modernization
+
+- Upgraded to Electron 43, `better-sqlite3` 13, Electron Builder 26, Electron Rebuild 4, and Electron Updater 6.8
+- Aligned local and CI builds on Node.js 22.12+ and deduplicated the EVTX message provider onto the Electron-compatible SQLite 13 addon
+- Set the packaged operating-system floor to macOS 12 (Monterey), matching Electron 43 support
+
 ## v1.0.9 — July 27, 2026
 
 ### Large EVTX Imports

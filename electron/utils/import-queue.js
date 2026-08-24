@@ -4,6 +4,7 @@ function makeImportQueueKey(filePath, opts = {}) {
   return [
     path.resolve(filePath),
     opts.sheetName ?? "",
+    opts.tableName ?? "",
     opts.aiHistoryTool ?? "",
     opts.aiHistoryIncludeSubagents ? "subagents" : "main",
   ].join("\u0000");

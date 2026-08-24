@@ -6,11 +6,24 @@ const DEFAULT_LEVELS = ["critical", "high", "medium", "low", "informational"];
 const LEVEL_RANK = ["informational", "low", "medium", "high", "critical"];
 const STATUS_LIST = ["stable", "test", "experimental"];
 
+function hayabusaMajorVersion(version) {
+  if (typeof version !== "string") return null;
+  // Require a recognisable version token — "v4", "v4.0.0" or "4.0.0". A bare /(\d+)/
+  // matches the first digit run ANYWHERE, so a string like "unknown-3" would silently
+  // route the scan down the legacy v2/v3 CLI and fail against a v4 binary. Anything
+  // unrecognised returns null, which callers treat as "assume modern".
+  const match = version.match(/\bv(\d+)(?:\.\d+)*\b|\b(\d+)\.\d+(?:\.\d+)*\b/);
+  if (!match) return null;
+  return parseInt(match[1] ?? match[2], 10);
+}
+
 function createScanOutputPaths(outputMode = "csv") {
   const ts = Date.now();
   const tmpOutput = path.join(os.tmpdir(), `tle-hayabusa-${ts}.csv`);
   const tmpHtmlReport = path.join(os.tmpdir(), `tle-hayabusa-report-${ts}.html`);
-  const outputExt = outputMode === "csv" ? ".csv" : ".jsonl";
+  // One extension per output type. This used to collapse json and jsonl onto ".jsonl",
+  // so a `-t json` scan wrote JSON-document content into a file named .jsonl.
+  const outputExt = outputMode === "json" ? ".json" : outputMode === "jsonl" ? ".jsonl" : ".csv";
   const actualOutput = outputMode !== "csv" ? tmpOutput.replace(".csv", outputExt) : tmpOutput;
   return { tmpOutput, tmpHtmlReport, actualOutput };
 }
@@ -28,20 +41,28 @@ function buildScanCommand({ dirPath, options = {}, outputPaths, warnings = [] })
   let statusFilter = selectedStatuses.length < STATUS_LIST.length ? selectedStatuses : null;
 
   const outputMode = options.outputMode || "csv";
-  const subcommand = outputMode === "json" || outputMode === "jsonl" ? "json-timeline" : "csv-timeline";
+  // Hayabusa v4 unified csv-timeline/json-timeline into a single dfir-timeline. need to consider v2/v3
+  const major = hayabusaMajorVersion(options.version);
+  const useUnified = major === null || major >= 4;
+  const outputType = outputMode === "json" ? "json" : outputMode === "jsonl" ? "jsonl" : "csv";
+  const subcommand = useUnified
+    ? "dfir-timeline"
+    : (outputMode === "json" || outputMode === "jsonl" ? "json-timeline" : "csv-timeline");
   const profile = options.profile || "verbose";
 
   const args = [
     subcommand,
     "-d", dirPath,
     "-o", outputPaths.actualOutput,
+  ];
+  if (useUnified) args.push("-t", outputType);
+  args.push(
     "-p", profile,
     "--no-wizard",
     "-q",
     "-H", outputPaths.tmpHtmlReport,
-  ];
-
-  if (outputMode === "jsonl") args.push("--jsonl-output");
+  );
+  if (!useUnified && outputMode === "jsonl") args.push("--jsonl-output");
 
   const ruleSet = options.ruleSet || "all";
   if (ruleSet === "core") {
@@ -130,4 +151,5 @@ module.exports = {
   buildScanCommand,
   buildGenericCommand,
   getAvailableProfiles,
+  hayabusaMajorVersion,
 };

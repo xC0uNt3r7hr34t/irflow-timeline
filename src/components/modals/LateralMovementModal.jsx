@@ -1228,8 +1228,16 @@ export default function LateralMovementModal() {
                   </div>
                   {modal.lmMultiSource && (
                     <div style={{ borderTop: `1px solid ${th.border}22`, paddingTop: 8 }}>
-                      <div style={{ fontSize: LM_TYPOGRAPHY.meta, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, fontFamily: "-apple-system, sans-serif" }}>
-                        Select tabs to include ({(modal.lmSelectedTabIds || []).length + 1} of {otherTabs.length + 1} tabs)
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 6 }}>
+                        <div style={{ fontSize: LM_TYPOGRAPHY.meta, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "-apple-system, sans-serif" }}>
+                          Select tabs to include ({(modal.lmSelectedTabIds || []).length + 1} of {otherTabs.length + 1} tabs)
+                        </div>
+                        {otherTabs.length > 0 && (
+                          <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                            <button onClick={() => setModal((p) => ({ ...p, lmSelectedTabIds: otherTabs.map(t => t.id) }))} style={{ padding: "2px 8px", fontSize: LM_TYPOGRAPHY.control, background: th.panelBg, border: `1px solid ${th.border}44`, borderRadius: 4, color: th.text, cursor: "pointer" }}>Select All</button>
+                            <button onClick={() => setModal((p) => ({ ...p, lmSelectedTabIds: [] }))} style={{ padding: "2px 8px", fontSize: LM_TYPOGRAPHY.control, background: th.panelBg, border: `1px solid ${th.border}44`, borderRadius: 4, color: th.text, cursor: "pointer" }}>Clear</button>
+                          </div>
+                        )}
                       </div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 3, maxHeight: 120, overflow: "auto" }}>
                         {/* Current tab — always included, shown but not toggleable */}
@@ -1707,7 +1715,7 @@ export default function LateralMovementModal() {
                               {wList.map((w, i) => {
                                 const c = w.level === "error" ? th.sev.critical : w.level === "warn" ? th.sev.med : th.textMuted;
                                 return (
-                                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: LM_TYPOGRAPHY.meta, color: th.textDim, padding: "3px 6px", background: c + "08", borderLeft: `2px solid ${c}`, borderRadius: 3 }}>
+                                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: LM_TYPOGRAPHY.meta, color: th.textDim, padding: "3px 6px", background: c + "08", borderRadius: 3 }}>
                                     <span style={{ color: c, fontWeight: 700, fontSize: LM_TYPOGRAPHY.badge, textTransform: "uppercase", flexShrink: 0 }}>{w.level}</span>
                                     <span>{w.text}</span>
                                   </div>
@@ -3210,7 +3218,7 @@ export default function LateralMovementModal() {
                                 <div>
                                   <div style={{ fontSize: LM_TYPOGRAPHY.badge, color: th.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 600, marginBottom: 4 }}>Why It Matters</div>
                                   {narrative.map((n, ni) => (
-                                    <div key={ni} style={{ fontSize: LM_TYPOGRAPHY.meta, color: th.textDim, marginBottom: 2, lineHeight: 1.4, paddingLeft: 8, borderLeft: `2px solid ${th.accent}22` }}>{n}</div>
+                                    <div key={ni} style={{ fontSize: LM_TYPOGRAPHY.meta, color: th.textDim, marginBottom: 2, lineHeight: 1.4, paddingLeft: 8 }}>{n}</div>
                                   ))}
                                 </div>
                               )}

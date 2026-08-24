@@ -17,7 +17,7 @@ IRFlow Timeline now supports in-app macOS updates with `electron-updater`.
 
 The manual check lives under **Help** in the menu bar:
 
-![Help menu showing Check for Updates… alongside Quick Help, Keyboard Shortcuts, and About](/dfir-tips/Check-For-Updates-Button.png)
+![Help menu showing Command Palette, Quick Help, Keyboard Shortcuts, Check for Updates, Website, and About](/dfir-tips/Check-For-Updates-Button.png)
 
 Selecting **Check for Updates…** opens an in-app status popup that reports whether you are up to date, shows download progress when an update is available, and prompts you to restart when the package is ready to install.
 

@@ -21,12 +21,12 @@ const config = {
   mac: {
     category: "public.app-category.developer-tools",
     icon: "assets/icon.icns",
-    // The bundled Hayabusa binary (extraResources) is universal (arm64+x86_64)
-    // Mach-O, identical in both the x64 and arm64 sub-builds. @electron/universal
-    // refuses to merge an identical Mach-O unless it's explicitly allowed here, so
-    // this tells it to copy the (already-fat) binary through as-is. Without this the
-    // universal build fails with "not covered by the x64ArchFiles rule".
-    x64ArchFiles: "**/hayabusa/hayabusa",
+    minimumSystemVersion: "12.0",
+    // Hayabusa is already universal, while better-sqlite3 13 ships architecture-named
+    // Darwin prebuilds in both sub-builds. @electron/universal refuses identical Mach-O
+    // files unless they are explicitly allowed, so copy these known, self-identifying
+    // files through while it merges the rest of the application normally.
+    x64ArchFiles: "**/{hayabusa/hayabusa,node_modules/better-sqlite3/prebuilds/darwin-*.node}",
     target: [
       {
         target: "dmg",
@@ -68,6 +68,9 @@ const config = {
     deleteAppDataOnUninstall: false,
   },
   afterSign: process.platform === "darwin" ? "scripts/notarize.js" : undefined,
+  // Notarizes + staples the DMG itself. afterSign only reaches the .app, which
+  // left the downloaded disk image unsigned and Gatekeeper-rejected.
+  afterAllArtifactBuild: process.platform === "darwin" ? "scripts/notarize-dmg.js" : undefined,
   electronUpdaterCompatibility: ">=2.16",
   dmg: {
     title: "IRFlow Timeline",
@@ -109,6 +112,8 @@ const config = {
     { ext: "tsv", name: "TSV File", role: "Viewer" },
     { ext: "xlsx", name: "Excel File", role: "Viewer" },
     { ext: "plaso", name: "Plaso File", role: "Viewer" },
+    { ext: "sqlite", name: "SQLite Database", role: "Viewer" },
+    { ext: "db", name: "SQLite Database", role: "Viewer" },
     { ext: "evtx", name: "EVTX File", role: "Viewer" },
     { ext: "mft", name: "MFT File", role: "Viewer" },
   ],

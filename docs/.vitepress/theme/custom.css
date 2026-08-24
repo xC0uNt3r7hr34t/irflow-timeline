@@ -1,6 +1,9 @@
 /* IRFlow Timeline — Unit 42 Orange Theme */
 
 :root {
+  /* Use more of the viewport so tables and prose are not stuck at 688px. */
+  --vp-layout-max-width: 1760px;
+
   /* Brand colors: Unit 42 Orange #E85D2A */
   --vp-c-brand-1: #E85D2A;
   --vp-c-brand-2: #F47B50;
@@ -234,4 +237,58 @@
 /* Code tabs — light */
 :root:not(.dark) .vp-code-group .tabs label.active {
   color: #E85D2A !important;
+}
+
+/*
+ * Article width — VPDoc.vue scopes max-width: 688px on .has-aside .content-container,
+ * which beats an unscoped override. Force the middle column to fill the space
+ * between the left nav and the outline, and keep tables inside that box.
+ */
+@media (min-width: 1280px) {
+  .VPDoc.has-aside .content {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    overflow-x: hidden;
+  }
+
+  .VPDoc.has-aside .content-container {
+    max-width: none !important;
+    width: 100%;
+  }
+
+  .VPDoc .aside {
+    flex: 0 0 220px !important;
+    max-width: 220px !important;
+    padding-left: 20px;
+  }
+
+  .VPDoc .aside-container {
+    width: 200px;
+    background-color: var(--vp-c-bg);
+    z-index: 2;
+  }
+
+  .VPDoc .aside-curtain {
+    width: 200px;
+  }
+}
+
+.vp-doc table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.vp-doc th,
+.vp-doc td {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.vp-doc td code,
+.vp-doc th code {
+  white-space: pre-wrap;
+  word-break: break-all;
 }

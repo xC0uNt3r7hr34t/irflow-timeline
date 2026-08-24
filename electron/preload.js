@@ -41,6 +41,7 @@ contextBridge.exposeInMainWorld("tle", {
   triageImport: (dir, paths, opts) => ipcRenderer.invoke("triage-import", { dir, paths, ...(opts || {}) }),
   triageCancelBatch: (batchId, tabIds) => ipcRenderer.invoke("triage-cancel-batch", { batchId, tabIds }),
   listJobs: () => ipcRenderer.invoke("jobs-list"),
+  getJobMetrics: () => ipcRenderer.invoke("jobs-metrics"),
   cancelJob: (jobId) => ipcRenderer.invoke("jobs-cancel", { jobId }),
   debugLog: (payload) => ipcRenderer.invoke("debug-log", payload),
   getPathForFile: (file) => webUtils.getPathForFile(file),
@@ -72,17 +73,25 @@ contextBridge.exposeInMainWorld("tle", {
   getFileActivityHeatmap: (tabId) => ipcRenderer.invoke("get-file-activity-heatmap", { tabId }),
   analyzeADS: (tabId) => ipcRenderer.invoke("analyze-ads", { tabId }),
   analyzeUsnJournal: (tabId, startTime, endTime, analyses, pathFilter, mftTabId) => ipcRenderer.invoke("analyze-usn-journal", { tabId, startTime, endTime, analyses, pathFilter, mftTabId }),
-  analyzeAiHistory: (tabId, options) => ipcRenderer.invoke("analyze-ai-history", { tabId, mode: options?.mode, redact: options?.redact, salt: options?.salt }),
+  analyzeAiHistory: (tabId, options) => ipcRenderer.invoke("analyze-ai-history", { tabId, mode: options?.mode, salt: options?.salt }),
+  startAiSecretScan: (tabId, options) => ipcRenderer.invoke("start-ai-secret-scan", { tabId, mode: options?.mode, salt: options?.salt }),
+  getAiSecretResultsPage: (scanId, offset, limit) => ipcRenderer.invoke("get-ai-secret-results-page", { scanId, offset, limit }),
+  revealAiSecret: (scanId, findingId) => ipcRenderer.invoke("reveal-ai-secret", { scanId, findingId }),
+  releaseAiSecretScan: (scanId) => ipcRenderer.invoke("release-ai-secret-scan", { scanId }),
   decodeAiHistory: (path, tool, options) => ipcRenderer.invoke("decode-ai-history", { path, tool, ...(options || {}) }),
+  decodeComputerHistory: (path, options) => ipcRenderer.invoke("decode-computer-history", { path, ...(options || {}) }),
   pickAiHistoryScanFolder: () => ipcRenderer.invoke("pick-ai-history-scan-folder"),
   discoverAiHistoryProfile: (options) => ipcRenderer.invoke("discover-ai-history-profile", options || {}),
   extractAiHistoryProfile: (options) => ipcRenderer.invoke("extract-ai-history-profile", options || {}),
   cancelAiHistoryExtract: () => ipcRenderer.invoke("cancel-ai-history-extract"),
   saveTextFile: (content, defaultPath, filters) => ipcRenderer.invoke("save-text-file", { content, defaultPath, filters }),
+  saveAiSecretExport: (content, defaultPath, filters) => ipcRenderer.invoke("save-ai-secret-export", { content, defaultPath, filters }),
   exportRansomwarePdf: (html, defaultName) => ipcRenderer.invoke("export-ransomware-pdf", { html, defaultName }),
   exportAiSecretsPdf: (html, defaultName) => ipcRenderer.invoke("export-ai-secrets-pdf", { html, defaultName }),
   generateReport: (tabId, fileName, tagColors, vtEnrichment) => ipcRenderer.invoke("generate-report", { tabId, fileName, tagColors, vtEnrichment }),
   selectSheet: (data) => ipcRenderer.invoke("select-sheet", data),
+  selectTable: (data) => ipcRenderer.invoke("select-table", data),
+  selectTablesAll: (data) => ipcRenderer.invoke("select-tables-all", data),
   searchCount: (tabId, searchTerm, searchMode, searchCondition) => ipcRenderer.invoke("search-count", { tabId, searchTerm, searchMode, searchCondition }),
   getHistogramData: (tabId, colName, options) => ipcRenderer.invoke("get-histogram-data", { tabId, colName, options }),
   getStackingData: (tabId, colName, options) => ipcRenderer.invoke("get-stacking-data", { tabId, colName, options }),
@@ -125,6 +134,7 @@ contextBridge.exposeInMainWorld("tle", {
   rdpBitmapPreviewImage: (imagePath, options) => ipcRenderer.invoke("rdp-bitmap-preview-image", { imagePath, options }),
   bulkTagByTimeRange: (tabId, colName, ranges) => ipcRenderer.invoke("bulk-tag-by-time-range", { tabId, colName, ranges }),
   mergeTabs: (mergedTabId, sources) => ipcRenderer.invoke("merge-tabs", { mergedTabId, sources }),
+  diffTabs: (diffTabId, spec) => ipcRenderer.invoke("diff-tabs", { diffTabId, spec }),
   getEmptyColumns: (tabId) => ipcRenderer.invoke("get-empty-columns", { tabId }),
 
   // Tag operations
@@ -136,8 +146,16 @@ contextBridge.exposeInMainWorld("tle", {
   getBookmarkedIds: (tabId) => ipcRenderer.invoke("get-bookmarked-ids", { tabId }),
   bulkAddTags: (tabId, tagMap) => ipcRenderer.invoke("bulk-add-tags", { tabId, tagMap }),
   bulkTagFiltered: (tabId, tag, options) => ipcRenderer.invoke("bulk-tag-filtered", { tabId, tag, options }),
-  bulkRemoveTagFiltered: (tabId, tag, options) => ipcRenderer.invoke("bulk-remove-tag-filtered", { tabId, tag, options }),
+  bulkUntagFiltered: (tabId, tag, options) => ipcRenderer.invoke("bulk-untag-filtered", { tabId, tag, options }),
   bulkBookmarkFiltered: (tabId, add, options) => ipcRenderer.invoke("bulk-bookmark-filtered", { tabId, add, options }),
+  // Apply/remove ONE tag across an explicit row-ID list in a single transaction.
+  // Multi-row tagging must use this, never a per-row addTag loop.
+  setTagOnRows: (tabId, rowIds, tag, add) => ipcRenderer.invoke("set-tag-on-rows", { tabId, rowIds, tag, add }),
+  getTagsForRows: (tabId, rowIds) => ipcRenderer.invoke("get-tags-for-rows", { tabId, rowIds }),
+  renameTag: (tabId, from, to) => ipcRenderer.invoke("rename-tag", { tabId, from, to }),
+  deleteTag: (tabId, tag) => ipcRenderer.invoke("delete-tag", { tabId, tag }),
+  mergeDuplicateTags: (tabId) => ipcRenderer.invoke("merge-duplicate-tags", { tabId }),
+  countFilteredRows: (tabId, options) => ipcRenderer.invoke("count-filtered-rows", { tabId, options }),
 
   // IOC matching
   loadIocFile: () => ipcRenderer.invoke("load-ioc-file"),
@@ -162,7 +180,7 @@ contextBridge.exposeInMainWorld("tle", {
   autoSaveSession: (data) => ipcRenderer.invoke("auto-save-session", { sessionData: data }),
   loadAutoSave: () => ipcRenderer.invoke("load-auto-save"),
   clearAutoSave: () => ipcRenderer.invoke("clear-auto-save"),
-  importFileForRestore: (filePath, sheetName) => ipcRenderer.invoke("import-file-for-restore", { filePath, sheetName }),
+  importFileForRestore: (filePath, sheetName, tableName) => ipcRenderer.invoke("import-file-for-restore", { filePath, sheetName, tableName }),
 
   // Filter presets (persistent)
   loadFilterPresets: () => ipcRenderer.invoke("load-filter-presets"),
@@ -189,9 +207,11 @@ contextBridge.exposeInMainWorld("tle", {
     ipcRenderer.on("analysis-progress", handler);
     return () => ipcRenderer.removeListener("analysis-progress", handler);
   },
+  onAiSecretScanComplete: (cb) => onIpc("ai-secret-scan-complete", cb),
   onProcessTreeComplete: (cb) => onIpc("process-tree-complete", cb),
   onPersistenceAnalysisComplete: (cb) => onIpc("persistence-analysis-complete", cb),
   onSheetSelection: (cb) => onIpc("sheet-selection", cb),
+  onTableSelection: (cb) => onIpc("table-selection", cb),
   onRecentFilesUpdated: (cb) => onIpc("recent-files-updated", cb),
   onUsnPathsUpdated: (cb) => onIpc("usn-paths-updated", cb),
   onRwProgress: (cb) => onIpc("rw-progress", cb),

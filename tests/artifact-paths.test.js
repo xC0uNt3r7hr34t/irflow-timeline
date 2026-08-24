@@ -16,22 +16,40 @@ const {
 } = require("../electron/parsers/ai-history/artifact-paths");
 const { discoverLocalAiHistoryRoots } = require("../electron/parsers/ai-history/profile-scan");
 
-test("getLocalAiHistoryCandidates includes all nine tools", () => {
+test("getLocalAiHistoryCandidates includes all ten tools", () => {
   const tools = new Set(getLocalAiHistoryCandidates().map((c) => c.tool));
   assert.deepEqual(tools, new Set([
     "claude-code", "codex", "grok-build", "gemini-cli", "cursor", "chatgpt", "copilot",
-    "windsurf", "continue",
+    "windsurf", "continue", "computer-history",
   ]));
+});
+
+test("computer-history candidates cover both the raw stream and the derived summaries", () => {
+  const paths = getLocalAiHistoryCandidates()
+    .filter((c) => c.tool === "computer-history")
+    .map((c) => c.path);
+  assert.equal(paths.length, 2);
+  assert.ok(paths.some((p) => p.endsWith(path.join("Skysight", "segments"))));
+  assert.ok(paths.some((p) => p.endsWith(path.join("skysight", "resources"))));
 });
 
 test("listClaudeCodeCandidatePaths includes CLI and Desktop roots", () => {
   const kinds = new Set(listClaudeCodeCandidatePaths().map((c) => c.kind));
   assert.ok(kinds.has("cli"));
   assert.ok(listClaudeCodeCandidatePaths().some((c) => c.path.endsWith(".claude")));
+  // A desktop root is either the app-support directory itself or one of the session directories
+  // below it. The parent is preferred when present, because pending-uploads/,
+  // plan-usage-history.json and git-worktrees.json are siblings of claude-code-sessions and are
+  // unreachable from a scan aimed at the session directories alone.
   const desktopPaths = listClaudeCodeCandidatePaths().filter((c) => c.kind === "desktop");
   for (const { path: p } of desktopPaths) {
-    assert.match(p, /claude-code-sessions|local-agent-mode-sessions/);
+    assert.match(p, /claude-code-sessions|local-agent-mode-sessions|[/\\]Claude$/);
   }
+  // Never both: scanning the parent already covers the children, and listing both would parse
+  // every transcript twice.
+  const parents = desktopPaths.filter((c) => /[/\\]Claude$/.test(c.path));
+  const children = desktopPaths.filter((c) => /sessions$/.test(c.path));
+  assert.ok(!(parents.length && children.length), "parent and children are mutually exclusive");
 });
 
 test("listChatgptCandidatePaths is non-empty on every platform", () => {

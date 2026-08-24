@@ -28,7 +28,7 @@ const MEMORY_PRESSURE_MIN_FILE_BYTES = 2 * 1024 * 1024 * 1024;
  * @param {object} deps - Dependencies from main.js
  */
 async function importFile(filePath, preTabId, preSheetName, deps, queueItem = {}) {
-  const { mainWindow, safeSend, activeWindow, getXLSXSheets, enqueueImport, nextTabId } = deps;
+  const { mainWindow, safeSend, activeWindow, getXLSXSheets, listSqliteTables, isSqliteFile, validatePlasoFile, enqueueImport, nextTabId } = deps;
   const { detectAiHistoryImport } = require("./parsers/ai-history-import");
   const { AI_HISTORY_TOOLS } = require("./parsers/ai-history/schema");
 
@@ -153,14 +153,42 @@ async function importFile(filePath, preTabId, preSheetName, deps, queueItem = {}
     }
   }
 
-  dbg("IMPORT", `calling startImport`, { tabId, sheetName });
-  await startImport(filePath, tabId, fileName, sheetName, fileSize, deps);
+  let tableName = queueItem.tableName || null;
+  const sqliteCandidate = !aiHistory && (
+    ext === ".sqlite" || ext === ".sqlite3" || ext === ".db" || (typeof isSqliteFile === "function" && isSqliteFile(filePath))
+  );
+  if (sqliteCandidate && !tableName) {
+    try {
+      const plasoCheck = typeof validatePlasoFile === "function" ? validatePlasoFile(filePath) : { valid: false };
+      if (!plasoCheck.valid) {
+        dbg("IMPORT", `listSqliteTables calling...`, { filePath });
+        const tables = await listSqliteTables(filePath);
+        dbg("IMPORT", `listSqliteTables returned`, { tableCount: tables.length, tables: tables.map((t) => t.name) });
+        if (!tables.length) {
+          safeSend("import-error", { tabId, fileName, error: "No importable tables found in SQLite database" });
+          return;
+        }
+        if (tables.length > 1) {
+          safeSend("table-selection", { tabId, fileName, filePath, tables });
+          return;
+        }
+        tableName = tables[0].name;
+      }
+    } catch (e) {
+      dbg("IMPORT", `listSqliteTables failed`, { error: e.message, stack: e.stack });
+      safeSend("import-error", { tabId, fileName, error: e.message || "Failed to read SQLite database" });
+      return;
+    }
+  }
+
+  dbg("IMPORT", `calling startImport`, { tabId, sheetName, tableName });
+  await startImport(filePath, tabId, fileName, sheetName, fileSize, deps, tableName);
 }
 
-async function startImport(filePath, tabId, fileName, sheetName, preFileSize, deps) {
+async function startImport(filePath, tabId, fileName, sheetName, preFileSize, deps, tableName = null) {
   const { safeSend, db, runImportJob, scheduleIndexBuild, importQueue, pendingIndexTabs, tabMeta } = deps;
 
-  dbg("IMPORT", `startImport begin`, { filePath, tabId, fileName, sheetName });
+  dbg("IMPORT", `startImport begin`, { filePath, tabId, fileName, sheetName, tableName });
   let fileSize = preFileSize || 0;
   if (!fileSize) { try { fileSize = fs.statSync(filePath).size; } catch {} }
   dbg("IMPORT", `fileSize`, { fileSize });
@@ -196,11 +224,12 @@ async function startImport(filePath, tabId, fileName, sheetName, preFileSize, de
     filePath,
     fileSize,
     sheetName: sheetName || null,
+    tableName: tableName || null,
   });
 
   try {
     dbg("IMPORT", `starting import worker...`);
-    const result = await runImportJob(filePath, tabId, sheetName, fileSize);
+    const result = await runImportJob(filePath, tabId, sheetName, fileSize, tableName);
     dbg("IMPORT", `parseFile complete`, { headers: result.headers?.length, rowCount: result.rowCount, tsColumns: result.tsColumns?.length });
 
     // Track original file path + format for features like resident data extraction
@@ -284,6 +313,7 @@ async function startImport(filePath, tabId, fileName, sheetName, preFileSize, de
       importWarning,
       importNotice,
       isLargeFile,
+      tableName: tableName || null,
     });
 
     if (isLargeFile && global.gc) {

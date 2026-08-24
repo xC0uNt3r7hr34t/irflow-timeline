@@ -11,6 +11,12 @@ const { openDialogOptions } = require("../utils/open-dialog");
 const { dbg } = require("../logger");
 const { authorizeAiArtifactPick, assertAiReadablePath } = require("../parsers/ai-history/path-auth");
 const { isTleSessionPath, loadSessionFromPath, resolveSessionPath } = require("../session-file");
+const {
+  assertValidSessionPayload,
+  writeSessionAtomic,
+  readSessionWithBackup,
+} = require("../utils/session-persistence");
+const { diffTabTitle } = require("../db/diff-tabs");
 
 function enqueuePlannedImports(planned, enqueueImport) {
   const scopePending = [];
@@ -291,6 +297,22 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
     enqueueImport(filePath, { tabId, sheetName, skipRecent: true });
   });
 
+  safeHandle("select-table", (event, { filePath, tabId, fileName, tableName }) => {
+    enqueueImport(filePath, { tabId, tableName, fileName, skipRecent: true, displayName: fileName });
+  });
+
+  safeHandle("select-tables-all", (event, { filePath, tables }) => {
+    let baseName;
+    try { baseName = decodeURIComponent(path.basename(filePath)); } catch { baseName = path.basename(filePath); }
+    for (const t of tables || []) {
+      enqueueImport(filePath, {
+        tableName: t.name,
+        displayName: `${baseName} [${t.name}]`,
+        skipRecent: true,
+      });
+    }
+  });
+
   // Merge multiple tabs into a single chronological timeline
   safeHandle("merge-tabs", async (event, { mergedTabId, sources }) => {
     try {
@@ -347,6 +369,76 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
     }
   });
 
+  // Diff two tabs into a result timeline (Added / Removed / Changed / Unchanged)
+  safeHandle("diff-tabs", async (event, { diffTabId, spec }) => {
+    const baselineName = spec?.baseline?.tabName || "Baseline";
+    const compareName = spec?.compare?.tabName || "Compare";
+    const fileName = diffTabTitle(baselineName, compareName);
+    try {
+      safeSend("import-start", {
+        tabId: diffTabId,
+        fileName,
+        filePath: "(diff)",
+      });
+
+      const result = await db.diffTabs(diffTabId, spec, (progress) => {
+        safeSend("import-progress", {
+          tabId: diffTabId,
+          rowsImported: progress.current,
+          bytesRead: progress.current,
+          totalBytes: progress.total,
+          percent: progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0,
+          phase: progress.phase,
+          statusDetail: progress.sourceName || progress.phase || "",
+        });
+      });
+
+      const sortCol = (result.headers || []).includes("datetime") ? "datetime" : "_Diff";
+      const initialData = db.queryRows(diffTabId, {
+        offset: 0,
+        limit: 5000,
+        sortCol,
+        sortDir: "asc",
+      });
+      const emptyColumns = db.getEmptyColumns(diffTabId);
+
+      safeSend("import-complete", {
+        tabId: diffTabId,
+        fileName,
+        headers: result.headers,
+        rowCount: result.rowCount,
+        tsColumns: result.tsColumns,
+        numericColumns: result.numericColumns || [],
+        initialRows: initialData.rows,
+        totalFiltered: initialData.totalFiltered,
+        emptyColumns,
+        sourceFormat: "tab-diff",
+        diffMeta: {
+          kind: "tab-diff",
+          baselineName,
+          compareName,
+          baselineTabId: spec?.baseline?.tabId || null,
+          compareTabId: spec?.compare?.tabId || null,
+          matchKeys: result.matchKeys || [],
+          includeUnchanged: !!result.includeUnchanged,
+          stats: result.stats || {},
+          schemaDelta: result.schemaDelta || { onlyA: [], onlyB: [], common: [] },
+        },
+      });
+
+      if (scheduleIndexBuild) scheduleIndexBuild(diffTabId);
+      return { success: true, rowCount: result.rowCount, stats: result.stats };
+    } catch (err) {
+      try { db.closeTab(diffTabId); } catch (_) {}
+      safeSend("import-error", {
+        tabId: diffTabId,
+        fileName,
+        error: err.message,
+      });
+      return { success: false, error: err.message };
+    }
+  });
+
   // Session save
   safeHandle("save-session", async (event, { sessionData }) => {
     const result = await dialog.showSaveDialog(_activeWindow(), {
@@ -354,7 +446,7 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
       filters: [{ name: "TLE Session", extensions: ["tle"] }],
     });
     if (result.canceled) return null;
-    await fsp.writeFile(result.filePath, JSON.stringify(sessionData, null, 2), "utf-8");
+    await writeSessionAtomic(result.filePath, sessionData, { pretty: true });
     return result.filePath;
   });
 
@@ -365,25 +457,43 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
       filters: [{ name: "TLE Session", extensions: ["tle"] }],
     }));
     if (result.canceled || !result.filePaths.length) return null;
-    return loadSessionFromPath(result.filePaths[0]);
+    try {
+      const raw = fs.readFileSync(result.filePaths[0], "utf-8");
+      return assertValidSessionPayload(JSON.parse(raw));
+    } catch (e) {
+      return { error: e.message };
+    }
   });
 
   safeHandle("load-session-from-path", async (_event, { filePath } = {}) => {
     if (!filePath || typeof filePath !== "string") {
       return { error: "No session file path provided." };
     }
-    return loadSessionFromPath(filePath);
+    try {
+      const raw = fs.readFileSync(filePath, "utf-8");
+      return assertValidSessionPayload(JSON.parse(raw));
+    } catch (e) {
+      return { error: e.message };
+    }
   });
 
   // Auto-save: write to a fixed path in userData, no dialog. Used by the
   // renderer's debounced auto-save effect to capture in-flight investigation
   // state so it survives crashes.
   const _autoSavePath = path.join(app.getPath("userData"), "autosave.tle");
+  const _autoSaveBackupPath = `${_autoSavePath}.bak`;
+  let _autoSaveWriteChain = Promise.resolve();
   safeHandle("auto-save-session", async (event, { sessionData }) => {
     try {
-      await fsp.writeFile(_autoSavePath, JSON.stringify(sessionData), "utf-8");
-      return { ok: true, path: _autoSavePath };
+      assertValidSessionPayload(sessionData);
+      const write = _autoSaveWriteChain
+        .catch(() => {})
+        .then(() => writeSessionAtomic(_autoSavePath, sessionData, { backupPath: _autoSaveBackupPath }));
+      _autoSaveWriteChain = write;
+      const saved = await write;
+      return { ok: true, path: _autoSavePath, bytes: saved.bytes };
     } catch (e) {
+      dbg("SESSION", "Autosave failed", { error: e?.message || String(e) });
       return { ok: false, error: e.message };
     }
   });
@@ -392,10 +502,13 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
   // so the renderer can decide whether to offer restore.
   safeHandle("load-auto-save", async () => {
     try {
-      if (!fs.existsSync(_autoSavePath)) return null;
-      const raw = await fsp.readFile(_autoSavePath, "utf-8");
-      return JSON.parse(raw);
+      const loaded = await readSessionWithBackup(_autoSavePath, _autoSaveBackupPath);
+      if (loaded?.recoveredFromBackup) {
+        dbg("SESSION", "Recovered autosave from backup", { sourcePath: loaded.sourcePath });
+      }
+      return loaded?.session || null;
     } catch (e) {
+      dbg("SESSION", "Autosave recovery failed", { error: e?.message || String(e) });
       return { error: e.message };
     }
   });
@@ -403,7 +516,10 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
   // Delete the auto-save file (after a successful restore or explicit dismiss).
   safeHandle("clear-auto-save", async () => {
     try {
-      if (fs.existsSync(_autoSavePath)) await fsp.unlink(_autoSavePath);
+      await Promise.all([
+        fsp.rm(_autoSavePath, { force: true }),
+        fsp.rm(_autoSaveBackupPath, { force: true }),
+      ]);
       return { ok: true };
     } catch (e) {
       return { ok: false, error: e.message };
@@ -420,7 +536,7 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
   });
 
   // Import file for session restore (no dialog)
-  safeHandle("import-file-for-restore", async (event, { filePath, sheetName }) => {
+  safeHandle("import-file-for-restore", async (event, { filePath, sheetName, tableName }) => {
     if (isTleSessionPath(filePath)) {
       return { error: "Use session restore for .tle files, not file import." };
     }
@@ -428,7 +544,12 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
     if (!fs.existsSync(resolved)) return { error: `File not found: ${filePath}` };
     const tabId = nextTabId();
     let fileName; try { fileName = decodeURIComponent(path.basename(resolved)); } catch { fileName = path.basename(resolved); }
-    enqueueImport(resolved, { tabId, sheetName: sheetName || undefined, skipRecent: true });
+    enqueueImport(resolved, {
+      tabId,
+      sheetName: sheetName || undefined,
+      tableName: tableName || undefined,
+      skipRecent: true,
+    });
     return { tabId, fileName };
   });
 

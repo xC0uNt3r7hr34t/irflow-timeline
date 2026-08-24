@@ -260,6 +260,28 @@ export function ShortModal({ th, ms }) {
   );
 }
 
+export function TableModal({ th, ms, tle }) {
+  const modal = useUIStore((s) => s.modal);
+  const setModal = useUIStore((s) => s.setModal);
+  const data = modal;
+  return (
+    <Overlay th={th}>
+      <h3 style={ms.mh}>Select Table — {data.fileName}</h3>
+      <p style={{ color: th.textDim, fontSize: 12, marginBottom: 12 }}>This database has multiple tables:</p>
+      {(Array.isArray(data.tables) ? data.tables : []).map((t) => (
+        <button key={t.name} onClick={() => { tle.selectTable({ filePath: data.filePath, tabId: data.tabId, fileName: `${data.fileName} [${t.name}]`, tableName: t.name }); setModal(null); }}
+          style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", background: th.bgInput, border: `1px solid ${th.btnBorder}`, borderRadius: 6, color: th.text, fontSize: 13, cursor: "pointer", marginBottom: 6, fontFamily: "inherit" }}>
+          {t.name} <span style={{ color: th.textMuted, fontSize: 11 }}>({formatNumber(Number(t.rowCount) || 0)} rows)</span>
+        </button>
+      ))}
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
+        <button onClick={() => { tle.selectTablesAll({ filePath: data.filePath, tables: data.tables || [] }); setModal(null); }} style={{ ...ms.bp, background: th.btnBg, color: th.text, border: `1px solid ${th.btnBorder}` }}>Import all tables</button>
+        <button onClick={() => setModal(null)} style={ms.bs}>Cancel</button>
+      </div>
+    </Overlay>
+  );
+}
+
 export function SheetModal({ th, ms, tle }) {
   const modal = useUIStore((s) => s.modal);
   const setModal = useUIStore((s) => s.setModal);

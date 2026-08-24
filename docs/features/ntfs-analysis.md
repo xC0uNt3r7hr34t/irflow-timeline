@@ -15,7 +15,7 @@ IRFlow Timeline includes six specialized tools for analyzing raw NTFS artifacts 
 
 Both formats are imported as regular tabs and are available alongside CSV, EVTX, XLSX, and Plaso timelines. Once imported, open **Tools → Platforms → Windows** and use the **Master File Table** or **USN Journal** submenus for the tools below.
 
-![Tools menu Platforms section expanded to show Windows with Master File Table and USN Journal submenus](/dfir-tips/Analysis-Button-NewUI.png)
+![Tools menu with Windows expanded — Process Inspector, Lateral Movement, Persistence, RDP Bitmap Cache, Master File Table, and USN Journal](/dfir-tips/Analysis-Button-NewUI.png)
 
 ## Ransomware Analysis
 
@@ -84,13 +84,13 @@ Each detection includes the file path, both SI and FN timestamps, the delta, and
 
 Timestomped files are auto-tagged with `Timestomp Indicator` for filtering and reporting.
 
-![Timestomping Detection results with SI vs FN deltas, severity scores, and Timestomp Indicator tags](/dfir-tips/MFT-Timestomp-Indicator.png)
+![Timestomp Indicator Review on the U42 $MFT — 46,204 indicators, 5,757 critical, bulk-stomp clusters](/dfir-tips/MFT-Timestomp-Indicator.png)
 
 ## File Activity Heatmap
 
 Visualizes MFT file creation and modification activity as a calendar heatmap, revealing temporal patterns in filesystem activity.
 
-![File Activity Heatmap showing hourly and daily buckets with day-of-week activity matrix](/dfir-tips/MFT-File-Activity-Heatmap.png)
+![File Activity Heatmap on the U42 $MFT — 116,249 creations/modifications and a 2024-11-12 burst window](/dfir-tips/MFT-File-Activity-Heatmap.png)
 
 Open via **Tools → Platforms → Windows → Master File Table → File Activity Heatmap** after importing a raw `$MFT` tab.
 
@@ -106,7 +106,7 @@ This is useful for identifying after-hours activity, automated processes (consis
 
 Scans MFT records for Alternate Data Streams (ADS), which attackers use to hide data, store payloads, or bypass detection.
 
-![ADS Analyzer dashboard with Zone.Identifier, suspicious ADS, and executable stream categories](/dfir-tips/MFT-ADS-Analyzer.png)
+![ADS Analyzer on the U42 $MFT — 128 ADS files, 101 Zone.Identifier downloads, amcache.py MOTW hit](/dfir-tips/MFT-ADS-Analyzer.png)
 
 Open via **Tools → Platforms → Windows → Master File Table → ADS Analyzer** after importing a raw `$MFT` tab with ADS-related columns.
 

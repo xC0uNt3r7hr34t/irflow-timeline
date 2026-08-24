@@ -14,11 +14,12 @@ const { parseEvtxFile } = require("./evtx");
 const { isMftFile, parseMftFile, extractResidentData } = require("./mft");
 const { isUsnJrnlFile, parseUsnJrnlFile } = require("./usn");
 const { detectAiHistoryImport, parseAiHistoryImport } = require("./ai-history-import");
+const { isSqliteFile, listSqliteTables, parseSqliteTable } = require("./sqlite");
 
 /**
  * Auto-detect file type and parse accordingly
  */
-async function parseFile(filePath, tabId, db, onProgress, sheetName, fileSize) {
+async function parseFile(filePath, tabId, db, onProgress, sheetName, fileSize, tableName) {
   // Pass fileSize hint to db.createTab for pragma scaling on large files
   if (fileSize) db._fileSizeHint = fileSize;
   const ext = path.extname(filePath).toLowerCase();
@@ -72,6 +73,13 @@ async function parseFile(filePath, tabId, db, onProgress, sheetName, fileSize) {
     return parseAiHistoryImport(filePath, tabId, db, onProgress, aiHistory);
   }
 
+  if (ext === ".sqlite" || ext === ".sqlite3" || ext === ".db" || isSqliteFile(filePath)) {
+    const check = validatePlasoFile(filePath);
+    if (check.valid) return parsePlasoFile(filePath, tabId, db, onProgress);
+    if (!tableName) throw new Error("SQLite table name required");
+    return parseSqliteTable(filePath, tabId, db, onProgress, tableName);
+  }
+
   if (ext === ".jsonl" || ext === ".json") {
     throw new Error(
       "This file looks like structured AI assistant data, not a delimited table. "
@@ -97,6 +105,9 @@ module.exports = {
   isUsnJrnlFile,
   validatePlasoFile,
   getXLSXSheets,
+  isSqliteFile,
+  listSqliteTables,
+  parseSqliteTable,
   parseFile,
   parseCSVLine,
   detectDelimiter,

@@ -1,16 +1,18 @@
 ---
-description: Persistence Analyzer — 36 EVTX and 33 registry detection rules with automated risk scoring and MITRE ATT&CK mapping.
+description: Persistence Analyzer — 39 EVTX and 33 registry detection rules with incident clustering, Timeline/Table analyst modes, and MITRE ATT&CK mapping.
 ---
 
 # Persistence Analyzer
 
-The Persistence Analyzer automatically scans your timeline data for Windows persistence mechanisms, scoring each finding by risk level and organizing results by category. It supports both EVTX event logs and registry exports (RECmd CSV and similar), with **69 built-in rule definitions** — **36 EVTX event-log rules** and **33 registry key-family rules** — across services, scheduled tasks, WMI subscriptions, autorun keys, and related locations.
+The Persistence Analyzer scans imported EVTX timelines and registry exports (RECmd / Registry Explorer) for Windows persistence, scores each finding, clusters related events into **incidents**, and maps them to MITRE ATT&CK. It ships **72 built-in rules** — **39 EVTX** and **33 registry key-family** — plus intent presets, per-technique toggles, custom rules, multi-source merge, and whole-collection KAPE scans.
 
-![Persistence Analyzer showing 8648 findings in Timeline view with severity scores, service installations, and category filtering](/dfir-tips/Persistence-Analyzer.png)
+![Persistence Analyzer Grouped alerts on WKS2390 — 763 incidents, Registry Autorun / T1547.001, Group by Technique](/dfir-tips/Persistence-Analyzer-Grouped.png)
 
 ## Opening the Persistence Analyzer
 
 - **Menu:** **Tools → Platforms → Windows → Persistence Analyzer**
+- **Home:** Persistence Analyzer capability tile (when a tab is ready)
+- Handoff from the [Process Inspector](/features/process-tree) detail panel (**Persistence**) with host + time already applied
 
 ## Data Source Modes
 
@@ -31,11 +33,27 @@ In auto-detect mode, the analyzer examines your column headers to determine whet
 - **Multi-source** — enable in the config panel and select other open tabs to merge. Formats are detected per tab so service-install events and RECmd rows can cluster into the same incident when they describe the same host/key.
 - **Analyze KAPE Collection** — browse to a collection root; IRFlow scans for supported EVTX and registry exports, runs the matching rule packs, clusters findings into **incidents**, and reports coverage gaps (for example EVTX files present but not read). Prefer this when the evidence is still a folder rather than a single imported CSV.
 
-Handoffs from the [Process Inspector](/features/process-tree) detail panel (**Persistence**) open this analyzer with host + time context already applied.
+## Config phase
+
+![Persistence Analyzer config — EVTX Logs auto-detect, Analyze KAPE Collection, Low-noise / Balanced / Broad intents, technique-group toggles](/dfir-tips/Persistence-Analyzer-Config.png)
+
+Before **Analyze**, the config panel shows:
+
+- **Data source** — Auto / EVTX / Registry, with live tracked-event count
+- **Column mapping** — auto-detected Event ID, Channel, Timestamp, Computer, User (or Key Path / Value Name / Value Data)
+- **Analyze KAPE Collection** — point at a triage folder to read scheduled-task XML on disk (Hidden, RunLevel, COM handlers, triggers) rather than inferring them from events
+- **Multi-source Correlation** — merge other open tabs (Security 4688, Sysmon 1/13, PowerShell 4104, hive exports) so a service install can be corroborated, not just observed
+- **Intent presets** — **Low-noise triage** (high-confidence only), **Balanced ★** (recommended), **Broad hunt**
+- **Detection Techniques** — toggle whole groups (Services & Drivers, Scheduled Tasks, WMI, Registry & Startup, Advanced Detection, Remote Execution, Defender Tampering)
+- **Event Availability** — which EIDs exist in this tab, how many events they contribute, and how many rules are in scope
+
+![Event Availability — 39/39 EVTX rules enabled, ~55k events in scope, Svc Install / Sched Tasks / WMI / Defender / Remote Exec chips](/dfir-tips/Persistence-Analyzer-Availability.png)
+
+**Advanced** expands the per-rule list (enable/disable each `evtx-*` / `reg-*` detector with live event counts) and **Add Custom Rule**.
 
 ## EVTX Detection Rules
 
-When analyzing event logs, the Persistence Analyzer applies **36 EVTX rule definitions** across multiple log channels:
+When analyzing event logs, the Persistence Analyzer applies **39 EVTX rule definitions** across multiple log channels:
 
 ### Services
 
@@ -43,6 +61,7 @@ When analyzing event logs, the Persistence Analyzer applies **36 EVTX rule defin
 |----------|--------|-------------|
 | 7045 | System | New service installed |
 | 4697 | Security | Service installed (auditing) |
+| 7040 | System | Service start type changed |
 
 ### Scheduled Tasks
 
@@ -57,6 +76,8 @@ When analyzing event logs, the Persistence Analyzer applies **36 EVTX rule defin
 | 140 | Task Scheduler | Task updated |
 | 141 | Task Scheduler | Task deleted |
 | 200 | Task Scheduler | Task action started |
+| 4702 | Security | Task updated (Security) |
+| TASKXML | On-disk task definition | Registered task XML from a KAPE/triage folder (including tasks that never fired) |
 
 ### WMI Persistence
 
@@ -74,6 +95,7 @@ When analyzing event logs, the Persistence Analyzer applies **36 EVTX rule defin
 | Sysmon 13 | Sysmon | Registry Autorun | Registry value set (autorun modifications) |
 | Sysmon 12 | Sysmon | Registry Modification | Registry key created or deleted |
 | Sysmon 14 | Sysmon | Registry Rename | Registry key or value renamed |
+| 4657 | Security | Registry Autorun | Registry value modified (fallback when Sysmon 12/13/14 are absent) |
 
 ### File System Indicators
 
@@ -93,6 +115,29 @@ When analyzing event logs, the Persistence Analyzer applies **36 EVTX rule defin
 | 4728 | Security | Member added to global security group |
 | 4732 | Security | Member added to local security group |
 | 4756 | Security | Member added to universal security group |
+| 4738 | Security | User account changed |
+
+### Domain Persistence
+
+| Event ID | Source | Description |
+|----------|--------|-------------|
+| 5136 | Security | AD object modified |
+| 5137 | Security | AD object created |
+| 5141 | Security | AD object deleted |
+
+### Defender Tampering
+
+| Event ID | Source | Description |
+|----------|--------|-------------|
+| 5001, 5010, 5012, 5101 | Defender Operational | Protection disabled / exclusions |
+| 5007 | Defender Operational | Defender setting changed |
+
+### Remote Execution (how persistence arrived)
+
+| Event ID | Source | Description |
+|----------|--------|-------------|
+| 5857, 5858, 5860 | WMI-Activity | WMI remote operation |
+| 145, 161, 169 | WinRM | WinRM remote session |
 
 ## Registry Detection Rules
 
@@ -196,49 +241,80 @@ This whitelisting prevents hundreds of false-positive service events from clutte
 
 ## Results Interface
 
-After the scan completes, the results panel displays five key statistics:
+After the scan completes, the hero cards show:
 
-- **Total Found** -- total number of persistence mechanisms detected
-- **Critical** -- count of critical-severity findings
-- **High** -- count of high-severity findings
-- **Suspicious** -- count of findings with behavioral detection badges
-- **Categories** -- number of distinct persistence categories
+- **Incidents** (Alerts) or **Total found** (Items)  
+- **Critical** / **High**  
+- **Suspicious** — findings with behavioral badges  
+- **Categories**
+
+A severity bar and **Top** category chips (Scheduled Tasks, Registry Autorun, DLL Hijacking, Remote Execution, Services, Defender Tampering, …) sit under the cards. Click a chip to filter.
+
+When a KAPE folder or multi-source merge contributed, a **Collection** / **Merged** provenance banner states what was read. If inbound logons can be joined, a **Remotely planted** banner lists findings tied to a source host/IP/logon session (the join key into [Lateral Movement](/features/lateral-movement)).
 
 ### Filtering Results
 
-The results panel includes a filter bar with:
+- **Search** — full-text across findings  
+- **Severity** — Critical / High / Medium / Low  
+- **Category** — Services, Scheduled Tasks, WMI, Registry Autorun, DLL Hijacking, …  
+- **Sort** — Priority, Severity, Recency, Events  
+- **Group** (Alerts) — By Incident, By Host, By Technique, By Artifact  
 
-- **Search** -- full-text search across all findings
-- **Severity filter** -- show only critical, high, medium, or low findings
-- **Category filter** -- filter by persistence type (Services, Scheduled Tasks, WMI, Registry Autorun, DLL Hijacking, etc.)
+### View modes
 
-### View Modes
+| Mode | What you see |
+|------|----------------|
+| **Grouped → Alerts** | Clustered incidents (title, MITRE, evidence pills, occurrence count) |
+| **Grouped → Items** | Flat list of every matching event |
+| **Timeline** | Analyst modes **Triage** / **Hunt** / **Chronology** plus category pills |
+| **Table** | Analyst modes **Triage** / **Review** / **Raw**, optional **Hide Expected** |
 
-Results can be displayed in three different layouts:
+#### Grouped — Alerts
 
-#### Grouped View
+Incidents are the default. Related events collapse into one card (for example the same Run-key value set 12 times). Group by **Technique** to walk T1547.001, T1053.005, T1055, … in score order.
 
-Findings organized under collapsible category headers (e.g., "Services", "Scheduled Tasks", "WMI Subscriptions", "Registry Autorun", "DLL Hijacking", "Driver Loading", "Process Tampering"). Each category shows its finding count. Up to 200 items are displayed per category.
+![Grouped Alerts — 763 incidents on WKS2390, Group by Technique, Registry Autorun T1547.001](/dfir-tips/Persistence-Analyzer-Grouped.png)
 
-#### Timeline View
+Expand a card for artifact/command, time range, suspicious-reason badges, evidence pills, raw fields, and pivots: **Filter Artifact**, **Filter Host**, **Filter Related**, **Open in Timeline**, **Copy IOC**.
 
-Findings sorted chronologically, showing when each persistence mechanism was installed. This view reveals the temporal sequence of persistence activity and is limited to 500 items for performance.
+#### Grouped — Items
 
-#### Table View
+Every matching event, risk-sorted. Use this when you need the raw 7045 / Sysmon 13 / 129 rows rather than the clustered story.
 
-A flat tabular view of all findings with sortable columns. No item limit -- all findings are displayed.
+![Grouped Items — 2,952 mechanisms, Registry Value Set rows with user-writable path and execution-corroboration pills](/dfir-tips/Persistence-Analyzer-Items.png)
+
+#### Timeline
+
+Three analyst modes:
+
+| Mode | Default |
+|------|---------|
+| **Triage** | Suspicious only, risk-sorted |
+| **Hunt** | Medium+ severity, risk-sorted |
+| **Chronology** | All items, time-sorted |
+
+Category pills (Account Persistence, DLL Hijacking, Defender Tampering, Registry Autorun, Scheduled Tasks, Services, …) facet the list. Consecutive low-risk repeats collapse into streaks.
+
+![Timeline Triage — Suspicious Only, Registry Value Set on OneDrive.exe from AppData, 961 suspicious](/dfir-tips/Persistence-Analyzer-Timeline.png)
+
+![Timeline Chronology — time-sorted Service StartType Changed and QEMU Guest Agent service installs](/dfir-tips/Persistence-Analyzer-Chronology.png)
+
+#### Table
+
+**Triage** / **Review** / **Raw** with sortable columns (Risk, Severity, Category, Detection, Artifact, Command/Path, Timestamp, Computer, User, Source). **Hide Expected** drops AV/EDR and other allowlisted noise. Collapse mode dedupes into clusters (Outlook Update + LOLBin `cmd.exe` is the interesting cluster on WKS2390).
+
+![Table Triage — 232 suspicious clusters, OneDrive autoruns and Outlook Update LOLBin tasks](/dfir-tips/Persistence-Analyzer-Table.png)
 
 ### Item Details
 
-Click any finding to expand its details panel showing:
+Click any finding to expand:
 
-- Full registry path or event log entry
-- Command line or executable path
-- Timestamp of installation
-- Associated user account
-- Source host
-- Risk score breakdown
-- Suspicious reason badges (if any)
+- Full registry path or event log entry  
+- Command line or executable path  
+- Timestamp, user, source host  
+- Risk score and suspicious-reason badges  
+- Evidence pills (execution corroboration, user-writable path, LOLBin, non-standard task, RMM)  
+- **Filter Artifact / Host / Related**, **Open in Timeline**, **Copy IOC**
 
 ### Bulk Operations
 
@@ -246,7 +322,7 @@ Use the checkbox selection to select multiple findings for:
 
 - Bulk tagging in the source timeline
 - Filtering the source tab to selected items
-- Exporting selected findings
+- Exporting selected findings (↓ CSV / ↓ JSON)
 
 ## Cross-Event Correlation
 
@@ -273,6 +349,10 @@ This means you can narrow your timeline to a specific time window or host before
 
 ::: tip Start with Auto-Detect
 Let the analyzer auto-detect your data mode. It correctly identifies EVTX vs registry data in most cases and saves configuration time.
+:::
+
+::: tip Start in Timeline Triage, then Chronology
+**Triage** is suspicious-only and risk-sorted. Flip to **Chronology** once you know *what* landed and need *when* (service start-type changes, then the 7045, then the task).
 :::
 
 ::: tip Focus on Critical and High

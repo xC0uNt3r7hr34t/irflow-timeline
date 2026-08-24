@@ -28,7 +28,7 @@ You can also start from **File → Open Triage Collection…**, which pre-select
 
 ## Detection Rules
 
-![Lateral Movement Tracker detection rules configuration showing 15 built-in rules across RDP, Security, Privilege, Session, and RMM categories](/dfir-tips/Lateral-Movement-Detection-Rules.png)
+![Lateral Movement Tracker configuration on WKS2390 — Analyze and RDP-focused scan options before the run](/dfir-tips/Lateral-Movement-Detection-Rules.png)
 
 The tracker uses a configurable rules system with **15 built-in detection rules** across five categories. Each rule can be individually toggled on or off.
 
@@ -202,7 +202,7 @@ Click any host in the Network Graph to see that host's individual telemetry cove
 
 The tracker has seven sub-tabs (Exec Sessions and Findings only appear when detections are present). The UI tab order is: **Network Graph**, **RDP Sessions**, **Accounts**, **Chains**, **Exec Sessions**, **Connections**, **Findings**. The sections below describe each tab; numbering is independent of the UI ordering.
 
-![Lateral Movement Tracker sub-tabs including Network Graph, RDP Sessions, Accounts, Chains, Exec Sessions, Connections, and Findings with Telemetry Coverage above](/dfir-tips/Lateral-Movement-Tabs.png)
+![Lateral Movement Tracker Accounts tab on WKS2390 — 250 identities scored with successes, failures, and suspicion reasons](/dfir-tips/Lateral-Movement-Tabs.png)
 
 ### 1. Network Graph
 
@@ -210,7 +210,7 @@ The interactive force-directed visualization described above.
 
 ### 2. Findings
 
-![Lateral Movement Tracker Findings tab showing MITRE ATT&CK-mapped attack pattern detections with severity badges](/dfir-tips/Lateral-Movement-Findings.png)
+![Lateral Movement Tracker Findings on WKS2390 — LSASS access, brute force, credential compromise, and WMI persistence](/dfir-tips/Lateral-Movement-Findings.png)
 
 The Findings tab displays automated attack pattern detections with MITRE ATT&CK mapping. Each finding is a card showing severity, MITRE technique badge (clickable — links to attack.mitre.org), title, description, source/target hosts, time range, and event count.
 

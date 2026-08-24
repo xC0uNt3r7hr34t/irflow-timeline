@@ -5,6 +5,39 @@ All notable changes to IRFlow Timeline. The macOS release workflow
 released version as the GitHub release notes — keep version headers in the form
 `## v<MAJOR.MINOR.PATCH>`.
 
+## v1.0.10
+
+IRFlow Timeline 1.0.10 adds **ChatGPT Computer History** as a new forensic artifact family, and hardens the app for long-running investigations.
+
+### ChatGPT Computer History (new)
+
+- **New artifact family** — collect and analyze the opt-in macOS ChatGPT "Computer History" feature: the raw interaction-event stream (kept for roughly 48 hours) and the activity summaries that persist until the user clears them.
+- **A timeline of real user activity** — see what was typed, clicked, selected, and dragged between applications, along with the window and website in view at the time. Not just that an application ran.
+- **Credential entry is flagged** — typing into a password field is identified as credential entry, with a clear note that macOS hides the value while the keystrokes themselves are still recorded.
+- **File and menu selections captured** — Finder file selections and menu commands now appear on the timeline; previously these arrived as empty rows.
+- **Cleared history is detected** — each recording segment is reconciled against its own metadata, so records removed by the app's "clear last 10 minutes / hour / day" control are surfaced as a deletion lead rather than passing unnoticed.
+- **Deleted summaries recovered** — activity summaries the user cleared are recovered read-only, together with when they were removed.
+- **Deleted AI conversations flagged** — conversations marked deleted are identified, and the model chosen and text typed into them are often still recoverable from the activity timeline.
+- **Host attribution** — identify the ChatGPT account and signed-in user behind a capture. Every identifier is labelled with how strongly it identifies an account rather than just a device, and no authentication tokens are ever stored or exported.
+- **Analyst caveats travel with the evidence** — capture depth varies by application, and in hardened messaging apps only outbound typing is recorded. The import notice states these limits so they reach the report.
+
+### Stability and Crash Resilience
+
+- Worker threads are retired properly once finished, so they no longer accumulate during long sessions.
+- Autosaves are written safely and validated on restore, with the previous snapshot kept as a fallback.
+- Closing the macOS window now hides the workspace instead of tearing it down; Dock activation restores it with tabs and background work intact.
+- Unexpected crashes trigger a clean shutdown of workers and databases followed by one controlled restart.
+- A memory-aware worker budget now spans imports, indexing, analyzers, Sigma scans, and AI extraction.
+- Cancelling a Hayabusa EVTX scan reliably stops the process and cleans up its temporary output.
+
+### Additional Improvements
+
+- Upgraded to Electron 43 with refreshed native dependencies.
+- Minimum supported macOS is now 12 (Monterey).
+- Building and testing now require Node.js 22.14 or newer.
+
+**Full artifact paths, schema, and investigation guidance:** [AI Query History and AI App Artifacts](https://r3nzsec.github.io/irflow-timeline/dfir-tips/ai-query-history)
+
 ## v1.0.9
 
 IRFlow Timeline 1.0.9 is a focused reliability patch for large Windows Event Log investigations.

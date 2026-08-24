@@ -134,6 +134,7 @@ function aiHistoryOpenDialogFilters() {
     { name: "Excel", extensions: ["xlsx", "xls", "xlsm"] },
     { name: "EVTX", extensions: ["evtx"] },
     { name: "Plaso / Timeline", extensions: ["plaso", "timeline"] },
+    { name: "SQLite Databases", extensions: ["sqlite", "db", "sqlite3"] },
     { name: "NTFS ($MFT, $J)", extensions: ["mft", "bin"] },
     { name: "Claude Code (.claude / JSONL)", extensions: ["jsonl"] },
     { name: "OpenAI Codex (.codex / JSONL)", extensions: ["jsonl"] },

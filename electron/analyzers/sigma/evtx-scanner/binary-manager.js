@@ -330,17 +330,24 @@ async function verifyHayabusaBinary(binPath) {
   return out;
 }
 
-function getHayabusaStatus() {
-  const binPath = findHayabusa();
-  if (!binPath) return { installed: false, path: null, version: null, source: null };
-
-  let version = null;
+// Detect the version string (e.g. "v4.0.0") a Hayabusa binary reports in its `help` banner.
+function detectHayabusaVersion(binPath) {
+  if (!binPath) return null;
   try {
     const result = spawnSync(binPath, ["help"], { encoding: "utf8", timeout: 5000, shell: false });
     const out = `${result.stdout || ""}\n${result.stderr || ""}`;
     const match = out.match(/Hayabusa\s+(v[\d.]+)/i);
-    version = match ? match[1] : null;
-  } catch {}
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+function getHayabusaStatus() {
+  const binPath = findHayabusa();
+  if (!binPath) return { installed: false, path: null, version: null, source: null };
+
+  const version = detectHayabusaVersion(binPath);
 
   let source = "system";
   try {
@@ -493,6 +500,7 @@ module.exports = {
   ensureWritableHayabusa,
   ensureDefaultNoisyRules,
   findHayabusa,
+  detectHayabusaVersion,
   hayabusaAssetPattern,
   downloadHayabusa,
   verifyHayabusaBinary,

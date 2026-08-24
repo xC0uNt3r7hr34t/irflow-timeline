@@ -30,3 +30,10 @@ test("AI history scope remains part of the import identity", () => {
   });
   assert.notEqual(mainOnly, withSubagents);
 });
+
+test("distinct SQLite tables of the same file remain separately queued", () => {
+  const events = makeImportQueueKey("/evidence/store.sqlite", { tableName: "events" });
+  const users = makeImportQueueKey("/evidence/store.sqlite", { tableName: "users" });
+  assert.notEqual(events, users);
+  assert.equal(isDuplicatePendingImport([{ queueKey: events }], null, users), false);
+});

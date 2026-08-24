@@ -552,6 +552,7 @@ module.exports = function registerAiHistoryHandlers(safeHandle, safeSend, ctx) {
         message: "Choose the Skysight segments folder, a segment bucket, an events.jsonl, a .codex "
           + "folder (derived summaries), or a triage folder containing them",
         properties: ["openFile", "openDirectory"],
+        prefer: "directory",
         filters: [{ name: "Skysight events / summaries", extensions: ["jsonl", "json", "md"] }],
         buttonLabel: "Extract",
         defaultPath: hinted,

@@ -12,7 +12,8 @@ const {
 const { makeImportQueueKey } = require("../electron/utils/import-queue");
 
 function skipSqlite(t, err) {
-  if (/ERR_DLOPEN_FAILED|better-sqlite3|NODE_MODULE_VERSION/.test(String(err?.message || err))) {
+  const text = `${err?.code || ""} ${err?.message || err}`;
+  if (/ERR_DLOPEN_FAILED|better-sqlite3|NODE_MODULE_VERSION/.test(text)) {
     t.skip("better-sqlite3 native module is not built for this Node runtime");
     return true;
   }
@@ -36,14 +37,20 @@ test("generic SQLite import lists tables and streams one table", async (t) => {
 
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-sqlite-import-"));
   const dbPath = path.join(dir, "sample.sqlite");
-  const sqlite = new Database(dbPath);
-  sqlite.exec(`
-    CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, created_at TEXT);
-    CREATE TABLE events (id INTEGER PRIMARY KEY, user_id INTEGER, action TEXT);
-    INSERT INTO users (name, created_at) VALUES ('alice', '2026-08-01 12:00:00'), ('bob', '2026-08-02 08:15:00');
-    INSERT INTO events (user_id, action) VALUES (1, 'login'), (1, 'export'), (2, 'login');
-  `);
-  sqlite.close();
+  try {
+    const sqlite = new Database(dbPath);
+    sqlite.exec(`
+      CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, created_at TEXT);
+      CREATE TABLE events (id INTEGER PRIMARY KEY, user_id INTEGER, action TEXT);
+      INSERT INTO users (name, created_at) VALUES ('alice', '2026-08-01 12:00:00'), ('bob', '2026-08-02 08:15:00');
+      INSERT INTO events (user_id, action) VALUES (1, 'login'), (1, 'export'), (2, 'login');
+    `);
+    sqlite.close();
+  } catch (err) {
+    fs.rmSync(dir, { recursive: true, force: true });
+    if (skipSqlite(t, err)) return;
+    throw err;
+  }
 
   try {
     assert.equal(isSqliteFile(dbPath), true);
@@ -69,6 +76,9 @@ test("generic SQLite import lists tables and streams one table", async (t) => {
     assert.equal(result.sourceFormat, "sqlite");
     assert.equal(batches.flat().length, 2);
     assert.equal(batches.flat()[0][1], "alice");
+  } catch (err) {
+    if (skipSqlite(t, err)) return;
+    throw err;
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

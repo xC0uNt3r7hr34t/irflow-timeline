@@ -27,6 +27,7 @@ const path = require("path");
 const { execFileSync } = require("child_process");
 
 const { dbg } = require("../../logger");
+const { readPlistKeyFromBuffer } = require("../../utils/plist-key");
 
 /** Attribution strength, reported on every identifier so it cannot be overstated in a report. */
 const STRENGTH_DIRECT = "direct";
@@ -104,25 +105,31 @@ function findIdentityRoot(target) {
 /* ------------------------------------------------------------------ plists */
 
 /**
- * Read ONE key out of a (possibly binary) plist via the macOS-bundled plutil.
+ * Read ONE key out of a (possibly binary) plist.
  *
- * Deliberately key-at-a-time rather than `-convert json`: these plists contain `<data>` blobs, which
- * have no JSON representation, so a whole-file conversion fails outright ("Invalid object in plist
- * for JSON format") and takes the readable keys down with it. `-extract … raw` returns strings
- * verbatim and data as base64.
+ * On macOS, `plutil -extract … raw` is preferred: these plists can contain `<data>` blobs, which
+ * have no JSON representation, so a whole-file conversion fails outright. Key names contain dots,
+ * which plutil treats as keypath separators, so each dot is escaped.
  *
- * Key names here contain dots, which plutil treats as keypath separators, so each dot is escaped.
+ * Windows/Linux examiners still ingest macOS Computer History homes. When plutil is absent, parse
+ * XML and binary (`bplist00`) plists in-process.
  */
 function readPlistKey(filePath, key) {
   if (!filePath || !key || !fs.existsSync(filePath)) return null;
   const keypath = String(key).replace(/\./g, "\\.");
   try {
-    return execFileSync("plutil", ["-extract", keypath, "raw", "-o", "-", filePath], {
+    const fromPlutil = execFileSync("plutil", ["-extract", keypath, "raw", "-o", "-", filePath], {
       timeout: PLUTIL_TIMEOUT_MS, maxBuffer: PLUTIL_MAX_BUFFER, encoding: "utf8",
       windowsHide: true, stdio: ["ignore", "pipe", "ignore"],
     }).trim();
+    if (fromPlutil !== "") return fromPlutil;
   } catch {
-    return null; // key absent is the common case, not an error worth logging per app
+    // plutil missing (Windows/Linux) or key absent — fall through to the JS parser
+  }
+  try {
+    return readPlistKeyFromBuffer(fs.readFileSync(filePath), key);
+  } catch {
+    return null;
   }
 }
 

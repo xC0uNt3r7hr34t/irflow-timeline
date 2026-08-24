@@ -3,7 +3,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-const Database = require("better-sqlite3");
 const registerAnalysisHandlers = require("../electron/ipc/analysis-handlers");
 const { fingerprint } = require("../electron/analyzers/ai-history/validators");
 const {
@@ -13,13 +12,35 @@ const {
 } = require("../electron/analyzers/ai-history/result-store");
 
 test("AI Secret scan IPC returns a cancellable job, pages redacted results, and reveals only a verified finding", async (t) => {
+  let Database;
+  try {
+    Database = require("better-sqlite3");
+  } catch (err) {
+    const text = `${err?.code || ""} ${err?.message || err}`;
+    if (/ERR_DLOPEN_FAILED|better-sqlite3|NODE_MODULE_VERSION/.test(text)) {
+      t.skip("better-sqlite3 native module is not built for this Node runtime");
+      return;
+    }
+    throw err;
+  }
+
   const handlers = {};
   const sent = [];
   const tabId = "tab-ai-secret";
   const jobId = `ai-secret-ipc-${process.pid}-${Date.now()}`;
   const salt = "stable-test-salt";
   const secret = "ghp_Z9Y8X7W6V5U4T3S2R1Q0P9O8N7M6L5K4J3I2";
-  const sourceDb = new Database(":memory:");
+  let sourceDb;
+  try {
+    sourceDb = new Database(":memory:");
+  } catch (err) {
+    const text = `${err?.code || ""} ${err?.message || err}`;
+    if (/ERR_DLOPEN_FAILED|better-sqlite3|NODE_MODULE_VERSION/.test(text)) {
+      t.skip("better-sqlite3 native module is not built for this Node runtime");
+      return;
+    }
+    throw err;
+  }
   sourceDb.exec("CREATE TABLE data (c0 TEXT)");
   sourceDb.prepare("INSERT INTO data (c0) VALUES (?)").run(secret);
   t.after(() => {

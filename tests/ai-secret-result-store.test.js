@@ -11,7 +11,17 @@ const {
 
 test("AI Secret result store pages redacted findings and enforces its retention cap", (t) => {
   const jobId = `result-store-test-${process.pid}-${Date.now()}`;
-  const writer = new AiSecretResultWriter(jobId, { maxStoredFindings: 3 });
+  let writer;
+  try {
+    writer = new AiSecretResultWriter(jobId, { maxStoredFindings: 3 });
+  } catch (err) {
+    const text = `${err?.code || ""} ${err?.message || err}`;
+    if (/ERR_DLOPEN_FAILED|better-sqlite3|NODE_MODULE_VERSION/.test(text)) {
+      t.skip("better-sqlite3 native module is not built for this Node runtime");
+      return;
+    }
+    throw err;
+  }
   const sentinel = "ghp_Z9Y8X7W6V5U4T3S2R1Q0P9O8N7M6L5K4J3I2";
   for (let i = 0; i < 7; i++) {
     writer.add({

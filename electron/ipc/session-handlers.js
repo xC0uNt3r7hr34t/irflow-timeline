@@ -8,6 +8,7 @@ const {
   aiHistoryOpenDialogFilters,
 } = require("../parsers/ai-history/open-dialog-paths");
 const { openDialogOptions } = require("../utils/open-dialog");
+const { dbg } = require("../logger");
 const { authorizeAiArtifactPick, assertAiReadablePath } = require("../parsers/ai-history/path-auth");
 const { isTleSessionPath, loadSessionFromPath, resolveSessionPath } = require("../session-file");
 
@@ -119,12 +120,22 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
   // picker on Windows/Linux and loses the file-type filters. Folders go through
   // "open-folder-dialog" below.
   safeHandle("open-file-dialog", async () => {
-    const result = await dialog.showOpenDialog(_activeWindow(), openDialogOptions({
+    const options = openDialogOptions({
       properties: ["openFile", "openDirectory", "multiSelections"],
       prefer: "file",
+      title: "Open File",
+      buttonLabel: "Open",
       defaultPath: defaultAiHistoryOpenPath(),
       filters: aiHistoryOpenDialogFilters(),
-    }));
+    });
+    // Logged so a stale build is provable from the debug log: a file dialog must show
+    // "openFile" here. "openDirectory" means the running code predates the folder-picker fix.
+    dbg("DIALOG", "open-file-dialog", {
+      platform: process.platform,
+      properties: options.properties,
+      filterCount: (options.filters || []).length,
+    });
+    const result = await dialog.showOpenDialog(_activeWindow(), options);
     if (result.canceled) return null;
     return ingestPickedPaths(result.filePaths);
   });

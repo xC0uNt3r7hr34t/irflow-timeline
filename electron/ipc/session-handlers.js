@@ -104,22 +104,42 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
     });
   }
 
-  // Open file dialog
-  safeHandle("open-file-dialog", async () => {
-    const result = await dialog.showOpenDialog(_activeWindow(), openDialogOptions({
-      properties: ["openFile", "openDirectory", "multiSelections"],
-      defaultPath: defaultAiHistoryOpenPath(),
-      filters: aiHistoryOpenDialogFilters(),
-    }));
-    if (result.canceled) return null;
-    for (const picked of result.filePaths || []) {
+  function ingestPickedPaths(filePaths) {
+    for (const picked of filePaths || []) {
       if (picked) authorizeAiArtifactPick(picked);
     }
-    const { supported, skippedDirs } = partitionUnsupportedDirectories(planImportPaths(result.filePaths));
+    const { supported, skippedDirs } = partitionUnsupportedDirectories(planImportPaths(filePaths));
     notifySkippedDirectories(skippedDirs);
     const { enqueued, scopePending } = enqueuePlannedImports(supported, enqueueImport);
     if (scopePending.length) return { scopePending };
     return enqueued > 0 ? true : null;
+  }
+
+  // Open file dialog. File-only: a combined file+directory dialog collapses into a folder
+  // picker on Windows/Linux and loses the file-type filters. Folders go through
+  // "open-folder-dialog" below.
+  safeHandle("open-file-dialog", async () => {
+    const result = await dialog.showOpenDialog(_activeWindow(), openDialogOptions({
+      properties: ["openFile", "openDirectory", "multiSelections"],
+      prefer: "file",
+      defaultPath: defaultAiHistoryOpenPath(),
+      filters: aiHistoryOpenDialogFilters(),
+    }));
+    if (result.canceled) return null;
+    return ingestPickedPaths(result.filePaths);
+  });
+
+  // Folder counterpart — the only way to hand IRFlow an artifact ROOT (.claude, .codex,
+  // ChatGPT app data, Windsurf User) on platforms without a combined dialog.
+  safeHandle("open-folder-dialog", async () => {
+    const result = await dialog.showOpenDialog(_activeWindow(), openDialogOptions({
+      properties: ["openDirectory", "multiSelections"],
+      defaultPath: defaultAiHistoryOpenPath(),
+      title: "Open Folder",
+      message: "Choose an AI artifact folder (.claude, .codex, .gemini, ChatGPT app data, Windsurf User).",
+    }));
+    if (result.canceled) return null;
+    return ingestPickedPaths(result.filePaths);
   });
 
   safeHandle("open-ai-source", async (_event, { filePath, lineNumber } = {}) => {

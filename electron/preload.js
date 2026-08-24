@@ -27,6 +27,7 @@ function onIpcNoArgs(channel, cb) {
 contextBridge.exposeInMainWorld("tle", {
   // File operations
   openFileDialog: () => ipcRenderer.invoke("open-file-dialog"),
+  openFolderDialog: () => ipcRenderer.invoke("open-folder-dialog"),
   openAiSource: (filePath, lineNumber) => ipcRenderer.invoke("open-ai-source", { filePath, lineNumber }),
   openExternal: (url) => ipcRenderer.invoke("open-external", { url }),
   checkForUpdates: () => ipcRenderer.invoke("check-for-updates"),
@@ -112,6 +113,7 @@ contextBridge.exposeInMainWorld("tle", {
   scanKapeCollection: (dir) => ipcRenderer.invoke("scan-kape-collection", { dir }),
   analyzeKapeCollection: (dir, options) => ipcRenderer.invoke("analyze-kape-collection", { dir, options }),
   rdpBitmapSelectSource: () => ipcRenderer.invoke("rdp-bitmap-select-source"),
+  rdpBitmapSelectSourceFolder: () => ipcRenderer.invoke("rdp-bitmap-select-source-folder"),
   rdpBitmapSelectTool: () => ipcRenderer.invoke("rdp-bitmap-select-tool"),
   rdpBitmapToolStatus: () => ipcRenderer.invoke("rdp-bitmap-tool-status"),
   rdpBitmapListHistory: (options) => ipcRenderer.invoke("rdp-bitmap-list-history", options || {}),
@@ -270,6 +272,7 @@ contextBridge.exposeInMainWorld("tle", {
 
   // Menu triggers
   onTriggerOpen: (cb) => onIpcNoArgs("trigger-open", cb),
+  onTriggerOpenFolder: (cb) => onIpcNoArgs("trigger-open-folder", cb),
   onTriggerExport: (cb) => onIpcNoArgs("trigger-export", cb),
   onTriggerGenerateReport: (cb) => onIpcNoArgs("trigger-generate-report", cb),
   onTriggerSearch: (cb) => onIpcNoArgs("trigger-search", cb),

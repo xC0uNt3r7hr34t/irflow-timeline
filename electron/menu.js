@@ -107,6 +107,11 @@ function buildMenu(deps) {
           click: () => mainWindow?.webContents.send("trigger-open"),
         },
         {
+          label: "Open Folder...",
+          accelerator: "CmdOrCtrl+Shift+D",
+          click: () => mainWindow?.webContents.send("trigger-open-folder"),
+        },
+        {
           label: "Open Recent",
           submenu: recentSubmenu,
         },

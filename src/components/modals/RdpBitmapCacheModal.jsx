@@ -175,11 +175,12 @@ export default function RdpBitmapCacheModal() {
   const setPatch = (patch) => setModal((p) => p?.type === "rdpBitmapCache" ? { ...p, ...patch } : p);
   const setOption = (key, value) => setModal((p) => p?.type === "rdpBitmapCache" ? { ...p, options: { ...(p.options || {}), [key]: value } } : p);
 
-  const selectSource = async () => {
-    if (!tle?.rdpBitmapSelectSource) return;
+  const selectSource = async ({ folder = false } = {}) => {
+    const pick = folder ? tle?.rdpBitmapSelectSourceFolder : tle?.rdpBitmapSelectSource;
+    if (!pick) return;
     setPatch({ selecting: true, error: null, result: null, packageResult: null });
     try {
-      const selected = await tle.rdpBitmapSelectSource();
+      const selected = await pick();
       if (selected) {
         setPatch({
           paths: selected.paths || [],
@@ -426,7 +427,10 @@ export default function RdpBitmapCacheModal() {
               <h4 style={{ margin: 0, color: th.text, fontSize: 16, fontWeight: 800 }}>Cache Source</h4>
               <div style={{ marginTop: 5, color: th.textDim, fontSize: 12, fontFamily: "'SF Mono',Menlo,monospace", whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{sourceText}</div>
             </div>
-            <button onClick={selectSource} disabled={modalState.selecting || modalState.extracting} style={secondaryButton}>{modalState.selecting ? "Selecting..." : selectedPaths.length ? "Change Source" : "Select Source"}</button>
+            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+              <button onClick={() => selectSource()} disabled={modalState.selecting || modalState.extracting} style={secondaryButton}>{modalState.selecting ? "Selecting..." : selectedPaths.length ? "Change Files" : "Select Files"}</button>
+              <button onClick={() => selectSource({ folder: true })} disabled={modalState.selecting || modalState.extracting} style={secondaryButton}>Select Folder</button>
+            </div>
           </div>
 	          {preflight?.warnings?.length > 0 && (
 	            <div style={{ display: "grid", gap: 6, marginTop: 10 }}>

@@ -347,10 +347,15 @@ module.exports = function registerAiHistoryHandlers(safeHandle, safeSend, ctx) {
       const homedir = os.homedir();
       const hinted = defaultDecodeAiHistoryDialogPath(selectedTool);
       const defaultPath = hinted && fs.existsSync(hinted) ? hinted : hinted;
+      // Every tool's primary target is an artifact ROOT folder (.claude, .codex, .gemini,
+      // ChatGPT app data, Windsurf User), so folder selection wins where a combined
+      // file+directory dialog is unsupported. `pickMode: "file"` selects an individual
+      // artifact (history.jsonl, a session .jsonl, state.vscdb) instead.
       const res = await dialog.showOpenDialog(win, openDialogOptions({
         title: dlg.title,
         message: dlg.message,
         properties: ["openFile", "openDirectory"],
+        prefer: options.pickMode === "file" ? "file" : "directory",
         filters: dlg.filters,
         buttonLabel: "Extract",
         defaultPath: defaultPath && fs.existsSync(defaultPath) ? defaultPath : homedir,

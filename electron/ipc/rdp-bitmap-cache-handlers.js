@@ -599,10 +599,31 @@ function createRdpBitmapHandlers({
         title: "Select RDP Bitmap Cache Source",
         buttonLabel: "Select Cache Source",
         properties: ["openFile", "openDirectory", "multiSelections"],
+        prefer: "file",
         filters: [
           { name: "RDP Bitmap Cache", extensions: ["bmc", "bin"] },
           { name: "All Files", extensions: ["*"] },
         ],
+      }));
+      if (result.canceled || !result.filePaths?.length) return null;
+      const grants = authorizeSelectedSources(authorizer, result.filePaths);
+      const preflight = await preflightSources(authorizer, result.filePaths);
+      return {
+        paths: grants.map((grant) => grant.path),
+        grants,
+        preflight,
+      };
+    },
+
+    // Cache folder counterpart (e.g. …\Terminal Server Client\Cache) for platforms where
+    // one dialog cannot offer both files and directories.
+    async selectSourceFolder() {
+      if (!dialog?.showOpenDialog) throw new Error("Native file selection is unavailable.");
+      const result = await dialog.showOpenDialog(getWindow(), openDialogOptions({
+        title: "Select RDP Bitmap Cache Folder",
+        buttonLabel: "Select Cache Folder",
+        message: "Choose a Terminal Server Client cache folder containing bcache*.bmc / cache*.bin files.",
+        properties: ["openDirectory", "multiSelections"],
       }));
       if (result.canceled || !result.filePaths?.length) return null;
       const grants = authorizeSelectedSources(authorizer, result.filePaths);
@@ -790,6 +811,7 @@ module.exports = function registerRdpBitmapCacheHandlers(safeHandle, safeSend, c
   });
 
   safeHandle("rdp-bitmap-select-source", handlers.selectSource);
+  safeHandle("rdp-bitmap-select-source-folder", handlers.selectSourceFolder);
   safeHandle("rdp-bitmap-select-tool", handlers.selectTool);
   safeHandle("rdp-bitmap-tool-status", handlers.toolStatus);
   safeHandle("rdp-bitmap-list-history", handlers.listHistory);

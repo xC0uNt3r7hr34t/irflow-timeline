@@ -8,7 +8,8 @@ description: Keyboard shortcuts reference for IRFlow Timeline — file operation
 
 | Shortcut | Action |
 |----------|--------|
-| `Cmd+O` | Open file |
+| `Cmd+O` | Open file — file picker with format filters (multi-select) |
+| `Cmd+Shift+D` | Open folder — pick an AI artifact root (`.claude`, `.codex`, `.gemini`, ChatGPT app data, Windsurf User) |
 | Menu | **File → Open Triage Collection…** — inventory a KAPE/triage folder and import selected artifacts ([workflow](/workflows/kape-integration#open-triage-collection)) |
 | `Cmd+E` | Export filtered data |
 | `Cmd+S` | Save session |

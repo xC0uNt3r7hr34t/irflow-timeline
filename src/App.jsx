@@ -473,6 +473,12 @@ export default function App() {
     handleOpenFileDialogResult(tle, setModal, r);
     return r;
   }, [tle, setModal]);
+  const runOpenFolderDialog = useCallback(async () => {
+    if (!tle?.openFolderDialog) return null;
+    const r = await tle.openFolderDialog();
+    handleOpenFileDialogResult(tle, setModal, r);
+    return r;
+  }, [tle, setModal]);
   const runImportPaths = useCallback(async (paths) => {
     if (!tle || !paths?.length) return;
     const r = await tle.importFiles(paths);
@@ -1422,6 +1428,7 @@ export default function App() {
       setModal(openSimpleModal("sheets", { tabId, fileName, filePath, sheets }));
     });
     listen(tle.onTriggerOpen, () => { runOpenFileDialog(); });
+    listen(tle.onTriggerOpenFolder, () => { runOpenFolderDialog(); });
     listen(tle.onTriggerExport, () => {
       const cur = ctRef.current;
       if (cur) {

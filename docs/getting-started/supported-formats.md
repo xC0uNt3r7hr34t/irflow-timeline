@@ -119,6 +119,36 @@ Plaso is the forensic timeline format created by the `log2timeline` / `plaso` fr
 For very large Plaso databases (10GB+), consider using `psort` to export a filtered CSV first, as the Plaso reader loads all rows in a single query.
 :::
 
+## SQLite Database
+
+**Extensions:** `.sqlite`, `.db`
+
+Generic SQLite database import for arbitrary tabular data. IRFlow Timeline reads SQLite databases directly using `better-sqlite3` and streams rows into the timeline engine.
+
+Plaso files (`.plaso`) and valid Plaso `.timeline` databases are routed to the dedicated Plaso parser — generic SQLite import applies to all other SQLite databases.
+
+### Features
+
+- **Table selection** — for multi-table databases, a dialog lets you choose which table to import (mirrors Excel sheet selection)
+- **Import all tables** — import every table as a separate tab with one click
+- **Single-table auto-import** — databases with one table import automatically with no dialog
+- **Streaming import** — uses `.iterate()` to stream rows without loading the full table into memory
+- **Column discovery** — reads column names from `PRAGMA table_info`
+- **BLOB handling** — binary values are serialized as hex strings (`0x...`) for display and search
+
+### Common DFIR SQLite Sources
+
+- KAPE / EZ Tools SQLite output
+- Custom forensic scripts and triage tools
+- Browser artifact databases
+- Application-specific SQLite logs and caches
+
+### Limitations
+
+- **Read-only access** — databases locked by another process (e.g., live WAL mode) may fail to open; copy the database first if needed
+- **No cross-table JOIN** — each import reads a single table; use tab merging for combining heterogeneous tables
+- **Virtual tables** — FTS5 and other virtual tables are excluded from the table picker
+
 ## Raw $MFT (NTFS Master File Table)
 
 **Extensions:** `.mft`, or any file with `MFT` in the name, or `$MFT` (no extension)
@@ -198,6 +228,7 @@ IRFlow Timeline determines the file format by extension and content detection:
 .xls                        →  Legacy Excel Parser (SheetJS)
 .evtx                       →  EVTX Binary Parser
 .plaso, .timeline            →  Plaso SQLite Reader (auto-detect; .timeline falls back to CSV)
+.sqlite, .db                →  Generic SQLite Reader (table picker for multi-table DBs)
 .mft / $MFT (FILE0 magic)  →  Raw MFT Binary Parser
 $J / $UsnJrnl (by name)    →  Raw USN Journal Parser
 ```

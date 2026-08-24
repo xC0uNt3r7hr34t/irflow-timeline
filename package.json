@@ -79,6 +79,16 @@
         "ext": "xlsx",
         "name": "Excel Workbook",
         "role": "Viewer"
+      },
+      {
+        "ext": "sqlite",
+        "name": "SQLite Database",
+        "role": "Viewer"
+      },
+      {
+        "ext": "db",
+        "name": "SQLite Database",
+        "role": "Viewer"
       }
     ]
   },

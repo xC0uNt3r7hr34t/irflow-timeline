@@ -1,6 +1,6 @@
 # IRFlow Timeline (Windows)
 
-A high-performance native Windows application for DFIR timeline analysis. Built on Electron + SQLite to handle large forensic files (CSV, TSV, XLSX, EVTX, Plaso, raw $MFT, $J) without breaking a sweat.
+A high-performance native Windows application for DFIR timeline analysis. Built on Electron + SQLite to handle large forensic files (CSV, TSV, XLSX, EVTX, Plaso, SQLite, raw $MFT, $J) without breaking a sweat.
 
 Inspired by Eric Zimmerman's Timeline Explorer for Windows.
 
@@ -99,6 +99,7 @@ Output in `release/`.
 | **XLSX / XLS / XLSM** | Excel files with multi-sheet picker |
 | **EVTX** | Windows Event Logs (native parsing via `@ts-evtx/core`) |
 | **Plaso** | Plaso SQLite databases (auto-detects schema version, handles zlib-compressed event data) |
+| **SQLite** | Generic SQLite databases with multi-table picker and import-all support |
 | **Raw $MFT** | NTFS Master File Table — direct binary parsing, no tools required |
 | **Raw $J / UsnJrnl** | NTFS USN Change Journal — parent path resolved from $MFT if loaded |
 

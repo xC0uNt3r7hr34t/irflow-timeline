@@ -24,7 +24,7 @@ A session file preserves the complete state of your analysis:
 
 | State | Details |
 |-------|---------|
-| **Open tabs** | All tabs with file paths and sheet names |
+| **Open tabs** | All tabs with file paths, sheet names, and SQLite table names |
 | **Column configuration** | Pinned columns, hidden columns, column widths, column order |
 | **Filter state** | Column filters, checkbox filters, date ranges, advanced filters |
 | **Bookmarks** | All bookmarked row identifiers |
@@ -63,6 +63,7 @@ The `.tle` file is a JSON structure:
       "name": "Security.evtx",
       "filePath": "/path/to/Security.evtx",
       "sheetName": null,
+      "tableName": null,
       "columns": { ... },
       "filters": { ... },
       "bookmarks": [1, 42, 156, ...],

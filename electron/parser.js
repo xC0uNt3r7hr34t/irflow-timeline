@@ -5,6 +5,7 @@
  *   - CSV (comma, tab, pipe delimited) via raw chunk processing
  *   - XLSX via ExcelJS streaming reader
  *   - Plaso (.plaso) SQLite databases via native reading
+ *   - Generic SQLite (.sqlite, .db) databases with table selection
  *   - Progress callbacks for UI feedback
  *   - Batch insertion into SQLite (array-based, zero object allocation)
  */
@@ -1205,6 +1206,147 @@ async function parsePlasoFile(filePath, tabId, db, onProgress) {
     };
   } finally {
     try { plasoDb.close(); } catch {}
+  }
+}
+
+// ── Generic SQLite database parser ───────────────────────────────────
+
+const SQLITE_MAGIC = Buffer.from("SQLite format 3\0");
+
+/**
+ * Check if a file is a SQLite database by magic bytes.
+ */
+function isSQLiteFile(filePath) {
+  try {
+    const fd = fs.openSync(filePath, "r");
+    const buf = Buffer.alloc(16);
+    fs.readSync(fd, buf, 0, 16, 0);
+    fs.closeSync(fd);
+    return buf.equals(SQLITE_MAGIC);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Open a SQLite file readonly with performance pragmas.
+ */
+function _openSQLiteReadonly(filePath) {
+  const Database = require("better-sqlite3");
+  const sqliteDb = new Database(filePath, { readonly: true, fileMustExist: true });
+  sqliteDb.pragma("mmap_size = 268435456");
+  sqliteDb.pragma("cache_size = -65536");
+  return sqliteDb;
+}
+
+/**
+ * Quote a SQLite identifier (table/column name).
+ */
+function _quoteSqliteIdent(name) {
+  return `"${String(name).replace(/"/g, '""')}"`;
+}
+
+/**
+ * Get list of importable tables from a SQLite database.
+ * @returns {Promise<Array<{name: string, rowCount: number}>>}
+ */
+async function getSQLiteTables(filePath) {
+  dbg("SQLITE", "getSQLiteTables start", { filePath });
+  let sqliteDb;
+  try {
+    sqliteDb = _openSQLiteReadonly(filePath);
+    const rows = sqliteDb.prepare(
+      `SELECT name, sql FROM sqlite_master
+       WHERE type = 'table'
+         AND name NOT LIKE 'sqlite_%'
+       ORDER BY name`
+    ).all();
+    const tables = [];
+    for (const row of rows) {
+      if (row.sql && /VIRTUAL/i.test(row.sql)) continue;
+      const quoted = _quoteSqliteIdent(row.name);
+      const countRow = sqliteDb.prepare(`SELECT COUNT(*) AS cnt FROM ${quoted}`).get();
+      tables.push({ name: row.name, rowCount: countRow.cnt });
+    }
+    dbg("SQLITE", "getSQLiteTables done", { tableCount: tables.length });
+    return tables;
+  } finally {
+    try { sqliteDb?.close(); } catch {}
+  }
+}
+
+/**
+ * Coerce a SQLite cell value to a display string.
+ */
+function _coerceSqliteValue(val) {
+  if (val == null) return "";
+  if (Buffer.isBuffer(val)) return "0x" + val.toString("hex");
+  if (typeof val === "object") return JSON.stringify(val);
+  return String(val);
+}
+
+/**
+ * Parse a single table from a generic SQLite database into TimelineDB.
+ */
+async function parseSQLiteTable(filePath, tabId, db, onProgress, tableName) {
+  dbg("SQLITE", "parseSQLiteTable start", { filePath, tabId, tableName });
+  const tables = await getSQLiteTables(filePath);
+  const tableInfo = tables.find((t) => t.name === tableName);
+  if (!tableInfo) throw new Error(`Table not found: ${tableName}`);
+
+  let sqliteDb;
+  try {
+    sqliteDb = _openSQLiteReadonly(filePath);
+    const quoted = _quoteSqliteIdent(tableName);
+    const colInfo = sqliteDb.pragma(`table_info(${quoted})`);
+    if (colInfo.length === 0) throw new Error(`Table has no columns: ${tableName}`);
+
+    const headers = colInfo.map((c) => c.name);
+    const colCount = headers.length;
+    const totalRows = tableInfo.rowCount;
+
+    db.createTab(tabId, headers);
+
+    const batchSize = Math.max(5000, Math.min(BATCH_SIZE_DEFAULT, Math.floor(BATCH_SIZE_MAX_BYTES / (colCount * 80))));
+    let batch = [];
+    let rowCount = 0;
+    let lastProgress = 0;
+
+    const stmt = sqliteDb.prepare(`SELECT * FROM ${quoted}`);
+    for (const row of stmt.iterate()) {
+      const values = new Array(colCount);
+      for (let i = 0; i < colCount; i++) {
+        values[i] = _coerceSqliteValue(row[headers[i]]);
+      }
+      batch.push(values);
+      rowCount++;
+
+      if (batch.length >= batchSize) {
+        db.insertBatchArrays(tabId, batch);
+        batch = [];
+        if (rowCount - lastProgress >= 10000) {
+          lastProgress = rowCount;
+          if (onProgress) onProgress(rowCount, rowCount, totalRows);
+        }
+      }
+    }
+
+    if (batch.length > 0) {
+      db.insertBatchArrays(tabId, batch);
+    }
+
+    if (onProgress) onProgress(rowCount, totalRows, totalRows);
+    const result = db.finalizeImport(tabId);
+
+    dbg("SQLITE", "parseSQLiteTable done", { tableName, rowCount: result.rowCount });
+    return {
+      headers,
+      rowCount: result.rowCount,
+      tsColumns: result.tsColumns,
+      numericColumns: result.numericColumns,
+    };
+  } finally {
+    try { sqliteDb?.close(); } catch {}
   }
 }
 
@@ -2539,7 +2681,7 @@ async function parseUsnJrnlFile(filePath, tabId, db, onProgress) {
 /**
  * Auto-detect file type and parse accordingly
  */
-async function parseFile(filePath, tabId, db, onProgress, sheetName, fileSize) {
+async function parseFile(filePath, tabId, db, onProgress, sheetName, fileSize, tableName) {
   // Pass fileSize hint to db.createTab for pragma scaling on large files
   if (fileSize) db._fileSizeHint = fileSize;
   const ext = path.extname(filePath).toLowerCase();
@@ -2558,6 +2700,12 @@ async function parseFile(filePath, tabId, db, onProgress, sheetName, fileSize) {
     // .timeline files: if valid Plaso SQLite, parse as Plaso; otherwise fall through to CSV
     if (check.valid) return parsePlasoFile(filePath, tabId, db, onProgress);
     if (ext === ".timeline") { /* not Plaso — fall through to CSV below */ }
+  }
+  if (ext === ".sqlite" || ext === ".db" || isSQLiteFile(filePath)) {
+    const check = validatePlasoFile(filePath);
+    if (check.valid) return parsePlasoFile(filePath, tabId, db, onProgress);
+    if (!tableName) throw new Error("SQLite table name required");
+    return parseSQLiteTable(filePath, tabId, db, onProgress, tableName);
   }
   if (ext === ".mft") {
     return parseMftFile(filePath, tabId, db, onProgress);
@@ -2591,6 +2739,9 @@ module.exports = {
   isUsnJrnlFile,
   validatePlasoFile,
   getXLSXSheets,
+  isSQLiteFile,
+  getSQLiteTables,
+  parseSQLiteTable,
   parseFile,
   parseCSVLine,
   detectDelimiter,

@@ -46,6 +46,8 @@ contextBridge.exposeInMainWorld("tle", {
   exportRansomwarePdf: (html, defaultName) => ipcRenderer.invoke("export-ransomware-pdf", { html, defaultName }),
   generateReport: (tabId, fileName, tagColors, vtEnrichment) => ipcRenderer.invoke("generate-report", { tabId, fileName, tagColors, vtEnrichment }),
   selectSheet: (data) => ipcRenderer.invoke("select-sheet", data),
+  selectTable: (data) => ipcRenderer.invoke("select-table", data),
+  selectTablesAll: (data) => ipcRenderer.invoke("select-tables-all", data),
   searchCount: (tabId, searchTerm, searchMode, searchCondition) => ipcRenderer.invoke("search-count", { tabId, searchTerm, searchMode, searchCondition }),
   getHistogramData: (tabId, colName, options) => ipcRenderer.invoke("get-histogram-data", { tabId, colName, options }),
   getStackingData: (tabId, colName, options) => ipcRenderer.invoke("get-stacking-data", { tabId, colName, options }),
@@ -93,7 +95,7 @@ contextBridge.exposeInMainWorld("tle", {
   // Session operations
   saveSession: (data) => ipcRenderer.invoke("save-session", { sessionData: data }),
   loadSession: () => ipcRenderer.invoke("load-session"),
-  importFileForRestore: (filePath, sheetName) => ipcRenderer.invoke("import-file-for-restore", { filePath, sheetName }),
+  importFileForRestore: (filePath, sheetName, tableName) => ipcRenderer.invoke("import-file-for-restore", { filePath, sheetName, tableName }),
 
   // Filter presets (persistent)
   loadFilterPresets: () => ipcRenderer.invoke("load-filter-presets"),
@@ -112,6 +114,7 @@ contextBridge.exposeInMainWorld("tle", {
   onFtsProgress: (cb) => ipcRenderer.on("fts-progress", (_, d) => cb(d)),
   onIndexProgress: (cb) => ipcRenderer.on("index-progress", (_, d) => cb(d)),
   onSheetSelection: (cb) => ipcRenderer.on("sheet-selection", (_, d) => cb(d)),
+  onTableSelection: (cb) => ipcRenderer.on("table-selection", (_, d) => cb(d)),
   onRecentFilesUpdated: (cb) => ipcRenderer.on("recent-files-updated", (_, d) => cb(d)),
   onUsnPathsUpdated: (cb) => ipcRenderer.on("usn-paths-updated", (_, d) => cb(d)),
   onRwProgress: (cb) => ipcRenderer.on("rw-progress", (_, d) => cb(d)),

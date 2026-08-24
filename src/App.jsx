@@ -1740,7 +1740,7 @@ export default function App() {
 
     const allChannels = [
       "import-start", "import-progress", "import-complete", "import-error", "import-queue",
-      "export-progress", "sheet-selection", "fts-progress", "index-progress",
+      "export-progress", "sheet-selection", "table-selection", "fts-progress", "index-progress",
       "trigger-open", "trigger-export", "trigger-search",
       "trigger-bookmark-toggle", "trigger-column-manager",
       "trigger-color-rules", "trigger-shortcuts",
@@ -1784,7 +1784,7 @@ export default function App() {
     tle.onImportProgress(({ tabId, rowsImported, percent }) => {
       setImportingTabs((prev) => ({ ...prev, [tabId]: { ...(prev[tabId] || { fileName: "", status: "importing" }), rowsImported, percent, status: percent >= 100 ? "indexing" : "importing" } }));
     });
-    tle.onImportComplete(({ tabId, fileName, headers, rowCount, tsColumns, numericColumns, initialRows, totalFiltered, emptyColumns, sourceFormat, resolveStats }) => {
+    tle.onImportComplete(({ tabId, fileName, headers, rowCount, tsColumns, numericColumns, initialRows, totalFiltered, emptyColumns, sourceFormat, resolveStats, tableName }) => {
       const cw = {};
       headers.forEach((h) => {
         const hLen = h.length * 8 + 36;
@@ -1802,6 +1802,7 @@ export default function App() {
           tsColumns: new Set(tsColumns || []), numericColumns: new Set(numericColumns || []),
           columnWidths: saved ? { ...cw, ...saved.columnWidths } : cw, importing: false, dataReady: true, bookmarkedSet: new Set(),
           sourceFormat: sourceFormat || null,
+          tableName: tableName || null,
           usnResolveStats: sourceFormat === "raw-usnjrnl" ? (resolveStats || null) : null };
         if (!saved) {
           const autoHidden = new Set(emptyColumns || []);
@@ -1915,6 +1916,9 @@ export default function App() {
     });
     tle.onSheetSelection(({ tabId, fileName, filePath, sheets }) => {
       setModal({ type: "sheets", tabId, fileName, filePath, sheets });
+    });
+    tle.onTableSelection(({ tabId, fileName, filePath, tables }) => {
+      setModal({ type: "tables", tabId, fileName, filePath, tables });
     });
     tle.onTriggerOpen(() => tle.openFileDialog());
     tle.onTriggerExport(() => {
@@ -2142,6 +2146,8 @@ export default function App() {
       }
       sessionTabs.push({
         filePath: tab.filePath, name: tab.name,
+        sheetName: tab.sheetName || null,
+        tableName: tab.tableName || null,
         bookmarkedRowIds: bookmarkIds, tags, tagColors: tab.tagColors || {},
         columnFilters: tab.columnFilters, checkboxFilters: tab.checkboxFilters,
         colorRules: tab.colorRules, hiddenColumns: [...tab.hiddenColumns],
@@ -2168,7 +2174,7 @@ export default function App() {
     setTabs([]); setActiveTab(null);
     const restoreMap = {};
     for (const savedTab of session.tabs) {
-      const result = await tle.importFileForRestore(savedTab.filePath, savedTab.sheetName);
+      const result = await tle.importFileForRestore(savedTab.filePath, savedTab.sheetName, savedTab.tableName);
       if (result.error) { alert(`Skipping "${savedTab.name}": ${result.error}`); continue; }
       restoreMap[result.tabId] = savedTab;
     }
@@ -2897,6 +2903,27 @@ export default function App() {
           </button>
         ))}
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+          <button onClick={() => setModal(null)} style={ms.bs}>Cancel</button>
+        </div>
+      </Overlay>
+    );
+  };
+
+  const TableModal = () => {
+    const data = modal;
+    return (
+      <Overlay>
+        <h3 style={ms.mh}>Select Table — {data.fileName}</h3>
+        <p style={{ color: th.textDim, fontSize: 12, marginBottom: 12 }}>This database has multiple tables:</p>
+        {data.tables.map((t) => (
+          <button key={t.name} onClick={() => { tle.selectTable({ filePath: data.filePath, tabId: data.tabId, fileName: `${data.fileName} [${t.name}]`, tableName: t.name }); setModal(null); }}
+            style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", background: th.bgInput, border: `1px solid ${th.btnBorder}`, borderRadius: 6, color: th.text, fontSize: 13, cursor: "pointer", marginBottom: 6, fontFamily: "inherit" }}>
+            {t.name} <span style={{ color: th.textMuted, fontSize: 11 }}>({t.rowCount} rows)</span>
+          </button>
+        ))}
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
+          <button onClick={() => { tle.selectTablesAll({ filePath: data.filePath, tables: data.tables }); setModal(null); }}
+            style={{ ...ms.bp, background: th.bgInput, border: `1px solid ${th.btnBorder}` }}>Import all tables</button>
           <button onClick={() => setModal(null)} style={ms.bs}>Cancel</button>
         </div>
       </Overlay>
@@ -5151,6 +5178,7 @@ export default function App() {
         </Overlay>
       )}
       {modal?.type === "sheets" && <SheetModal />}
+      {modal?.type === "tables" && <TableModal />}
       {modal?.type === "tags" && ct && (
         <Overlay>
           <h3 style={ms.mh}>Manage Tags</h3>

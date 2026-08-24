@@ -26,7 +26,7 @@ const fsp = require("fs/promises");
 const os = require("os");
 const https = require("https");
 const TimelineDB = require("./db");
-const { parseFile, getXLSXSheets, extractResidentData } = require("./parser");
+const { parseFile, getXLSXSheets, getSQLiteTables, isSQLiteFile, validatePlasoFile, extractResidentData } = require("./parser");
 const { createUpdateController } = require("./updater");
 
 // Raise V8 heap limit to 16 GB for large forensic files.
@@ -125,7 +125,8 @@ let _importRunning = false;
 const _pendingIndexTabs = [];
 
 function enqueueImport(filePath, opts) {
-  let fileName; try { fileName = decodeURIComponent(path.basename(filePath)); } catch { fileName = path.basename(filePath); }
+  let fileName = opts?.fileName;
+  if (!fileName) { try { fileName = decodeURIComponent(path.basename(filePath)); } catch { fileName = path.basename(filePath); } }
   let fileSize = 0; try { fileSize = fs.statSync(filePath).size; } catch {}
   _importQueue.push({ filePath, fileName, fileSize, ...opts });
   if (!opts?.skipRecent) addRecentFile(filePath);
@@ -154,7 +155,7 @@ async function _processQueue() {
     });
 
     try {
-      await importFile(item.filePath, item.tabId, item.sheetName);
+      await importFile(item.filePath, item.tabId, item.sheetName, item.tableName, item.fileName);
     } catch (err) {
       dbg("QUEUE", `importFile failed for ${item.fileName}`, { error: err?.message });
       safeSend("import-error", {
@@ -330,11 +331,12 @@ function createWindow() {
 }
 
 // ── File import ───────────────────────────────────────────────────────────────
-async function importFile(filePath, preTabId, preSheetName) {
+async function importFile(filePath, preTabId, preSheetName, preTableName, preFileName) {
   const tabId = preTabId || `tab_${++tabCounter}_${Date.now()}`;
-  let fileName; try { fileName = decodeURIComponent(path.basename(filePath)); } catch { fileName = path.basename(filePath); }
+  let fileName = preFileName;
+  if (!fileName) { try { fileName = decodeURIComponent(path.basename(filePath)); } catch { fileName = path.basename(filePath); } }
   const ext = path.extname(filePath).toLowerCase();
-  dbg("IMPORT", `importFile called`, { filePath, tabId, ext, preSheetName });
+  dbg("IMPORT", `importFile called`, { filePath, tabId, ext, preSheetName, preTableName });
 
   let fileSize = 0;
   try { fileSize = fs.statSync(filePath).size; } catch {}
@@ -405,12 +407,37 @@ async function importFile(filePath, preTabId, preSheetName) {
     }
   }
 
-  dbg("IMPORT", `calling startImport`, { tabId, sheetName });
-  await startImport(filePath, tabId, fileName, sheetName, fileSize);
+  let tableName = preTableName;
+  if (!tableName && (ext === ".sqlite" || ext === ".db" || isSQLiteFile(filePath))) {
+    try {
+      const check = validatePlasoFile(filePath);
+      if (!check.valid) {
+        dbg("IMPORT", `getSQLiteTables calling...`, { filePath });
+        const tables = await getSQLiteTables(filePath);
+        dbg("IMPORT", `getSQLiteTables returned`, { tableCount: tables.length, tables: tables.map((t) => t.name) });
+        if (tables.length === 0) {
+          safeSend("import-error", { tabId, fileName, error: "No importable tables found in SQLite database" });
+          return;
+        }
+        if (tables.length > 1) {
+          safeSend("table-selection", { tabId, fileName, filePath, tables });
+          return;
+        }
+        tableName = tables[0].name;
+      }
+    } catch (e) {
+      dbg("IMPORT", `getSQLiteTables failed`, { error: e.message, stack: e.stack });
+      safeSend("import-error", { tabId, fileName, error: e.message || "Failed to read SQLite database" });
+      return;
+    }
+  }
+
+  dbg("IMPORT", `calling startImport`, { tabId, sheetName, tableName });
+  await startImport(filePath, tabId, fileName, sheetName, fileSize, tableName);
 }
 
-async function startImport(filePath, tabId, fileName, sheetName, preFileSize) {
-  dbg("IMPORT", `startImport begin`, { filePath, tabId, fileName, sheetName });
+async function startImport(filePath, tabId, fileName, sheetName, preFileSize, tableName) {
+  dbg("IMPORT", `startImport begin`, { filePath, tabId, fileName, sheetName, tableName });
   let fileSize = preFileSize || 0;
   if (!fileSize) { try { fileSize = fs.statSync(filePath).size; } catch {} }
 
@@ -443,7 +470,7 @@ async function startImport(filePath, tabId, fileName, sheetName, preFileSize) {
           safeSend("import-memory-warning", { tabId, heapGB: heapGB.toFixed(1), rssGB: rssGB.toFixed(1) });
         }
       }
-    }, sheetName, fileSize);
+    }, sheetName, fileSize, tableName);
     dbg("IMPORT", `parseFile complete`, { headers: result.headers?.length, rowCount: result.rowCount, tsColumns: result.tsColumns?.length });
 
     _tabMeta.set(tabId, { filePath, sourceFormat: result.sourceFormat || null });
@@ -489,6 +516,7 @@ async function startImport(filePath, tabId, fileName, sheetName, preFileSize) {
       emptyColumns,
       sourceFormat: result.sourceFormat || null,
       resolveStats,
+      tableName: tableName || null,
     });
 
     if (_importQueue.length > 0) {
@@ -537,6 +565,7 @@ safeHandle("open-file-dialog", async () => {
       { name: "Excel Files", extensions: ["xlsx", "xls", "xlsm"] },
       { name: "EVTX Files", extensions: ["evtx"] },
       { name: "Plaso / Timeline Files", extensions: ["plaso", "timeline"] },
+      { name: "SQLite Databases", extensions: ["sqlite", "db"] },
       { name: "NTFS Artifacts ($MFT, $J)", extensions: ["mft", "bin"] },
     ],
   });
@@ -873,6 +902,18 @@ safeHandle("select-sheet", (event, { filePath, tabId, fileName, sheetName }) => 
   enqueueImport(filePath, { tabId, sheetName, skipRecent: true });
 });
 
+safeHandle("select-table", (event, { filePath, tabId, fileName, tableName }) => {
+  enqueueImport(filePath, { tabId, tableName, fileName, skipRecent: true });
+});
+
+safeHandle("select-tables-all", (event, { filePath, tables }) => {
+  let baseName; try { baseName = decodeURIComponent(path.basename(filePath)); } catch { baseName = path.basename(filePath); }
+  for (const t of tables) {
+    const tabId = `tab_${++tabCounter}_${Date.now()}`;
+    enqueueImport(filePath, { tabId, tableName: t.name, fileName: `${baseName} [${t.name}]`, skipRecent: true });
+  }
+});
+
 safeHandle("get-tab-info", (event, { tabId }) => db.getTabInfo(tabId));
 safeHandle("get-fts-status", (event, { tabId }) => db.getFtsStatus(tabId));
 safeHandle("search-count", (event, { tabId, searchTerm, searchMode, searchCondition }) => db.searchCount(tabId, searchTerm, searchMode, searchCondition));
@@ -969,11 +1010,11 @@ safeHandle("import-files", async (event, { filePaths }) => {
   return true;
 });
 
-safeHandle("import-file-for-restore", async (event, { filePath, sheetName }) => {
+safeHandle("import-file-for-restore", async (event, { filePath, sheetName, tableName }) => {
   if (!fs.existsSync(filePath)) return { error: `File not found: ${filePath}` };
   const tabId = `tab_${++tabCounter}_${Date.now()}`;
   let fileName; try { fileName = decodeURIComponent(path.basename(filePath)); } catch { fileName = path.basename(filePath); }
-  enqueueImport(filePath, { tabId, sheetName: sheetName || undefined, skipRecent: true });
+  enqueueImport(filePath, { tabId, sheetName: sheetName || undefined, tableName: tableName || undefined, skipRecent: true });
   return { tabId, fileName };
 });
 

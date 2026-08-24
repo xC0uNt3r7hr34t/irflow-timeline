@@ -505,9 +505,6 @@ export default function MenuBar({
     { category: "File", label: "Open", shortcut: mod("O"), action: async () => {
       handleOpenFileDialogResult(tle, setModal, await tle?.openFileDialog());
     } },
-    { category: "File", label: "Open Folder", shortcut: mod("D", { shift: true }), action: async () => {
-      handleOpenFileDialogResult(tle, setModal, await tle?.openFolderDialog?.());
-    } },
     { category: "File", label: "Open Triage Collection", action: () => setModal(openTriageCollectionModal()) },
     { category: "File", label: "Export", shortcut: mod("E"), action: handleExport, disabled: !ct?.dataReady },
     { category: "File", label: "Save Session", shortcut: mod("S"), action: handleSaveSession, disabled: tabs.length === 0 },
@@ -559,10 +556,6 @@ export default function MenuBar({
               {[
                 { label: "Open", shortcut: mod("O"), action: async () => {
                   const r = await tle?.openFileDialog();
-                  handleOpenFileDialogResult(tle, setModal, r);
-                } },
-                { label: "Open Folder…", shortcut: mod("D", { shift: true }), action: async () => {
-                  const r = await tle?.openFolderDialog?.();
                   handleOpenFileDialogResult(tle, setModal, r);
                 } },
                 { label: "Open Triage Collection…", action: () => setModal(openTriageCollectionModal()) },

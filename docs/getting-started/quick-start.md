@@ -16,12 +16,13 @@ There are three ways to open a file:
 
 IRFlow Timeline will automatically detect the file format and begin streaming the import.
 
-::: tip Opening a folder
-**File → Open** selects *files* and offers the format filters (choose **All Files** to see
-everything). To import an AI artifact **folder** — `.claude`, `.codex`, `.gemini`, ChatGPT
-app data, or a Windsurf `User` directory — use **File → Open Folder…** (`Cmd+Shift+D`).
-Windows and Linux cannot show one dialog that picks both files and folders, so these are
-separate entry points.
+::: tip Files vs folders
+**File → Open** selects *files* and offers the format filters — pick **All Files** to see
+everything. It does not ingest plain folders. Directories are always chosen through the
+workflow that understands them: **File → Open Triage Collection…** for a KAPE/triage
+folder, **Tools → AI Artifacts** for an artifact root (`.claude`, `.codex`, `.gemini`,
+ChatGPT app data, Windsurf `User`), and **Tools → Sigma** for an EVTX or rules directory.
+Dragging a folder onto the window follows the same rules as File → Open.
 :::
 
 ## Capability Launcher

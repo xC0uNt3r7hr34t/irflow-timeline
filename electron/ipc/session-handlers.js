@@ -105,20 +105,11 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
     });
   }
 
-  function ingestPickedPaths(filePaths) {
-    for (const picked of filePaths || []) {
-      if (picked) authorizeAiArtifactPick(picked);
-    }
-    const { supported, skippedDirs } = partitionUnsupportedDirectories(planImportPaths(filePaths));
-    notifySkippedDirectories(skippedDirs);
-    const { enqueued, scopePending } = enqueuePlannedImports(supported, enqueueImport);
-    if (scopePending.length) return { scopePending };
-    return enqueued > 0 ? true : null;
-  }
-
-  // Open file dialog. File-only: a combined file+directory dialog collapses into a folder
-  // picker on Windows/Linux and loses the file-type filters. Folders go through
-  // "open-folder-dialog" below.
+  // Open file dialog. File-only off macOS: a combined file+directory dialog collapses into
+  // a folder picker there and loses the file-type filters. Nothing is lost by that — the
+  // import planner rejects plain folders anyway, and every folder workflow (triage
+  // collections, Sigma EVTX/rules directories, AI artifact roots) has its own picker that
+  // knows what to do with the directory it is given.
   safeHandle("open-file-dialog", async () => {
     const options = openDialogOptions({
       properties: ["openFile", "openDirectory", "multiSelections"],
@@ -137,20 +128,14 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
     });
     const result = await dialog.showOpenDialog(_activeWindow(), options);
     if (result.canceled) return null;
-    return ingestPickedPaths(result.filePaths);
-  });
-
-  // Folder counterpart — the only way to hand IRFlow an artifact ROOT (.claude, .codex,
-  // ChatGPT app data, Windsurf User) on platforms without a combined dialog.
-  safeHandle("open-folder-dialog", async () => {
-    const result = await dialog.showOpenDialog(_activeWindow(), openDialogOptions({
-      properties: ["openDirectory", "multiSelections"],
-      defaultPath: defaultAiHistoryOpenPath(),
-      title: "Open Folder",
-      message: "Choose an AI artifact folder (.claude, .codex, .gemini, ChatGPT app data, Windsurf User).",
-    }));
-    if (result.canceled) return null;
-    return ingestPickedPaths(result.filePaths);
+    for (const picked of result.filePaths || []) {
+      if (picked) authorizeAiArtifactPick(picked);
+    }
+    const { supported, skippedDirs } = partitionUnsupportedDirectories(planImportPaths(result.filePaths));
+    notifySkippedDirectories(skippedDirs);
+    const { enqueued, scopePending } = enqueuePlannedImports(supported, enqueueImport);
+    if (scopePending.length) return { scopePending };
+    return enqueued > 0 ? true : null;
   });
 
   safeHandle("open-ai-source", async (_event, { filePath, lineNumber } = {}) => {

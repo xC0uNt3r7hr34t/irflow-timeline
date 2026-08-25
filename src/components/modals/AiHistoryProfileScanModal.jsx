@@ -256,7 +256,7 @@ export default function AiHistoryProfileScanModal() {
         phase: "discovering",
         statusDetail: mode === "folder"
           ? `Scanning collection…`
-          : "Scanning this Mac…",
+          : "Scanning this PC…",
         rowsSoFar: 0,
         log: [
           mode === "folder"
@@ -439,7 +439,7 @@ export default function AiHistoryProfileScanModal() {
       title="Collect AI Artifacts — Query History"
       subtitle={
         phase === "choose-target"
-          ? "This Mac, or a KAPE / triage / mounted disk folder"
+          ? "This PC, or a KAPE / triage / mounted disk folder"
           : phase === "config"
             ? `${roots.length} source(s)${isFolderScan && scanRoot ? ` in ${scanRoot.split("/").pop()}` : " ready"}`
             : progress.statusDetail
@@ -527,7 +527,7 @@ export default function AiHistoryProfileScanModal() {
       {phase === "choose-target" && (
         <div style={{ marginBottom: 14 }}>
           <p style={{ fontSize: 12, color: th.textMuted, margin: "0 0 10px", lineHeight: 1.5 }}>
-            Merge every AI assistant store into one timeline tab. Use <strong style={{ color: th.text }}>This Mac</strong> for
+            Merge every AI assistant store into one timeline tab. Use <strong style={{ color: th.text }}>This PC</strong> for
             live triage on your analyst machine, or <strong style={{ color: th.text }}>Browse folder</strong> for KAPE output,
             Velociraptor zips, E01-mounted images, external drives, or any path that contains <code style={{ fontSize: 10 }}>Users\</code> or <code style={{ fontSize: 10 }}>home/</code> trees.
           </p>
@@ -548,7 +548,7 @@ export default function AiHistoryProfileScanModal() {
                 color: th.text,
               }}
             >
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6 }}>This Mac</div>
+              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6 }}>This PC</div>
               <div style={{ fontSize: 11, color: th.textMuted, lineHeight: 1.45 }}>
                 Scan the logged-in user profile on this computer (default).
               </div>

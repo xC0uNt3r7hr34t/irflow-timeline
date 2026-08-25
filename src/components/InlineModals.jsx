@@ -267,11 +267,11 @@ export function TableModal({ th, ms, tle }) {
   return (
     <Overlay th={th}>
       <h3 style={ms.mh}>Select Table — {data.fileName}</h3>
-      <p style={{ color: th.textDim, fontSize: 12, marginBottom: 12 }}>This database has multiple tables:</p>
+      <p style={{ color: th.textDim, fontSize: 12, marginBottom: 12 }}>Select a table to import:</p>
       {(Array.isArray(data.tables) ? data.tables : []).map((t) => (
         <button key={t.name} onClick={() => { tle.selectTable({ filePath: data.filePath, tabId: data.tabId, fileName: `${data.fileName} [${t.name}]`, tableName: t.name }); setModal(null); }}
           style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", background: th.bgInput, border: `1px solid ${th.btnBorder}`, borderRadius: 6, color: th.text, fontSize: 13, cursor: "pointer", marginBottom: 6, fontFamily: "inherit" }}>
-          {t.name} <span style={{ color: th.textMuted, fontSize: 11 }}>({formatNumber(Number(t.rowCount) || 0)} rows)</span>
+          {t.name} <span style={{ color: th.textMuted, fontSize: 11 }}>({t.rowCountEstimate ? "~" : ""}{formatNumber(Number(t.rowCount) || 0)} rows{t.rowCountEstimate ? ", estimated" : ""})</span>
         </button>
       ))}
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
@@ -336,7 +336,7 @@ export function ImportProgress({ th, info }) {
       <line x1="32" y1="20" x2="34.5" y2="20" stroke={th.accent} strokeWidth="1.2" opacity="0.7" strokeLinecap="round" />
     </svg>
     <div style={{ fontSize: 18, fontWeight: 700, color: th.text, fontFamily: "-apple-system, 'SF Pro Display', sans-serif", marginBottom: 2 }}>IRFlow <span style={{ color: th.accent }}>Timeline</span></div>
-    <p style={{ color: th.textMuted, fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 28, fontFamily: "-apple-system, sans-serif" }}>DFIR Timeline Analysis for macOS</p>
+    <p style={{ color: th.textMuted, fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 28, fontFamily: "-apple-system, sans-serif" }}>DFIR Timeline Analysis for Windows</p>
     {/* Progress */}
     <div style={{ width: 400, maxWidth: "100%" }}>
       <h3 style={{ color: th.text, fontSize: 16, marginBottom: 8, fontFamily: "-apple-system, sans-serif" }}>

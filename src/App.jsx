@@ -3526,7 +3526,7 @@ export default function App() {
         icon: <><path d="M12 21V9"/><circle cx="12" cy="6" r="3"/><path d="M5 13H3m4.5 5L6 19.5M18 13h2m-3.5 5l1.5 1.5"/></> },
       { title: "Sigma · Hayabusa", desc: "Sigma detection over raw EVTX — no import needed", color: th.accent, outcome: "Scan a directory →", ready: true, onClick: () => setModal(openSigmaModal({ scanMode: "evtx-dir" })),
         icon: <><circle cx="12" cy="12" r="9"/><path d="M12 4v8l5 3"/></> },
-      { title: "Collect AI Artifacts", desc: "Claude, Codex, Cursor, ChatGPT & more — scan this Mac or a triage folder into one AI history timeline.", color: th.accent, chip: "Mac / folder", outcome: "Scan → AI timeline", onClick: () => setModal(openAiHistoryProfileScanModal()),
+      { title: "Collect AI Artifacts", desc: "Claude, Codex, Cursor, ChatGPT & more — scan this PC or a triage folder into one AI history timeline.", color: th.accent, chip: "PC / folder", outcome: "Scan → AI timeline", onClick: () => setModal(openAiHistoryProfileScanModal()),
         icon: <><path d="M11 3l1.7 4.4L17 9l-4.3 1.6L11 15l-1.7-4.4L5 9l4.3-1.6z"/><path d="M17.6 14l.7 1.8 1.7.7-1.7.7-.7 1.8-.7-1.8-1.7-.7 1.7-.7z"/></> },
       { title: "Master File Table", desc: "Ransomware mass-encryption, in-place rewrites & recovery-target deletion across the $MFT", color: th.accent, capability: "mft", chip: "Raw $MFT", outcome: "Open → ransomware scan", onClick: () => launchCapabilityFromHome("mft"),
         icon: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><rect x="10" y="11" width="4" height="4" rx="1"/><path d="M10.5 11V9.5a1.5 1.5 0 0 1 3 0V11"/></> },
@@ -3558,7 +3558,7 @@ export default function App() {
             <line x1="32" y1="20" x2="34.5" y2="20" stroke={th.accent} strokeWidth="1.2" opacity="0.7" strokeLinecap="round" />
           </svg>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: th.text, margin: 0, fontFamily: "-apple-system, 'SF Pro Display', sans-serif", letterSpacing: "-0.01em" }}>IRFlow <span style={{ color: th.accent }}>Timeline</span></h1>
-          <p style={{ color: th.textDim, fontSize: 14, letterSpacing: "0.14em", textTransform: "uppercase", margin: "10px 0 6px", fontWeight: 600 }}>DFIR Timeline Analysis for macOS</p>
+          <p style={{ color: th.textDim, fontSize: 14, letterSpacing: "0.14em", textTransform: "uppercase", margin: "10px 0 6px", fontWeight: 600 }}>DFIR Timeline Analysis for Windows</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "stretch", width: "100%", marginTop: 26, WebkitAppRegion: "no-drag" }}>
             <button onClick={() => runOpenFileDialog()} style={{ padding: "14px 48px", background: th.primaryBtn, color: "#fff", border: "none", borderRadius: 8, fontSize: 16, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, sans-serif" }}
               onMouseEnter={(e) => { e.currentTarget.style.filter = "brightness(1.1)"; }}

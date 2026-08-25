@@ -88,7 +88,7 @@ async function importFile(filePath, preTabId, preSheetName, deps, queueItem = {}
       type: "warning",
       title: "Large File Warning",
       message: `This file is ${sizeGB} GB`,
-      detail: `Importing very large files needs significant disk space (roughly 2–3× the file size on your temp volume) and memory. The UI may stay busy for several minutes after import finishes.\n\nSystem RAM: ${ramGB} GB\n\nTips: quit and restart IRFlow before importing, close other large tabs, and wait for "indexes ready" before opening column filters. For Plaso files, consider exporting a filtered CSV with psort first.`,
+      detail: `Importing very large files needs significant disk space (roughly 2–3× the file size on your temp volume) and memory. The UI may stay busy for several minutes after import finishes.\n\nSystem RAM: ${ramGB} GB\n\nTips: quit and restart IRFlow before importing, close other large tabs, and wait for "indexes ready" before opening column filters. For Plaso or large SQLite databases, consider exporting a filtered CSV with psort first.`,
       buttons: ["Import Anyway", "Cancel"],
       defaultId: 1,
       cancelId: 1,
@@ -162,17 +162,15 @@ async function importFile(filePath, preTabId, preSheetName, deps, queueItem = {}
       const plasoCheck = typeof validatePlasoFile === "function" ? validatePlasoFile(filePath) : { valid: false };
       if (!plasoCheck.valid) {
         dbg("IMPORT", `listSqliteTables calling...`, { filePath });
-        const tables = await listSqliteTables(filePath);
+        const tables = await listSqliteTables(filePath, fileSize);
         dbg("IMPORT", `listSqliteTables returned`, { tableCount: tables.length, tables: tables.map((t) => t.name) });
         if (!tables.length) {
           safeSend("import-error", { tabId, fileName, error: "No importable tables found in SQLite database" });
           return;
         }
-        if (tables.length > 1) {
-          safeSend("table-selection", { tabId, fileName, filePath, tables });
-          return;
-        }
-        tableName = tables[0].name;
+        // Always prompt so the analyst picks the table (even for single-table DBs).
+        safeSend("table-selection", { tabId, fileName, filePath, tables });
+        return;
       }
     } catch (e) {
       dbg("IMPORT", `listSqliteTables failed`, { error: e.message, stack: e.stack });

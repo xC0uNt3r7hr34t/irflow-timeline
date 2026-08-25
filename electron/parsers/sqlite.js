@@ -137,12 +137,21 @@ async function parseSqliteTable(filePath, tabId, db, onProgress, tableName, file
 
     const headers = colInfo.map((c) => c.name);
     const colCount = headers.length;
-    let totalRows = estimateTableRowCount(sqliteDb, tableName, useFastEstimate) ?? 0;
+    // On large DBs, skip COUNT/MAX(rowid) — it can block for minutes before the first row.
+    let totalRows = 0;
     if (!useFastEstimate) {
-      // Small DBs: exact count is cheap and improves progress accuracy.
-      totalRows = estimateTableRowCount(sqliteDb, tableName, false) ?? totalRows;
+      totalRows = estimateTableRowCount(sqliteDb, tableName, false) ?? 0;
     }
     db.createTab(tabId, headers);
+
+    if (onProgress) {
+      onProgress(0, 0, fileSize || 0, {
+        phase: "parsing",
+        statusDetail: useFastEstimate
+          ? "Importing SQLite rows (row total unknown for large databases)…"
+          : "Importing SQLite rows…",
+      });
+    }
 
     const defaultBatch = isLargeFile ? BATCH_SIZE_LARGE : BATCH_SIZE_DEFAULT;
     const batchSize = Math.max(
@@ -160,10 +169,16 @@ async function parseSqliteTable(filePath, tabId, db, onProgress, tableName, file
       lastProgress = rowCount;
       const bytesRead = totalRows > 0 && fileSize > 0
         ? Math.min(fileSize, Math.round((rowCount / totalRows) * fileSize))
-        : rowCount;
+        : 0;
+      const percent = totalRows > 0 && fileSize > 0
+        ? Math.min(99, Math.round((rowCount / totalRows) * 100))
+        : 0;
       onProgress(rowCount, bytesRead, fileSize || totalRows, {
         phase: "parsing",
-        statusDetail: isLargeFile ? `Importing SQLite table (${rowCount.toLocaleString()} rows)…` : "",
+        percentHint: percent,
+        statusDetail: totalRows > 0
+          ? `Importing SQLite table (${rowCount.toLocaleString()} / ${totalRows.toLocaleString()} rows)…`
+          : `Importing SQLite table (${rowCount.toLocaleString()} rows)…`,
       });
     };
 

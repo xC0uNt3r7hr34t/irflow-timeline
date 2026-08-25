@@ -271,7 +271,9 @@ export function TableModal({ th, ms, tle }) {
       {(Array.isArray(data.tables) ? data.tables : []).map((t) => (
         <button key={t.name} onClick={() => { tle.selectTable({ filePath: data.filePath, tabId: data.tabId, fileName: `${data.fileName} [${t.name}]`, tableName: t.name }); setModal(null); }}
           style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", background: th.bgInput, border: `1px solid ${th.btnBorder}`, borderRadius: 6, color: th.text, fontSize: 13, cursor: "pointer", marginBottom: 6, fontFamily: "inherit" }}>
-          {t.name} <span style={{ color: th.textMuted, fontSize: 11 }}>({t.rowCountEstimate ? "~" : ""}{formatNumber(Number(t.rowCount) || 0)} rows{t.rowCountEstimate ? ", estimated" : ""})</span>
+          {t.name} <span style={{ color: th.textMuted, fontSize: 11 }}>
+            {t.rowCountEstimate ? `(~${formatNumber(Number(t.rowCount) || 0)} rows, estimated)` : t.rowCount > 0 ? `(${formatNumber(Number(t.rowCount) || 0)} rows)` : ""}
+          </span>
         </button>
       ))}
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
@@ -320,7 +322,9 @@ export function ImportProgress({ th, info }) {
             : "Preparing import...";
   const percent = Math.max(0, Math.min(100, Number.isFinite(info?.percent) ? info.percent : 0));
   const byteTotal = info?.totalBytes || info?.fileSize || 0;
-  const hasByteProgress = byteTotal > 0 && Number.isFinite(info?.bytesRead);
+  const hasByteProgress = byteTotal > 0 && Number.isFinite(info?.bytesRead) && info.bytesRead > 0;
+  const rowsImported = Number(info?.rowsImported) || 0;
+  const indeterminate = (info?.phase === "preparing" || (percent === 0 && rowsImported === 0)) && info?.status !== "indexing";
   return (
   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", padding: 40 }}>
     {/* Logo + tagline */}
@@ -345,11 +349,11 @@ export function ImportProgress({ th, info }) {
       <p style={{ color: th.textDim, fontSize: 13, marginBottom: 8 }}>{info?.fileName}</p>
       <p style={{ color: th.textMuted, fontSize: 11, marginBottom: 16, fontFamily: "-apple-system, sans-serif" }}>{phaseLabel}</p>
       <div style={{ height: 6, background: th.border, borderRadius: 3, overflow: "hidden", marginBottom: 12 }}>
-        <div style={{ height: "100%", width: "100%", background: info?.status === "indexing" ? th.warning : th.borderAccent, borderRadius: 3, transformOrigin: "left", transform: `scaleX(${percent / 100})`, transition: "transform var(--m-slow)" }} />
+        <div style={{ height: "100%", width: "100%", background: info?.status === "indexing" ? th.warning : th.borderAccent, borderRadius: 3, transformOrigin: "left", transform: indeterminate ? "scaleX(0.35)" : `scaleX(${percent / 100})`, transition: indeterminate ? "none" : "transform var(--m-slow)", animation: indeterminate ? "tle-indeterminate 1.4s ease-in-out infinite alternate" : undefined }} />
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", color: th.textDim, fontSize: 12 }}>
-        <span>{formatNumber(info?.rowsImported || 0)} rows imported</span>
-        <span>{percent}%</span>
+        <span>{formatNumber(rowsImported)} rows imported</span>
+        <span>{indeterminate ? "…" : `${percent}%`}</span>
       </div>
       {hasByteProgress && (
         <div style={{ display: "flex", justifyContent: "space-between", color: th.textMuted, fontSize: 10, marginTop: 6, fontFamily: "SF Mono, Menlo, monospace" }}>

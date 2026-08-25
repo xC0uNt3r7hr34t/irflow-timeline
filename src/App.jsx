@@ -1222,21 +1222,28 @@ export default function App() {
 
     listen(tle.onImportStart, ({ tabId, fileName, filePath, fileSize, sheetName, tableName }) => {
       if (filePath) importPathsRef.current[tabId] = filePath;
-      setImportingTabs((prev) => ({ ...prev, [tabId]: { fileName, rowsImported: 0, percent: 0, status: "importing", fileSize: fileSize || 0 } }));
-      setTabs((prev) => [...prev, {
-        id: tabId, name: fileName, filePath, sheetName: sheetName || null, tableName: tableName || null, headers: [], rows: [], totalRows: 0, totalFiltered: 0,
-        tsColumns: new Set(), numericColumns: new Set(), searchTerm: "", searchMode: "mixed", searchCondition: "contains",
-        columnFilters: {}, checkboxFilters: {}, sortCol: null, sortDir: "asc", colorRules: [],
-        hiddenColumns: new Set(), bookmarkedSet: new Set(), showBookmarkedOnly: false, rowOffset: 0,
-        columnWidths: {}, columnOrder: [], pinnedColumns: [], groupByColumns: [], groupData: [], expandedGroups: {},
-        rowTags: {}, tagColors: { ...TAG_PRESETS }, tagFilter: null, rowIdFilter: null, rowIdFilterLabel: null,
-        dateRangeFilters: {}, searchHighlight: false, disabledFilters: new Set(),
-        advancedFilters: [],
-        usnResolveStats: null,
-        evtxMessageMode: null,
-        messagesDeferred: false,
-        importing: true, dataReady: false,
-      }]);
+      setImportingTabs((prev) => ({ ...prev, [tabId]: { fileName, rowsImported: 0, percent: 0, status: "importing", fileSize: fileSize || 0, statusDetail: "Preparing import…" } }));
+      setTabs((prev) => {
+        const existing = prev.find((t) => t.id === tabId);
+        const importingTab = {
+          id: tabId, name: fileName, filePath, sheetName: sheetName || null, tableName: tableName || null, headers: [], rows: [], totalRows: 0, totalFiltered: 0,
+          tsColumns: new Set(), numericColumns: new Set(), searchTerm: "", searchMode: "mixed", searchCondition: "contains",
+          columnFilters: {}, checkboxFilters: {}, sortCol: null, sortDir: "asc", colorRules: [],
+          hiddenColumns: new Set(), bookmarkedSet: new Set(), showBookmarkedOnly: false, rowOffset: 0,
+          columnWidths: {}, columnOrder: [], pinnedColumns: [], groupByColumns: [], groupData: [], expandedGroups: {},
+          rowTags: {}, tagColors: { ...TAG_PRESETS }, tagFilter: null, rowIdFilter: null, rowIdFilterLabel: null,
+          dateRangeFilters: {}, searchHighlight: false, disabledFilters: new Set(),
+          advancedFilters: [],
+          usnResolveStats: null,
+          evtxMessageMode: null,
+          messagesDeferred: false,
+          importing: true, dataReady: false,
+        };
+        if (existing) {
+          return prev.map((t) => (t.id === tabId ? { ...t, ...importingTab, name: fileName || t.name } : t));
+        }
+        return [...prev, importingTab];
+      });
       setActiveTab(tabId);
       // Bind a home-screen capability intent (if armed and not yet bound) to THIS import,
       // so its analyzer opens on this exact tab even if other imports finish first.
@@ -3751,6 +3758,7 @@ export default function App() {
         }
         @keyframes tle-spin { to { transform: rotate(360deg) } }
         @keyframes tle-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.95); } }
+        @keyframes tle-indeterminate { from { transform: scaleX(0.2); opacity: 0.55; } to { transform: scaleX(0.85); opacity: 1; } }
         @keyframes tle-modal-in { from { opacity: 0; transform: scale(0.97) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         @keyframes tle-overlay-in { from { opacity: 0; } to { opacity: 1; } }
         ::-webkit-scrollbar { width: 14px; height: 14px; }

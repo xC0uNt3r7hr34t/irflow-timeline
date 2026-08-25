@@ -293,9 +293,6 @@ export default function BulkActionsModal({
           <Button variant="dangerSoft" onClick={() => handleTag(false)} disabled={!tagName.trim() || busy}>
             Remove
           </Button>
-          <Button variant="dangerSoft" onClick={handleRemoveTag} disabled={!tagName.trim()} loading={busy}>
-            Remove Tag
-          </Button>
         </div>
         {dbTags.length > 0 && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 9 }}>

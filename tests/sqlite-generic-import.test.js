@@ -90,6 +90,34 @@ test("generic SQLite import lists tables and streams one table", async (t) => {
   }
 });
 
+test("listSqliteTables can skip row counts for fast single-table routing", async (t) => {
+  let Database;
+  try {
+    Database = require("better-sqlite3");
+  } catch (err) {
+    if (skipSqlite(t, err)) return;
+    throw err;
+  }
+
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-sqlite-fast-"));
+  const dbPath = path.join(dir, "single.sqlite");
+  try {
+    const sqlite = new Database(dbPath);
+    sqlite.exec(`
+      CREATE TABLE events (id INTEGER PRIMARY KEY, action TEXT);
+      INSERT INTO events (action) VALUES ('login');
+    `);
+    sqlite.close();
+    const tables = listSqliteTables(dbPath, 0, { rowCounts: false });
+    assert.deepEqual(tables, [{ name: "events", rowCount: 0, rowCountEstimate: false }]);
+  } catch (err) {
+    if (skipSqlite(t, err)) return;
+    throw err;
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test("listSqliteTables uses fast row estimates for large databases", async (t) => {
   let Database;
   try {

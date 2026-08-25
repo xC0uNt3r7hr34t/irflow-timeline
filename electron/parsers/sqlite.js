@@ -77,8 +77,9 @@ function estimateTableRowCount(sqliteDb, tableName, useFastEstimate) {
   }
 }
 
-function listSqliteTables(filePath, fileSizeHint = 0) {
-  dbg("SQLITE", "listSqliteTables start", { filePath });
+function listSqliteTables(filePath, fileSizeHint = 0, options = {}) {
+  const { rowCounts = true } = options;
+  dbg("SQLITE", "listSqliteTables start", { filePath, rowCounts });
   let fileSize = fileSizeHint;
   if (!fileSize) {
     try { fileSize = fs.statSync(filePath).size; } catch {}
@@ -97,6 +98,10 @@ function listSqliteTables(filePath, fileSizeHint = 0) {
     const tables = [];
     for (const row of rows) {
       if (row.sql && /VIRTUAL/i.test(row.sql)) continue;
+      if (!rowCounts) {
+        tables.push({ name: row.name, rowCount: 0, rowCountEstimate: false });
+        continue;
+      }
       const rowCount = estimateTableRowCount(sqliteDb, row.name, useFastEstimate);
       if (rowCount == null) continue;
       tables.push({
@@ -105,7 +110,7 @@ function listSqliteTables(filePath, fileSizeHint = 0) {
         rowCountEstimate: useFastEstimate,
       });
     }
-    dbg("SQLITE", "listSqliteTables done", { tableCount: tables.length, useFastEstimate });
+    dbg("SQLITE", "listSqliteTables done", { tableCount: tables.length, rowCounts, useFastEstimate });
     return tables;
   } finally {
     try { sqliteDb?.close(); } catch {}
@@ -123,10 +128,6 @@ async function parseSqliteTable(filePath, tabId, db, onProgress, tableName, file
   const isLargeFile = fileSize > LARGE_FILE_BYTES;
   const useFastEstimate = fileSize > LARGE_DB_BYTES;
 
-  const tables = listSqliteTables(filePath, fileSize);
-  const tableInfo = tables.find((t) => t.name === tableName);
-  if (!tableInfo) throw new Error(`Table not found: ${tableName}`);
-
   let sqliteDb;
   try {
     sqliteDb = openSqliteReadonly(filePath);
@@ -136,12 +137,10 @@ async function parseSqliteTable(filePath, tabId, db, onProgress, tableName, file
 
     const headers = colInfo.map((c) => c.name);
     const colCount = headers.length;
-    let totalRows = tableInfo.rowCount;
-    if (useFastEstimate || tableInfo.rowCountEstimate) {
-      // Re-count exactly during import only when the table is small enough.
-      if (!useFastEstimate) {
-        totalRows = estimateTableRowCount(sqliteDb, tableName, false) ?? totalRows;
-      }
+    let totalRows = estimateTableRowCount(sqliteDb, tableName, useFastEstimate) ?? 0;
+    if (!useFastEstimate) {
+      // Small DBs: exact count is cheap and improves progress accuracy.
+      totalRows = estimateTableRowCount(sqliteDb, tableName, false) ?? totalRows;
     }
     db.createTab(tabId, headers);
 

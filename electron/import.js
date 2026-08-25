@@ -162,15 +162,20 @@ async function importFile(filePath, preTabId, preSheetName, deps, queueItem = {}
       const plasoCheck = typeof validatePlasoFile === "function" ? validatePlasoFile(filePath) : { valid: false };
       if (!plasoCheck.valid) {
         dbg("IMPORT", `listSqliteTables calling...`, { filePath });
-        const tables = await listSqliteTables(filePath, fileSize);
+        // Name-only pass first — row counts can take minutes on multi-GB DBs and block
+        // the import progress UI from appearing. Count rows only when the picker needs them.
+        const tables = await listSqliteTables(filePath, fileSize, { rowCounts: false });
         dbg("IMPORT", `listSqliteTables returned`, { tableCount: tables.length, tables: tables.map((t) => t.name) });
         if (!tables.length) {
           safeSend("import-error", { tabId, fileName, error: "No importable tables found in SQLite database" });
           return;
         }
-        // Always prompt so the analyst picks the table (even for single-table DBs).
-        safeSend("table-selection", { tabId, fileName, filePath, tables });
-        return;
+        if (tables.length > 1) {
+          const tablesWithCounts = await listSqliteTables(filePath, fileSize, { rowCounts: true });
+          safeSend("table-selection", { tabId, fileName, filePath, tables: tablesWithCounts });
+          return;
+        }
+        tableName = tables[0].name;
       }
     } catch (e) {
       dbg("IMPORT", `listSqliteTables failed`, { error: e.message, stack: e.stack });

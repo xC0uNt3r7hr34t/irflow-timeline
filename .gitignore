@@ -1,4 +1,5 @@
 node_modules/
+.pnpm-store/
 dist/
 release/
 *.db
@@ -7,9 +8,26 @@ release/
 .DS_Store
 docs/.vitepress/dist
 docs/.vitepress/cache
+docs/.vitepress/.temp
 CLAUDE.md
 .env*
 *.pem
 *.key
 *.pfx
 *.p12
+hayabusa/
+tools/bmc-tools/
+tools/prefetch-parser/
+tools/lnk-parser/
+tools/jumplist-parser/
+tools/shellbag-parser/
+tools/artemis/
+.claude/
+# Claude fixture directories intentionally model the real artifact path.
+!tests/fixtures/**/.claude/
+!tests/fixtures/**/.claude/**
+*.bak
+*.code-workspace
+
+# Internal security audit output — kept locally, never published to the public repo.
+security_best_practices_report.md

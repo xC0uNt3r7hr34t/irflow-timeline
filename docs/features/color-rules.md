@@ -10,7 +10,7 @@ Color rules apply conditional formatting to grid cells, making patterns and anom
 
 ## Creating Color Rules
 
-1. Open **View > Color Rules** or `Cmd+Click` a cell and select **Create Color Rule**
+1. Open **View → Color Rules** or `Cmd+Click` a cell and select **Create Color Rule**
 2. Configure the rule:
    - **Column** — which column to evaluate (or "Any Column")
    - **Condition** — matching logic (see below)

@@ -6,11 +6,12 @@ description: Interactive timeline histogram with heatmap coloring, brush-to-filt
 
 The histogram provides a visual timeline of event distribution, helping you identify activity patterns, quiet periods, and suspicious bursts at a glance.
 
-![Histogram showing daily event distribution with multi-source coloring across a 37-day Sysmon timeline](/dfir-tips/Histogram.png)
+![Histogram above the WKS2390 EvtxECmd grid — daily buckets across the 2025-04-02 to 2025-04-23 investigation window](/dfir-tips/Histogram.png)
 
 ## Opening the Histogram
 
-- Click the **Histogram** button in the main toolbar
+- Click the **Histogram** button in the main toolbar (bar-chart icon)
+- **macOS menu bar:** **Tools → Toggle Histogram**
 - The histogram panel appears above the data grid and can be resized by dragging its bottom edge (80px–500px range, default 160px)
 
 ## Granularity

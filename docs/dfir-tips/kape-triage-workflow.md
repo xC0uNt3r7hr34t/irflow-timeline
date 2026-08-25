@@ -31,6 +31,14 @@ Before starting, ensure you have KAPE output collected with one of the common ta
 | **!EZParser** | Parses all collected artifacts using EZ Tools into CSV | MFTECmd, EvtxECmd, PECmd, LECmd, RECmd, AmcacheParser, SBECmd, AppCompatCacheParser, JLECmd |
 | **!SANS_Triage** | Extended parsing with timeline generation | All EZParser modules plus Hayabusa, mini-timeline creation |
 
+::: tip AI app evidence
+For AI investigations, also collect local AI app history paths from user profiles before scanning the collection in IRFlow Timeline. Prioritize ChatGPT Desktop, Claude Code, OpenAI Codex, Grok Build, Cursor, GitHub Copilot, Gemini CLI, Windsurf, and Continue paths such as `.claude`, `.codex`, `.grok`, `.cursor`, `.gemini`, `.continue`, ChatGPT app-data folders, and VS Code-family `User/workspaceStorage/*/chatSessions/`.
+
+After collection, open **Tools → Analysis → AI Artifacts → Collect AI Artifacts** and choose the KAPE output, triage root, mounted disk, or copied profile folder. IRFlow walks Windows, Linux, and macOS profile layouts and merges discovered AI history into one **AI Query History** tab.
+
+![Collect AI Artifacts — Browse folder for KAPE output or triage roots](/dfir-tips/Collect-AI-Artifacts-Target.png)
+:::
+
 ### Expected KAPE Output Directory Structure
 
 After a collection with `KapeTriage` targets and `!EZParser` modules, the output directory looks like this:
@@ -77,7 +85,7 @@ Use the [Multi-Tab](/workflows/multi-tab) workflow to load each major artifact t
 3. **MFTECmd output** -- file system metadata for file creation and modification
 4. **AmcacheParser output** -- application execution evidence with hashes
 
-Open each CSV file and IRFlow Timeline will apply the correct [KAPE profile](/workflows/kape-integration) automatically, pinning and ordering columns for that artifact type.
+Open each CSV file and IRFlow Timeline will apply the correct [KAPE profile](/workflows/kape-integration) automatically, ordering columns and hiding noise fields for that artifact type.
 
 ### 2. Set the investigation time window
 
@@ -97,7 +105,7 @@ If you have KAPE output from several systems, load each host into its own set of
 
 ### 4. Run Log Source Coverage
 
-Open **Tools > [Log Sources](/features/log-source-coverage)** on your EvtxECmd tab. The heatmap reveals which event log channels are present and where gaps exist.
+Open **Tools → Analysis → [Log Sources](/features/log-source-coverage)** on your EvtxECmd tab. The heatmap reveals which event log channels are present and where gaps exist.
 
 ### 5. Check for expected log sources
 
@@ -126,7 +134,7 @@ A sudden drop in all log sources at a specific time often indicates a system reb
 
 ### 7. Stack event logs by Event ID
 
-On the EvtxECmd tab, open **Tools > [Stack Values](/features/stacking)** and stack the **EventId** column. Review the distribution for these key event IDs:
+On the EvtxECmd tab, open **Tools → Analysis → [Stack Values](/features/stacking)** and stack the **EventId** column. Review the distribution for these key event IDs:
 
 | Event ID | Source | Significance |
 |----------|--------|-------------|
@@ -167,7 +175,7 @@ If you already set a date range filter in Step 2, stacking results only reflect 
 
 ### 10. Build the Process Inspector
 
-On the EvtxECmd tab, filter to Sysmon Event ID 1 or Security Event ID 4688, then open **Tools > [Process Inspector](/features/process-tree)**. IRFlow Timeline builds the parent-child hierarchy automatically.
+On the EvtxECmd tab, filter to Sysmon Event ID 1 or Security Event ID 4688, then open **Tools → Platforms → Windows → [Process Inspector](/features/process-tree)**. IRFlow Timeline builds the parent-child hierarchy automatically.
 
 ### 11. Review suspicious pattern highlights
 
@@ -191,7 +199,7 @@ For each suspicious chain, click the filter icon on the process node to jump bac
 
 ### 13. Map lateral movement
 
-Switch to the EvtxECmd tab (ensure logon events are present) and open **Tools > [Lateral Movement Tracker](/features/lateral-movement)**. The tracker builds a force-directed graph of network logon activity.
+Switch to the EvtxECmd tab (ensure logon events are present) and open **Tools → Platforms → Windows → [Lateral Movement Tracker](/features/lateral-movement)**. The tracker builds a force-directed graph of network logon activity.
 
 Review the three sub-tabs:
 
@@ -201,7 +209,7 @@ Review the three sub-tabs:
 
 ### 14. Run IOC matching
 
-If you have indicators from threat intelligence, open **Actions > IOC Matching** and paste your IOC list. IRFlow Timeline scans all columns across all loaded data for matches.
+If you have indicators from threat intelligence, open **Actions → IOC Matching** and paste your IOC list. IRFlow Timeline scans all columns across all loaded data for matches.
 
 | IOC Type | Where to Expect Matches |
 |----------|------------------------|

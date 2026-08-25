@@ -8,11 +8,12 @@ description: Keyboard shortcuts reference for IRFlow Timeline — file operation
 
 | Shortcut | Action |
 |----------|--------|
-| `Cmd+O` | Open file |
+| `Cmd+O` | Open file — file picker with format filters (multi-select) |
+| Menu | **File → Open Triage Collection…** — inventory a KAPE/triage folder and import selected artifacts ([workflow](/workflows/kape-integration#open-triage-collection)) |
 | `Cmd+E` | Export filtered data |
 | `Cmd+S` | Save session |
 | `Cmd+Shift+O` | Load session |
-| `Cmd+Shift+R` | Generate report |
+| `Cmd+Shift+R` | Generate HTML report (macOS menu bar → **File → Generate Report…**) |
 
 ## Navigation
 
@@ -62,20 +63,37 @@ description: Keyboard shortcuts reference for IRFlow Timeline — file operation
 | Deselect All | Clear selection (Actions menu) |
 | Invert Selection | Toggle selection state (Actions menu) |
 
-## Tools
+## Tools & display
+
+| Shortcut / control | Action |
+|--------------------|--------|
+| Toolbar histogram icon | Toggle timeline histogram (no keyboard shortcut) |
+| `Cmd+Plus` / `Cmd+-` | Increase / decrease font size (macOS **Tools → Font Size**) |
+| Toolbar **☀ / 🌙** | Toggle dark / light theme |
+
+Analysis tools in the **in-app Tools** menu are grouped in four sections: **Analysis** (Stack Values, Gap Analysis, Log Sources, Burst Detection, **AI Artifacts**), **Detection** (Sigma Scan and **AI Secret Hunt**), **Platforms** (active Windows tools plus one collapsed **Coming soon** group for planned Linux, macOS, and cloud analyzers), and **Export** (AI history package, source manifest, Generate Report).
+
+![Tools → Analysis → AI Artifacts with Collect AI Artifacts, nested OpenAI Codex / ChatGPT Computer History, and Grok Build](/dfir-tips/Tools-Menu-AI-Artifacts.png)
+
+Windows platform tools include Process Inspector, Lateral Movement Tracker, Persistence Analyzer, RDP Bitmap Cache, plus **Master File Table** and **USN Journal** submenus for raw NTFS analysis. See [Virtual Grid — Tools](/features/virtual-grid#tools) and [NTFS Analysis](/features/ntfs-analysis).
+
+## Help
 
 | Shortcut | Action |
 |----------|--------|
-| `Cmd+H` | Toggle histogram |
+| `Cmd+K` | Open the searchable command palette |
+| `Cmd+/` | Open Keyboard Shortcuts |
+
+The **Help** menu also includes Command Palette, Quick Help, **Check for Updates…**, Website, and About IRFlow Timeline.
 
 ## General
 
 | Shortcut | Action |
 |----------|--------|
-| `Cmd+,` | Preferences |
 | `Cmd+Q` | Quit |
 | `Cmd+M` | Minimize window |
-| `Cmd+Shift+F` | Toggle fullscreen |
+
+Display preferences (datetime format, timezone, theme, font size, temp storage folder) are in the [Preferences](/reference/preferences) guide — mostly via the in-app toolbar and the macOS **Tools** menu, not a single Preferences window.
 
 ## Search Syntax
 
@@ -86,7 +104,7 @@ description: Keyboard shortcuts reference for IRFlow Timeline — file operation
 | `-word` | EXCLUDE |
 | `"exact phrase"` | Phrase match |
 | `Column:value` | Column-specific filter |
-| `FL` / `HL` | Toggle filter / highlight mode |
+| Toolbar **Filter / Highlight** | Hide non-matches or keep all rows visible and highlight matches |
 
 ## Context Menu Shortcuts
 
@@ -98,7 +116,8 @@ description: Keyboard shortcuts reference for IRFlow Timeline — file operation
 
 **Right-click any cell** opens the full context menu:
 
-- Copy cell / Copy row
+- Copy cell / Copy this row
+- Copy selected rows (when rows are checked)
 - Filter in / Filter out
 - Tags ▸ (hover submenu — supports multi-row tagging)
 - VirusTotal lookup (for IPs, hashes, domains)

@@ -8,13 +8,13 @@ Sessions let you save and restore your complete analysis state, including all op
 
 ## Save a Session
 
-- **Menu:** File > Save Session (`Cmd+S`)
+- **Menu:** File → Save Session (`Cmd+S`)
 - Choose a location and filename
 - Sessions are saved as `.tle` files (JSON format)
 
 ## Load a Session
 
-- **Menu:** File > Load Session (`Cmd+Shift+O`)
+- **Menu:** File → Load Session (`Cmd+Shift+O`)
 - Select a `.tle` file
 - IRFlow Timeline restores all tabs and their state
 

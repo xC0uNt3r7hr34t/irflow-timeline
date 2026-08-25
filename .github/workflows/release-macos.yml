@@ -4,6 +4,16 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      from_tag:
+        description: "Previous release tag whose ZIP blockmap must remain available"
+        required: true
+        default: "v1.0.10"
+      to_tag:
+        description: "Current release tag whose ZIP blockmap must be published"
+        required: true
+        default: "v1.0.11"
 
 permissions:
   contents: write
@@ -14,9 +24,9 @@ concurrency:
 
 jobs:
   release:
-    # macos-14 (ARM64). The "Build universal better-sqlite3" step below explicitly
-    # rebuilds better-sqlite3 for both x64 and arm64 and lipo-merges them, so
-    # electron-builder receives a ready-made fat binary and npmRebuild is disabled.
+    if: github.event_name == 'push'
+    # macos-14 (ARM64). Electron Builder 26 rebuilds better-sqlite3 13 for both
+    # x64 and arm64 sub-builds before merging the universal application.
     runs-on: macos-14
     env:
       IRFLOW_UPDATE_BASE_URL: ${{ vars.IRFLOW_UPDATE_BASE_URL }}
@@ -43,7 +53,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22.17.0
           cache: npm
 
       - name: Ensure release tools
@@ -95,26 +105,103 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build universal better-sqlite3 native module
+      - name: Smoke Electron and native SQLite runtime
+        run: npm run smoke:electron
+
+      # better-sqlite3 13 ships prebuildify prebuilds and has no install script, so
+      # `npm rebuild better-sqlite3` is a no-op for it — the Node binding comes from
+      # node_modules/better-sqlite3/prebuilds/. Packaging rebuilds the universal Electron
+      # module below.
+      #
+      # That prebuild segfaults on Node 22.12/22.13 (crash on Database construction, not a
+      # clean ABI error), which surfaced as 21 unexplained SIGSEGVs across every
+      # SQLite-backed test file. Assert it loads before running the suite so a future
+      # runtime break fails here with one clear message instead of inside the tests.
+      - name: Verify native SQLite under the test runtime
+        run: |
+          set -euo pipefail
+          node -e "
+            const Database = require('better-sqlite3');
+            const db = new Database(':memory:');
+            db.exec('CREATE TABLE probe (v INTEGER)');
+            db.prepare('INSERT INTO probe VALUES (?)').run(1);
+            if (db.prepare('SELECT v FROM probe').get().v !== 1) throw new Error('probe query failed');
+            db.close();
+            console.log('better-sqlite3 OK under Node ' + process.versions.node);
+          "
+
+      - name: Run test suite
+        timeout-minutes: 10
+        run: npm test
+
+      - name: Build renderer
+        run: npm run build:renderer
+
+      - name: Build documentation
+        run: npm run docs:build
+
+      - name: Bundle external tools (Hayabusa + bmc-tools)
+        env:
+          # Authenticate the Hayabusa release-API lookup so the bundle script isn't
+          # throttled by GitHub's 60/hr unauthenticated rate limit on shared runner IPs.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
-          electron_version="$(node -p "require('./node_modules/electron/package.json').version")"
+          # hayabusa/ and tools/bmc-tools/ are .gitignored, so a fresh CI checkout has
+          # neither. electron-builder's extraResources would otherwise package nothing,
+          # shipping an app where Sigma (Hayabusa) scans and RDP Bitmap Cache silently
+          # fail / fall back to a network download (which breaks on TLS-intercepting
+          # corporate proxies). This step downloads + bundles both tools. The Hayabusa
+          # binary is built UNIVERSAL (arm64 + x86_64) via lipo inside the script.
+          npm run bundle:tools
 
-          # Build for x86_64 (native on this Intel runner)
-          npx @electron/rebuild -f -w better-sqlite3 -v "${electron_version}" --arch x64
-          cp node_modules/better-sqlite3/build/Release/better_sqlite3.node /tmp/bs3_x64.node
+          # Fail loudly if the expected artifacts are missing — a silent miss here is
+          # exactly the regression that shipped a tool-less app in the first place.
+          echo "==> Verifying bundled tools"
+          test -f hayabusa/hayabusa || { echo "::error::hayabusa binary missing after bundle"; exit 1; }
+          test -d hayabusa/rules    || { echo "::error::hayabusa rules dir missing after bundle"; exit 1; }
+          test -f tools/bmc-tools/bmc-tools.py || { echo "::error::bmc-tools.py missing after bundle"; exit 1; }
+          echo "Hayabusa binary architectures:"
+          lipo -info hayabusa/hayabusa
+          # The mac target is universal; confirm the bundled binary is a fat Mach-O so the
+          # @electron/universal merge (covered by mac.x64ArchFiles) succeeds.
+          lipo -info hayabusa/hayabusa | grep -q "x86_64 arm64\|arm64 x86_64" \
+            || { echo "::error::hayabusa binary is not a universal (x86_64+arm64) fat binary"; exit 1; }
+          echo "Bundled Sigma rule count: $(find hayabusa/rules/sigma -name '*.yml' | wc -l | tr -d ' ')"
 
-          # Build for arm64 (cross-compile from Intel)
-          npx @electron/rebuild -f -w better-sqlite3 -v "${electron_version}" --arch arm64
-          cp node_modules/better-sqlite3/build/Release/better_sqlite3.node /tmp/bs3_arm64.node
+      # electron-builder imports CSC_LINK into a keychain it creates and tears down
+      # itself, which the afterAllArtifactBuild hook cannot see — on v1.0.12 the DMG
+      # signing step logged "no Developer ID Application identity found in the
+      # keychain" and shipped an unsigned disk image. Importing into a keychain on
+      # the search list makes the identity and its private key available to every
+      # later step, not just electron-builder's own signing pass.
+      - name: Import signing certificate into the keychain
+        shell: bash
+        run: |
+          set -euo pipefail
+          kc="$RUNNER_TEMP/irflow-signing.keychain-db"
+          kc_pass="$(uuidgen)"
+          p12="$RUNNER_TEMP/cert.p12"
 
-          # Merge into a universal fat binary
-          lipo -create /tmp/bs3_x64.node /tmp/bs3_arm64.node \
-               -output node_modules/better-sqlite3/build/Release/better_sqlite3.node
+          # CSC_LINK is base64 p12 content (it may also be a path or file: URL).
+          if [ -f "${CSC_LINK}" ]; then cp "${CSC_LINK}" "${p12}";
+          else printf '%s' "${CSC_LINK}" | base64 --decode > "${p12}"; fi
 
-          echo "Universal binary verified:"
-          lipo -info node_modules/better-sqlite3/build/Release/better_sqlite3.node
+          security create-keychain -p "${kc_pass}" "${kc}"
+          security set-keychain-settings -lut 21600 "${kc}"
+          security unlock-keychain -p "${kc_pass}" "${kc}"
+          security import "${p12}" -k "${kc}" -P "${CSC_KEY_PASSWORD}" \
+            -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple:,codesign: \
+            -s -k "${kc_pass}" "${kc}" >/dev/null
+          security list-keychains -d user -s "${kc}" $(security list-keychains -d user | tr -d '"')
+          rm -f "${p12}"
+
+          security find-identity -v -p codesigning "${kc}" | sed 's/[A-F0-9]\{40\}/<hash>/'
+          security find-identity -v -p codesigning | grep -q "Developer ID Application" \
+            || { echo "::error::Developer ID identity not visible after import"; exit 1; }
 
       - name: Build signed macOS release
         shell: bash
@@ -123,10 +210,9 @@ jobs:
           export IRFLOW_UPDATE_CHANNEL="${IRFLOW_UPDATE_CHANNEL:-latest}"
           # Clean any stale artifacts from prior runs before building.
           rm -rf release
-          # --config.npmRebuild=false: skip electron-builder's built-in native module
-          # rebuild since we already pre-built the universal fat binary above.
-          npm run build:renderer
-          npx electron-builder --config electron-builder.config.cjs --mac --config.npmRebuild=false
+          # Electron Builder rebuilds the native SQLite addon independently for the
+          # x64 and arm64 sub-builds, then merges the universal application.
+          npx electron-builder --config electron-builder.config.cjs --mac
 
       - name: Collect release artifacts
         id: artifacts
@@ -140,6 +226,9 @@ jobs:
           # Match the exact version to guard against any stale files surviving the clean.
           dmg_path="$(find release -maxdepth 1 -type f -name "*${pkg_version}*.dmg" | sort | head -n 1)"
           zip_path="$(find release -maxdepth 1 -type f -name "*${pkg_version}*.zip" | sort | head -n 1)"
+          dmg_blockmap="${dmg_path}.blockmap"
+          zip_blockmap="${zip_path}.blockmap"
+          app_update_yml="$(find release -type f -path "*/Contents/Resources/app-update.yml" | sort | head -n 1)"
 
           if [ "${channel}" = "latest" ]; then
             yml_name="latest-mac.yml"
@@ -152,15 +241,22 @@ jobs:
             yml_path="$(find release -maxdepth 1 -type f -name '*-mac.yml' | sort | head -n 1)"
           fi
 
-          for path_name in dmg_path zip_path yml_path; do
+          for path_name in dmg_path zip_path dmg_blockmap zip_blockmap app_update_yml yml_path; do
             if [ -z "${!path_name:-}" ] || [ ! -f "${!path_name}" ]; then
               echo "::error::Missing expected release artifact: ${path_name}"
               exit 1
             fi
           done
 
+          if ! grep -Eq '^useMultipleRangeRequest:[[:space:]]*false$' "${app_update_yml}"; then
+            echo "::error::Packaged updater is not configured for S3-compatible single-range downloads"
+            exit 1
+          fi
+
           echo "dmg=${dmg_path}" >> "${GITHUB_OUTPUT}"
           echo "zip=${zip_path}" >> "${GITHUB_OUTPUT}"
+          echo "dmg_blockmap=${dmg_blockmap}" >> "${GITHUB_OUTPUT}"
+          echo "zip_blockmap=${zip_blockmap}" >> "${GITHUB_OUTPUT}"
           echo "yml=${yml_path}" >> "${GITHUB_OUTPUT}"
 
       - name: Upload workflow artifacts
@@ -170,6 +266,8 @@ jobs:
           path: |
             ${{ steps.artifacts.outputs.dmg }}
             ${{ steps.artifacts.outputs.zip }}
+            ${{ steps.artifacts.outputs.dmg_blockmap }}
+            ${{ steps.artifacts.outputs.zip_blockmap }}
             ${{ steps.artifacts.outputs.yml }}
           if-no-files-found: error
 
@@ -183,15 +281,52 @@ jobs:
           tag="${GITHUB_REF_NAME}"
           version="${tag#v}"
 
-          if ! gh release view "${tag}" >/dev/null 2>&1; then
+          # Build the release body from the changelog: the section under "## v<version>"
+          # (or "## <version>") up to the next "## " heading. Falls back to a generic
+          # note if the changelog is missing or has no matching section.
+          #
+          # Reads docs/about/changelog.md — the file that actually gets maintained and
+          # ships to the docs site. The root CHANGELOG.md stopped being updated at
+          # v1.0.10, so v1.0.12 silently published "Automated macOS release for v1.0.12."
+          # over hand-written notes.
+          changelog="docs/about/changelog.md"
+          [ -f "${changelog}" ] || changelog="CHANGELOG.md"
+          notes_file="$(mktemp)"
+          if [ -f "${changelog}" ]; then
+            awk -v ver="${version}" '
+              /^## / {
+                if (grab) exit
+                line=$0
+                sub(/^## v?/, "", line)
+                sub(/[^0-9.].*$/, "", line)
+                if (line == ver) { grab=1; next }
+              }
+              grab { print }
+            ' "${changelog}" > "${notes_file}"
+          fi
+          if ! grep -q '[^[:space:]]' "${notes_file}" 2>/dev/null; then
+            printf 'Automated macOS release for %s.\n' "${tag}" > "${notes_file}"
+            echo "::error::No ${changelog} section for ${version}. Refusing to overwrite"\
+                 " release notes with a generic placeholder."
+            exit 1
+          fi
+
+          # Create or UPDATE the release so re-runs refresh the notes too.
+          if gh release view "${tag}" >/dev/null 2>&1; then
+            gh release edit "${tag}" \
+              --title "IRFlow Timeline ${version}" \
+              --notes-file "${notes_file}"
+          else
             gh release create "${tag}" \
               --title "IRFlow Timeline ${version}" \
-              --notes "Automated macOS release for ${tag}."
+              --notes-file "${notes_file}"
           fi
 
           gh release upload "${tag}" \
             "${{ steps.artifacts.outputs.dmg }}" \
             "${{ steps.artifacts.outputs.zip }}" \
+            "${{ steps.artifacts.outputs.dmg_blockmap }}" \
+            "${{ steps.artifacts.outputs.zip_blockmap }}" \
             "${{ steps.artifacts.outputs.yml }}" \
             --clobber
 
@@ -210,6 +345,8 @@ jobs:
 
           dmg_name="$(basename "${{ steps.artifacts.outputs.dmg }}")"
           zip_name="$(basename "${{ steps.artifacts.outputs.zip }}")"
+          dmg_blockmap_name="$(basename "${{ steps.artifacts.outputs.dmg_blockmap }}")"
+          zip_blockmap_name="$(basename "${{ steps.artifacts.outputs.zip_blockmap }}")"
           yml_name="$(basename "${{ steps.artifacts.outputs.yml }}")"
 
           aws_s3_cp() {
@@ -230,6 +367,185 @@ jobs:
           aws_s3_cp "${{ steps.artifacts.outputs.zip }}" "${destination}/${zip_name}" \
             --cache-control "public, max-age=3600, immutable"
 
+          aws_s3_cp "${{ steps.artifacts.outputs.dmg_blockmap }}" "${destination}/${dmg_blockmap_name}" \
+            --cache-control "public, max-age=3600, immutable" \
+            --content-type "application/octet-stream"
+
+          aws_s3_cp "${{ steps.artifacts.outputs.zip_blockmap }}" "${destination}/${zip_blockmap_name}" \
+            --cache-control "public, max-age=3600, immutable" \
+            --content-type "application/octet-stream"
+
           aws_s3_cp "${{ steps.artifacts.outputs.yml }}" "${destination}/${yml_name}" \
             --cache-control "no-cache, no-store, must-revalidate" \
             --content-type "text/yaml"
+
+  repair-blockmaps:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: macos-14
+    env:
+      IRFLOW_UPDATE_BUCKET: ${{ vars.IRFLOW_UPDATE_BUCKET }}
+      IRFLOW_UPDATE_PREFIX: ${{ vars.IRFLOW_UPDATE_PREFIX }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
+      AWS_ENDPOINT_URL_S3: ${{ vars.AWS_ENDPOINT_URL_S3 }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.17.0
+          cache: npm
+
+      - name: Ensure repair tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v gh >/dev/null 2>&1; then
+            brew install gh
+          fi
+          if ! command -v aws >/dev/null 2>&1; then
+            brew install awscli
+          fi
+          npm ci --ignore-scripts
+
+      - name: Generate exact release blockmaps
+        shell: bash
+        env:
+          FROM_TAG: ${{ inputs.from_tag }}
+          TO_TAG: ${{ inputs.to_tag }}
+        run: |
+          set -euo pipefail
+          for tag in "${FROM_TAG}" "${TO_TAG}"; do
+            if [[ ! "${tag}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+              echo "::error::Invalid release tag: ${tag}"
+              exit 1
+            fi
+          done
+          mkdir -p repair
+
+          generate_release_blockmap() {
+            local tag="$1"
+            local version="${tag#v}"
+            local download_dir="repair/${tag}"
+
+            mkdir -p "${download_dir}"
+            gh release download "${tag}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --pattern "*.zip" \
+              --pattern "latest-mac.yml" \
+              --dir "${download_dir}" \
+              --clobber
+
+            local zip_path
+            zip_path="$(find "${download_dir}" -maxdepth 1 -type f -name "*.zip" | sort | head -n 1)"
+            local yml_path="${download_dir}/latest-mac.yml"
+            if [ -z "${zip_path}" ] || [ ! -f "${zip_path}" ] || [ ! -f "${yml_path}" ]; then
+              echo "::error::Missing ZIP or latest-mac.yml for ${tag}"
+              exit 1
+            fi
+
+            local expected_sha512
+            local expected_size
+            local actual_sha512
+            local actual_size
+            expected_sha512="$(awk '/^[[:space:]]+sha512:/{print $2; exit}' "${yml_path}")"
+            expected_size="$(awk '/^[[:space:]]+size:/{print $2; exit}' "${yml_path}")"
+            actual_sha512="$(openssl dgst -sha512 -binary "${zip_path}" | openssl base64 -A)"
+            actual_size="$(stat -f '%z' "${zip_path}")"
+
+            if [ "${actual_sha512}" != "${expected_sha512}" ] || [ "${actual_size}" != "${expected_size}" ]; then
+              echo "::error::Downloaded ${tag} ZIP does not match its updater metadata"
+              exit 1
+            fi
+
+            local blockmap_path="repair/IRFlow-Timeline-${version}-universal.zip.blockmap"
+            node scripts/generate-blockmap.js "${zip_path}" "${blockmap_path}"
+            test -s "${blockmap_path}"
+          }
+
+          generate_release_blockmap "${FROM_TAG}"
+          generate_release_blockmap "${TO_TAG}"
+
+      - name: Publish compatibility blockmaps
+        shell: bash
+        env:
+          FROM_TAG: ${{ inputs.from_tag }}
+          TO_TAG: ${{ inputs.to_tag }}
+        run: |
+          set -euo pipefail
+
+          missing=()
+          for var_name in IRFLOW_UPDATE_BUCKET AWS_REGION AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
+            if [ -z "${!var_name:-}" ]; then
+              missing+=("$var_name")
+            fi
+          done
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::Missing required GitHub variables/secrets: ${missing[*]}"
+            exit 1
+          fi
+
+          prefix="${IRFLOW_UPDATE_PREFIX#/}"
+          prefix="${prefix%/}"
+          if [ -n "${prefix}" ]; then
+            destination="s3://${IRFLOW_UPDATE_BUCKET}/${prefix}"
+          else
+            destination="s3://${IRFLOW_UPDATE_BUCKET}"
+          fi
+
+          aws_s3_cp() {
+            local source_path="$1"
+            local destination_path="$2"
+            shift 2
+
+            if [ -n "${AWS_ENDPOINT_URL_S3:-}" ]; then
+              aws s3 cp "${source_path}" "${destination_path}" --endpoint-url "${AWS_ENDPOINT_URL_S3}" "$@"
+            else
+              aws s3 cp "${source_path}" "${destination_path}" "$@"
+            fi
+          }
+
+          publish_release_blockmap() {
+            local tag="$1"
+            local version="${tag#v}"
+            local blockmap_path="repair/IRFlow-Timeline-${version}-universal.zip.blockmap"
+            local blockmap_name
+            blockmap_name="$(basename "${blockmap_path}")"
+
+            gh release upload "${tag}" "${blockmap_path}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --clobber
+
+            aws_s3_cp "${blockmap_path}" "${destination}/${blockmap_name}" \
+              --cache-control "public, max-age=3600, immutable" \
+              --content-type "application/octet-stream"
+          }
+
+          publish_release_blockmap "${FROM_TAG}"
+          publish_release_blockmap "${TO_TAG}"
+
+      - name: Verify public blockmaps
+        shell: bash
+        env:
+          FROM_TAG: ${{ inputs.from_tag }}
+          TO_TAG: ${{ inputs.to_tag }}
+          IRFLOW_UPDATE_BASE_URL: ${{ vars.IRFLOW_UPDATE_BASE_URL }}
+        run: |
+          set -euo pipefail
+          base_url="${IRFLOW_UPDATE_BASE_URL%/}"
+          if [ -z "${base_url}" ]; then
+            echo "::error::IRFLOW_UPDATE_BASE_URL is not configured"
+            exit 1
+          fi
+
+          for tag in "${FROM_TAG}" "${TO_TAG}"; do
+            version="${tag#v}"
+            name="IRFlow-Timeline-${version}-universal.zip.blockmap"
+            curl --fail --silent --show-error --head "${base_url}/${name}"
+          done

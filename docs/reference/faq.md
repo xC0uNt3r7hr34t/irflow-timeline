@@ -23,17 +23,31 @@ IRFlow Timeline has been tested with files exceeding **30 GB** and **150 million
 IRFlow Timeline is inspired by Eric Zimmerman's Timeline Explorer but adds capabilities beyond a data viewer:
 
 - Runs natively on macOS (Intel and Apple Silicon)
+- Dual-engine Sigma detection (Hayabusa + in-app JS Sigma)
 - Process Inspector with MITRE ATT&CK detection rules
 - Lateral Movement Tracker with interactive network graphs
-- Persistence Analyzer scanning 30+ techniques
+- Persistence Analyzer with 39 EVTX and 33 registry detection rules
 - IOC Matching with 17+ indicator types
 - Gap & Burst Analysis for anomaly detection
 - Log Source Coverage heatmap
+- **AI Artifacts** — collect local AI assistant history (including Grok Build) into timeline evidence; **ChatGPT Computer History** for macOS interaction telemetry; **AI Secret Hunt** for exposed keys, tokens, and credentials
 - Handles 30GB+ files via SQLite streaming (no row limits)
+
+### Can I analyze local AI assistant history?
+
+Yes. **Tools → Analysis → AI Artifacts → Collect AI Artifacts** discovers and merges local stores from Claude Code, OpenAI Codex, Grok Build, ChatGPT Desktop, Gemini CLI, Cursor, GitHub Copilot, Windsurf, and Continue — from this Mac or a KAPE/triage folder. On the resulting **AI Query History** tab, run **Tools → Detection → AI Secret Hunt** to review possible credential exposure (redacted by default).
+
+ChatGPT **Computer History** (Skysight) is a separate artifact family — macOS interaction telemetry, not conversation history. Import it from **Tools → Analysis → AI Artifacts → AI Apps → OpenAI Codex → ChatGPT Computer History**. It opens in its own 54-column tab.
+
+See [AI Artifacts](/features/ai-artifacts) and [AI Query History](/dfir-tips/ai-query-history).
+
+### Does it run Sigma rules?
+
+Yes. **Tools → Detection → Sigma Scan** provides a dual-engine detection workflow. The bundled [Hayabusa](https://github.com/Yamato-Security/hayabusa) engine scans folders of raw `.evtx` files at full speed, and an in-app JavaScript Sigma engine scans data you have already imported (the current tab) or EvtxECmd CSV/XLS/XLSX output when raw EVTX is unavailable. It supports scan presets, custom rule collections, noisy-rule suppression, GeoIP enrichment, and a MITRE ATT&CK-mapped triage dashboard with persistent scan history. See [Sigma Detection](/features/sigma-detection) for the full workflow.
 
 ### Does it support KAPE output?
 
-Yes. IRFlow Timeline auto-detects 15+ KAPE tool profiles including MFTECmd, EvtxECmd, PECmd, AmcacheParser, RECmd, SBECmd, AppCompatCacheParser, JLECmd, LECmd, SrumECmd, Hayabusa, and Chainsaw. Columns are automatically pinned, ordered, and formatted for each profile. See [KAPE Integration](/workflows/kape-integration) and [KAPE Profiles](/reference/kape-profiles) for details.
+Yes. IRFlow Timeline auto-detects 26 KAPE / EZ Tools profiles including MFTECmd, EvtxECmd, PECmd, AmcacheParser, RECmd, SBECmd, AppCompatCache, JLECmd, LECmd, SrumECmd, Hayabusa, and Chainsaw. Columns are automatically ordered and hidden (empty columns) per profile; pin columns yourself via the header context menu if needed. See [KAPE Integration](/workflows/kape-integration) and [KAPE Profiles](/reference/kape-profiles) for details.
 
 ---
 
@@ -41,13 +55,13 @@ Yes. IRFlow Timeline auto-detects 15+ KAPE tool profiles including MFTECmd, Evtx
 
 ### macOS blocks the app with "Apple cannot check it for malicious software"
 
-IRFlow Timeline is not notarized through the Apple App Store. To bypass the Gatekeeper prompt:
+Download builds from [GitHub Releases](https://github.com/r3nzsec/irflow-timeline/releases) — they are signed and notarized. If Gatekeeper still blocks a quarantined copy, use one of these once:
 
 1. **Right-click** the app in Applications and select **Open** (not double-click)
 2. Click **Open** in the dialog that appears
 3. The app will launch and macOS will remember your choice
 
-Alternatively: go to **System Settings > Privacy & Security**, scroll down, and click **Open Anyway** next to the IRFlow Timeline message.
+Alternatively: go to **System Settings → Privacy & Security**, scroll down, and click **Open Anyway** next to the IRFlow Timeline message.
 
 ::: tip
 You only need to do this once. After the first launch, macOS will open the app normally.
@@ -64,13 +78,13 @@ xcode-select --install
 
 **Wrong Node.js version:**
 ```bash
-# Ensure you're using Node.js 18+
+# Ensure you're using Node.js 22.14+ (CI uses 22.17)
 node --version
 
 # Clear node_modules and rebuild
 rm -rf node_modules
 npm install
-npx electron-rebuild -f -w better-sqlite3
+npm run rebuild
 ```
 
 **Apple Silicon with Rosetta conflicts:**
@@ -85,9 +99,9 @@ arch
 ### The app crashes on launch
 
 1. Check that your macOS version is **12 (Monterey) or later**
-2. Try deleting the app preferences: `rm -rf ~/Library/Application\ Support/tle-app`
+2. Try deleting the app preferences: `rm -rf ~/Library/Application\ Support/irflow-timeline`
 3. Check the debug log for errors: `cat ~/tle-debug.log | tail -50`
-4. If building from source, ensure you ran `npx electron-rebuild -f -w better-sqlite3` after `npm install`
+4. If building from source, ensure you ran `npm run rebuild` after `npm install`
 
 ---
 
@@ -142,15 +156,25 @@ Yes. Enable **Search All Tabs** in the search bar to run your query across every
 
 1. Toggle the bookmark filter (`Cmd+B`) to show only bookmarked rows
 2. Or use the tag filter dropdown to show rows with specific tags
-3. Go to **File > Export** (`Cmd+E`) — only the currently filtered/visible rows will be exported
+3. Go to **File → Export** (`Cmd+E`) — only the currently filtered/visible rows will be exported
 
 ### Can I save my analysis and reopen it later?
 
-Yes. Go to **File > Save Session** (`Cmd+S`) to save a `.tle` session file. This preserves all open tabs, filters, bookmarks, tags, color rules, and column configurations. Use **File > Load Session** to restore it. See [Sessions](/workflows/sessions) for details.
+Yes. Go to **File → Save Session** (`Cmd+S`) to save a `.tle` session file. This preserves all open tabs, filters, bookmarks, tags, color rules, and column configurations. Use **File → Load Session** to restore it. See [Sessions](/workflows/sessions) for details.
 
 ### Does IRFlow Timeline send any data externally?
 
-No. All processing happens locally on your machine. No timeline data, file contents, or analysis results are transmitted anywhere. The documentation site uses [GoatCounter](https://www.goatcounter.com/) for anonymous page view analytics, but the desktop application itself has no telemetry or network calls.
+**Core timeline analysis is fully local.** Import, filtering, search, tagging, bookmarks, and most analyzers run on your machine — timeline data, file contents, and analysis results are not uploaded to IRFlow or any analytics service.
+
+**Optional features may use the network when you enable them:**
+
+- **VirusTotal enrichment** — opt-in; sends only the IOC hashes or values you choose to look up (requires your API key)
+- **Auto-update** — checks for and downloads app updates when you use **Help → Check for Updates** or accept an update prompt
+- **Hayabusa / Sigma maintenance** — may download rule packs, GeoIP data, or the Hayabusa binary when you run those update actions
+
+AI Artifacts collection, AI Secret Hunt, and standard timeline workflows do not require network access.
+
+The documentation site uses [GoatCounter](https://www.goatcounter.com/) for anonymous page-view analytics; that is separate from the desktop app.
 
 ---
 

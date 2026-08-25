@@ -48,7 +48,7 @@ Before diving into the workflow, familiarize yourself with the Windows Event IDs
 
 Start every anti-forensics investigation by understanding what data you actually have -- and what might be missing.
 
-1. Open **Tools > [Log Sources](/features/log-source-coverage)**
+1. Open **Tools → Analysis → [Log Sources](/features/log-source-coverage)**
 2. Examine the heatmap for each log source across the timeline span
 3. Look for the following patterns:
 
@@ -68,7 +68,7 @@ Start every anti-forensics investigation by understanding what data you actually
 Use [Gap Analysis](/features/gap-burst-analysis) to pinpoint the exact timestamps where logging ceased and resumed.
 
 1. Filter the main grid to a single log source (e.g., channel = "Security")
-2. Open **Tools > [Gap Analysis](/features/gap-burst-analysis)**
+2. Open **Tools → Analysis → [Gap Analysis](/features/gap-burst-analysis)**
 3. Set the gap threshold to a value appropriate for the source:
    - **Security logs:** 5-15 minutes (these should be nearly continuous on active systems)
    - **Sysmon logs:** 5-30 minutes depending on system activity

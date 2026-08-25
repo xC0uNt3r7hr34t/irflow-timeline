@@ -6,7 +6,7 @@ description: Five search modes — full-text, regex, fuzzy, LIKE, and mixed — 
 
 IRFlow Timeline provides multiple search modes and filter types to help you find exactly what you need in massive timelines.
 
-![Search and Filtering interface showing a search for cmd.exe with forensic regex patterns panel](/dfir-tips/Search-Filtering.png)
+![Mixed-mode search for cmd.exe on the WKS2390 EvtxECmd timeline — 7,719 hits, condition radios, and histogram](/dfir-tips/Search-Filtering.png)
 
 ## Search Modes
 
@@ -108,7 +108,7 @@ You can also set date ranges by brush-selecting on the [Histogram](/features/his
 
 ### Advanced Filter Editor
 
-Open **View > Edit Filter** to build multi-condition filters with a visual editor:
+Open **View → Edit Filter** to build multi-condition filters with a visual editor:
 
 - **AND/OR logic** — each condition has a logic toggle to combine with AND or OR
 - **Column selector** — pick any column in the dataset
@@ -123,7 +123,7 @@ Advanced filters are applied alongside column filters and checkbox filters, givi
 Save frequently used filter configurations as named presets:
 
 1. Build your filter (column filters, advanced filters, checkbox filters)
-2. Open **View > Filter Presets**
+2. Open **View → Filter Presets**
 3. Enter a name and click **Save**
 4. Reload presets from the same menu in any session
 
@@ -142,7 +142,9 @@ Toggle `Cmd+B` to show only bookmarked rows. Useful for reviewing rows you've al
 
 ## Cross-Tab Search
 
-Use `Cmd+Shift+F` to search across all open tabs simultaneously. Results show the match count per tab, letting you quickly identify which timelines contain your search term.
+Use `Cmd+Shift+F` to open **Cross-Tab Search** and query all open tabs simultaneously. Results show the match count per tab, letting you quickly identify which timelines contain your search term.
+
+![Cross-Tab Search modal listing each open tab with match counts and a button to jump to hits](/dfir-tips/Cross-Tab-Search.png)
 
 ## Search Caching
 
@@ -156,7 +158,7 @@ When [IOC Matching](/features/ioc-matching) highlights are also active, both wor
 
 ## Find Duplicates
 
-Open **Actions > Find Duplicates** to identify repeated values in any column:
+Open **Actions → Find Duplicates** to identify repeated values in any column:
 
 1. Select a column from the dropdown
 2. Click **Find Duplicates** to scan

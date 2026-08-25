@@ -1,0 +1,11 @@
+# Shell scripts must use LF — CRLF breaks bash in WSL/Git Bash with:
+#   $'\r': command not found
+#   set: pipefail: invalid option name
+*.sh text eol=lf
+build.sh text eol=lf
+
+# PowerShell scripts may use CRLF on Windows
+*.ps1 text eol=crlf
+
+# Source and config
+*.{js,cjs,mjs,jsx,ts,tsx,json,yml,yaml,md,css,html,svg} text eol=lf

@@ -85,4 +85,4 @@ This enables immediate filtering via the tag system and ensures sort-by-verdict 
 - [IOC Matching](/features/ioc-matching) — scan timelines against threat intel indicator lists before enriching with VT
 - [Bookmarks & Tags](/features/bookmarks-tags) — VT verdicts auto-create tags for filtering and reporting
 - [Process Inspector](/features/process-tree) — trace processes associated with matched indicators
-- [Export & Reports](/workflows/export-reports) — include VT verdicts in exported reports
+- [Export & Reports](/workflows/export-reports#virustotal-ioc-enrichment) — HTML reports include a VT verdict summary and per-IOC table when enrichment was run on the tab

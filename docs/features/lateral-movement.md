@@ -12,14 +12,25 @@ The Lateral Movement Tracker visualizes network logon activity across your envir
 
 ## Opening the Tracker
 
-- **Menu:** Tools > Lateral Movement Tracker
+- **Menu:** **Tools → Platforms → Windows → Lateral Movement Tracker**
+- **Capability launcher:** **Lateral Movement** on the home screen (after a timeline tab is loaded)
 - Supports 16 event IDs across Windows Security, TerminalServices, and RDP logs
+
+## Multi-Source Correlation
+
+Correlate logon and lateral-movement evidence across **multiple open tabs** — for example Security EVTX, Sysmon, and Hayabusa output — in a single tracker run instead of analyzing one tab in isolation.
+
+![Lateral Movement Tracker multi-source setup with tab checkboxes to include Security, Sysmon, and other loaded timelines](/dfir-tips/Lateral-Movement-Multi-Source.png)
+
+In the tracker configuration phase, enable **Multi-source** and select the tabs to merge. Each tab’s format (raw EVTX, EvtxECmd, Hayabusa, Chainsaw, etc.) is detected automatically so edges and sessions stitch together correctly. The row budget (`maxRows`) is split across selected tabs so one large Security log cannot starve Sysmon (and vice versa). A detector registry keeps spine Event IDs aligned between single-tab and multi-source runs.
+
+You can also start from **File → Open Triage Collection…**, which pre-selects LM-relevant EVTX channels from a KAPE folder and can hand off into this tracker after import. From the [Process Inspector](/features/process-tree) detail panel, **Lateral** applies host + time filters on the current tab and opens the tracker.
 
 ## Detection Rules
 
-![Lateral Movement Tracker detection rules configuration showing 13 built-in rules across RDP, Security, Privilege, and Session categories](/dfir-tips/Lateral-Movement-Detection-Rules.png)
+![Lateral Movement Tracker configuration on WKS2390 — Analyze and RDP-focused scan options before the run](/dfir-tips/Lateral-Movement-Detection-Rules.png)
 
-The tracker uses a configurable rules system with 13 built-in detection rules across four categories. Each rule can be individually toggled on or off.
+The tracker uses a configurable rules system with **15 built-in detection rules** across five categories. Each rule can be individually toggled on or off.
 
 ### RDP Session Rules
 
@@ -53,6 +64,13 @@ The tracker uses a configurable rules system with 13 built-in detection rules ac
 |------|-----------|----------|------|
 | Session Reconnect / Disconnect | 4778, 4779 | Medium | Window Station events |
 | Account Logoff | 4634, 4647 | Low | Logoff / user-initiated logoff |
+
+### RMM / Remote Access Rules
+
+| Rule | Event IDs | Severity | Hint |
+|------|-----------|----------|------|
+| RMM Tool Detection | 4688, 1, 7045, 4697 | High | 33 RMM tools + 7 tunnel tools (process/service scan) |
+| Scheduled Task Execution | 4698, 4688, 1 | Medium | Remote `schtasks /create /s` |
 
 ### Custom Rules
 
@@ -174,7 +192,17 @@ The graph legend is draggable — click and drag to reposition it. It shows all 
 - **Redraw** — re-run the force layout algorithm
 - **Find Flagged** — cycle through outlier/suspicious hosts (appears when flagged hosts exist)
 
-## Five Sub-Tabs
+## Telemetry Coverage Panel
+
+Above the sub-tabs the tracker shows a **Telemetry Coverage** panel that summarizes which event categories are present in the current dataset and which detections are gated by missing data. Categories: Auth (Logon), Explicit Creds, Process Creation, Service Install, Scheduled Task, RDP Session, Share Access, Kerberos, NTLM. Each category turns green when at least one event of that type is present and grey when absent. A coverage warning list highlights detections that cannot run because their feeder events are missing — for example, "No Kerberos service ticket events (4769) — Kerberoasting detection unavailable".
+
+Click any host in the Network Graph to see that host's individual telemetry coverage and identify which hops in a chain have the weakest evidence.
+
+## Sub-Tabs
+
+The tracker has seven sub-tabs (Exec Sessions and Findings only appear when detections are present). The UI tab order is: **Network Graph**, **RDP Sessions**, **Accounts**, **Chains**, **Exec Sessions**, **Connections**, **Findings**. The sections below describe each tab; numbering is independent of the UI ordering.
+
+![Lateral Movement Tracker Accounts tab on WKS2390 — 250 identities scored with successes, failures, and suspicion reasons](/dfir-tips/Lateral-Movement-Tabs.png)
 
 ### 1. Network Graph
 
@@ -182,7 +210,7 @@ The interactive force-directed visualization described above.
 
 ### 2. Findings
 
-![Lateral Movement Tracker Findings tab showing MITRE ATT&CK-mapped attack pattern detections with severity badges](/dfir-tips/Lateral-Movement-Findings.png)
+![Lateral Movement Tracker Findings on WKS2390 — LSASS access, brute force, credential compromise, and WMI persistence](/dfir-tips/Lateral-Movement-Findings.png)
 
 The Findings tab displays automated attack pattern detections with MITRE ATT&CK mapping. Each finding is a card showing severity, MITRE technique badge (clickable — links to attack.mitre.org), title, description, source/target hosts, time range, and event count.
 
@@ -218,7 +246,11 @@ Scans process and service events for 33 remote monitoring and management tools c
 
 **RMM Tools (33):** ConnectWise ScreenConnect, AnyDesk, TeamViewer, Atera, NetSupport Manager, Splashtop, RustDesk, PDQ Connect, MeshAgent/MeshCentral, Action1, Ammyy Admin, Remote Utilities, SimpleHelp, TacticalRMM, FleetDeck, Level.io, DWService, ISL Online, HopToDesk, Lite Manager, UltraVNC, TigerVNC, RAdmin, Zoho Assist, Pulseway, LabTech/Automate, Kaseya VSA, N-able/SolarWinds, GoTo Resolve/LogMeIn, BeyondTrust (Bomgar), Dameware, Supremo, FixMe.IT
 
-**Network Tunnels (7):** ngrok, Tailscale, Cloudflare Tunnel, Chisel, FRP (Fast Reverse Proxy), Ligolo, WireGuard
+**Network Tunnels (7):** ngrok, Tailscale, Cloudflared, Chisel, ligolo-ng, ZeroTier, WireGuard
+
+::: tip Process Inspector
+The in-app [Process Inspector](/features/process-tree) also flags **frp** (`frpc`/`frps`) and other tunnel/RMM aliases via `src/detection-rules/tool-aliases.js` — separate from the Lateral Movement Tracker’s process/service RMM detector above.
+:::
 
 #### Finding Actions
 
@@ -226,6 +258,24 @@ Each finding card has two action buttons:
 
 - **Filter Events** — closes the modal and applies targeted filters to the main grid: sets a checkbox filter on Event ID with relevant IDs for the finding category, sets a date range filter padded +/-5 minutes around the finding's time range, and clears other filters to avoid interference
 - **View in Graph** — switches to the Graph tab and zooms/selects the relevant edge
+
+#### Incidents
+
+Pair-based incidents group 2+ findings on the same source-target pair within a 30-minute window. Each incident shows severity, triage score, MITRE techniques, narrative, and member findings. Actions: **Show in Timeline**, **View in Graph**, **Copy IOC**.
+
+#### Campaigns
+
+Campaign clustering rolls up pair-based incidents into multi-hop storylines. Two incidents join the same campaign when they share a **host** (hop continuity) or a **user** (same operator) and are within **2 hours** of each other. Connected-component analysis then groups the entire operator storyline into a single campaign.
+
+Each campaign card shows:
+
+- Severity, triage score, incident/finding/event counts
+- **Hop path** — visual breadcrumb of the movement chain (e.g. `WKS01 → SRV01 → DC01`)
+- Auto-generated narrative summarizing the operator's activity
+- User and technique pills
+- Expandable detail with member incidents (clickable to navigate to Incidents view), movement path visualization, **Show in Timeline**, **View in Graph**, **View Incidents**, and **Copy Summary**
+
+Campaigns only appear when 2+ incidents exist that share context. This is the highest-level view for operator/campaign-centric triage.
 
 ### 3. Chains
 
@@ -299,7 +349,26 @@ The engine processes all RDP-related events chronologically, linking them into s
 - **Checkbox selection** — select sessions for copy operations
 - **Copy** — exports selected or all sessions as tab-separated text
 
-### 5. Connections
+### 5. Exec Sessions
+
+The Execution Sessions tab provides a first-class view of non-RDP lateral movement — WMI, WinRM, PsExec, Impacket, remote service installs, scheduled tasks, admin share access, RMM tools, and Cobalt Strike activity. It mirrors the RDP Sessions tab in interaction model but shows execution-specific data.
+
+Sessions are built from findings: the analyzer clusters execution-tool findings by (technique, source-target pair, user, time-window) so each session represents a distinct operator action. Sessions inherit severity, triage scores, evidence pills, and user attribution from their underlying findings.
+
+**Columns:** Score, Severity, Technique, Source, Target, User(s), Findings, Events, Start, End, Status (EXECUTED or OBSERVED).
+
+**View modes:**
+
+- **Table** (default) — sortable table with expandable row detail. Expanded detail shows evidence pills, session metadata, and clickable related findings that navigate to the Findings tab.
+- **Timeline** — Gantt chart with technique-colored bars positioned proportionally within the global time range. Each bar is clickable (switches to table view with that session expanded). A legend maps technique to color.
+
+**Actions per session:**
+
+- **Timeline** — closes modal and filters the main grid to the session's EIDs, hosts, and time window.
+- **Graph** — switches to the Network Graph tab and highlights the source-target edge.
+- **Copy All / Export CSV** — toolbar buttons for clipboard and file export.
+
+### 6. Connections
 
 ![Lateral Movement Tracker Connections tab showing tabular view of all source-target-user-logon type pairs with event counts](/dfir-tips/Lateral-Movement-Connections.png)
 
@@ -312,6 +381,56 @@ A tabular view of all connections with full details:
 | User | Account used |
 | Logon Type | Windows logon type |
 | Count | Number of events |
+
+### 7. Accounts
+
+The Accounts tab pivots the analysis from connections (host→host edges) to identities (per-user aggregates). Every distinct user the tracker observed across the dataset gets one row, scored and classified to surface the identities most likely to need triage.
+
+Each account is built from four data sources:
+
+1. **Logon graph events** — every 4624/4625/4634/4647/4648/4672/4769/4776/4778/4779 row with a parseable user contributes source/target hosts, logon types, success/failure counts, and first/last seen.
+2. **RDP session correlation** — RDP-specific stats (concurrent sessions, admin sessions, failed/reconnect counts) come from the Sessions correlator.
+3. **Findings** — any finding that names this user adds its `id` and `category` to the account's findingIds / findingCategories.
+4. **Raw per-user event counts** — Kerberos (4768/4769/4771), NTLM (4776), explicit credentials (4648), and admin privilege (4672) counts. Crucially, accounts are **created** from this source even if they never produced a graph edge — so a domain account that appears only in DC Kerberos events still surfaces in the tab.
+
+**Columns**
+
+| Column | Description |
+|--------|-------------|
+| Score | Suspicion score 0–100. Color-coded: red ≥50, orange ≥25, yellow ≥10. |
+| User | Username (DOMAIN prefix stripped). |
+| Class | Classification pill: PRIV, ADMIN, MACHINE, SERVICE, USER. |
+| Successes | Count of successful logons (4624). |
+| Failures | Count of failed logons (4625). |
+| Sources | Number of distinct source hosts the account touched. |
+| Targets | Number of distinct target hosts. |
+| Admin | Count of 4672 (admin privilege assigned) events. |
+| Kerb | Combined 4768 + 4769 + 4771 count. |
+| NTLM | Count of 4776 events. |
+| Explicit | Count of 4648 explicit credential use events. |
+| First Seen / Last Seen | Time bounds for this account's activity. |
+| Why Suspicious | Pills summarizing the analyzer's `flags[]` for the account. |
+
+**Suspicion scoring** combines admin privilege use, failures-before-first-success, concurrent RDP, explicit credential use, target diversity, finding references, outlier source hits, NTLM-only authentication, privileged naming, and RDP-suspicion contribution. Machine accounts and well-known service accounts are dampened unless they have admin privilege or finding references.
+
+**Classification tiers** (highest precedence first):
+
+- **PRIV** (red) — name matches privileged-name regex (`Administrator`, `Admin`, `Root`, `DA_`, `Domain Admin`, `Enterprise Admin`, `Schema Admin`, `Backup`)
+- **ADMIN** (orange) — has 4672 events or admin RDP sessions
+- **MACHINE** (gray) — username ends in `$`
+- **SERVICE** (purple) — name matches service-account regex (`SVC_`, `SERVICE_`, etc.)
+- **USER** (green) — none of the above
+
+**Features**
+
+- **Click-to-sort** on every header. Default sort is Score descending.
+- **Copy All** exports the visible (sorted) rows as TSV including the header row.
+- **Per-row actions** — each account row has inline pivot buttons:
+  - **Findings (N)** — navigates to the Findings tab showing detections involving this user. Only appears when the user has linked findings.
+  - **Timeline** — closes the modal and filters the main grid to logon events (4624/4625/4648/4768/4769/4776) for this user within their first-to-last-seen window.
+  - **Graph** — switches to the Network Graph tab and highlights the first edge involving this user.
+- **Empty-state hint** points back at the Telemetry Coverage panel when no accounts can be extracted from the dataset.
+- The **Users** stats card above the tabs is the entry point — click it to jump straight here. The card sub-chip shows how many of the surfaced accounts have a suspicion score of ≥25.
 
 ## Outlier and Suspicious Host Detection
 

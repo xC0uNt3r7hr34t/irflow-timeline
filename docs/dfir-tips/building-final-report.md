@@ -9,7 +9,8 @@ Every investigation culminates in a report. The analysis work -- the searching, 
 ::: info Features Used
 - [Bookmarks & Tags](/features/bookmarks-tags) -- review and organize all annotated findings
 - [Merging Timelines](/workflows/merge-tabs) -- combine relevant tabs into a unified view
-- [Export & Reports](/workflows/export-reports) -- generate CSV, XLSX, and HTML outputs
+- [Export & Reports](/workflows/export-reports) -- generate CSV, XLSX, HTML, and AI history packages
+- [AI Artifacts](/features/ai-artifacts) -- AI history export and AI Secret Hunt exposure briefs
 - [Sessions](/workflows/sessions) -- save the complete analysis state for peer review
 - [Histogram](/features/histogram) -- visualize the incident timeline for report graphics
 - [Stacking](/features/stacking) -- produce frequency summaries for key columns
@@ -30,7 +31,7 @@ Before touching IRFlow Timeline, establish the structure of your report. A well-
 | **Indicators of Compromise** | Actionable IOCs for detection teams | Stacking results on IPs, hashes, domains |
 | **Affected Systems & Accounts** | Scope of the compromise | Stacking results on hosts and usernames |
 | **Recommendations** | Remediation and hardening actions | Written narrative informed by findings |
-| **Appendix** | Raw data exports and supporting evidence | CSV/XLSX exports, HTML report attachment |
+| **Appendix** | Raw data exports and supporting evidence | CSV/XLSX exports, HTML report attachment, AI history package, secret-exposure brief |
 
 ## Step-by-Step Workflow
 
@@ -54,7 +55,7 @@ Tags categorize your findings by attack phase or significance. Review them for c
 
 1. In each tab, open the **tag filter dropdown** to see all tags in use
 2. Ensure consistent naming -- if one tab uses `lateral-movement` and another uses `Lateral Movement`, standardize before merging
-3. Use **Actions > Bulk Tag / Bookmark** to bulk-apply missing tags where appropriate
+3. Use **Actions → Bulk Tag / Bookmark** to bulk-apply missing tags where appropriate
 4. Verify that critical events carry the right tags:
 
 | Tag | Expected Content |
@@ -70,7 +71,7 @@ Tags categorize your findings by attack phase or significance. Review them for c
 
 A single merged timeline provides the chronological backbone of your report.
 
-1. Open **View > Merge Tabs**
+1. Open **View → Merge Tabs**
 2. Select all tabs that contain bookmarked or tagged events relevant to the incident
 3. A new merged tab is created with a `_Source` column identifying the origin of each row
 4. Sort the merged tab by timestamp ascending
@@ -109,7 +110,7 @@ Use the histogram's brush selection to highlight just the active attack window. 
 
 Stacking produces the data you need for the "Indicators of Compromise" and "Affected Systems" sections.
 
-1. On the merged tab (filtered to bookmarked/tagged rows), open **Tools > Stack Values**
+1. On the merged tab (filtered to bookmarked/tagged rows), open **Tools → Analysis → Stack Values**
 2. Stack on key columns and record the results:
 
 | Stack Column | Report Section | What to Record |
@@ -124,7 +125,7 @@ Stacking produces the data you need for the "Indicators of Compromise" and "Affe
 
 Produce the raw data exports that support your report narrative.
 
-1. With the merged tab active and bookmarks filtered, go to **File > Export** (`Cmd+E`)
+1. With the merged tab active and bookmarks filtered, go to **File → Export** (`Cmd+E`)
 2. Export as **CSV** for tool-agnostic archival -- this file can be ingested by SIEMs, shared with other analysts, or attached to tickets
 3. Export as **XLSX** for stakeholders who prefer spreadsheets -- the styled headers and auto-fit columns make it immediately readable
 4. Consider separate exports for different audiences:
@@ -132,11 +133,22 @@ Produce the raw data exports that support your report narrative.
    - Filtered to specific tags (e.g., only `c2` tagged rows) for the network team
    - Filtered to `credential-access` and `lateral-movement` tags for the identity team
 
-### 8. Generate the HTML Report
+### 8. Export AI History Evidence (when applicable)
+
+If the investigation includes **AI Query History** tabs, preserve them for counsel and peer review:
+
+1. On each AI history tab, run **Tools → Detection → AI Secret Hunt** and tag findings worth reporting
+2. Export a redacted **PDF / HTML exposure brief** or CSV from the AI Secret Hunt results modal
+3. Use **Tools → Export → Export AI History Package…** for a filtered timeline CSV plus `manifest.json` source hashes
+4. Reference AI prompts, workspaces, and secret findings in the written narrative — not cleartext secrets unless your disclosure policy requires it
+
+See [Export & Reports — AI History Package](/workflows/export-reports#ai-history-package) and [AI Query History](/dfir-tips/ai-query-history#export-for-reporting).
+
+### 9. Generate the HTML Report
 
 The HTML report is a self-contained deliverable that combines summary statistics, tagged event tables, and bookmarked rows.
 
-1. Go to **Tools > Generate Report**
+1. Go to **Tools → Export → Generate Report** (or macOS **File → Generate Report…**, `Cmd+Shift+R`)
 2. Choose a save location (use a descriptive name like `incident-2026-0042-report.html`)
 3. The report opens in your browser and includes:
    - Summary cards with row counts, bookmark counts, and tag counts
@@ -151,11 +163,11 @@ The HTML file has no external dependencies. It can be emailed, uploaded to a cas
 The HTML report is for human consumption -- it tells the story. The CSV/XLSX exports are for machine consumption and detailed review. Include both in your case file. Reference the HTML report in the body of your written report and attach the data exports as appendices.
 :::
 
-### 9. Save the Session for Peer Review
+### 10. Save the Session for Peer Review
 
 Before closing IRFlow Timeline, save your complete analysis state.
 
-1. Go to **File > Save Session** (`Cmd+S`)
+1. Go to **File → Save Session** (`Cmd+S`)
 2. Save as a `.tle` file alongside your evidence and exports
 3. The session preserves all tabs, filters, bookmarks, tags, color rules, and column configurations
 
@@ -169,7 +181,7 @@ A saved session allows a peer reviewer to open the exact same view you used to r
 Save sessions at key milestones during the investigation, not just at the end. Use filenames like `incident-0042-initial-triage.tle`, `incident-0042-lateral-movement-analysis.tle`, and `incident-0042-final-report.tle`. This creates an audit trail of your analytical process.
 :::
 
-### 10. Assemble the Written Report
+### 11. Assemble the Written Report
 
 With all data exported and the HTML report generated, write the final document. Use the following outline as a template, pulling data from the IRFlow Timeline outputs at each step.
 
@@ -200,6 +212,7 @@ Use this checklist to verify report completeness:
 - [ ] CSV export of bookmarked timeline attached
 - [ ] XLSX export for stakeholder review attached
 - [ ] HTML report generated and attached
+- [ ] AI history package and secret-exposure brief attached (if AI artifacts were in scope)
 - [ ] Session file saved alongside evidence
 - [ ] IOC list extracted from stacking results
 - [ ] Affected systems and accounts enumerated

@@ -12,7 +12,7 @@ Filter presets let you save complex filter configurations and reload them instan
    - [Column filters](/features/search-filtering#column-filters) (text, checkbox, or date range)
    - [Advanced filter editor](/features/search-filtering#advanced-filter-editor) conditions
    - [Tag filters](/features/search-filtering#tag-filters)
-2. Open **View > Filter Presets**
+2. Open **View → Filter Presets**
 3. Enter a descriptive name for the preset
 4. Click **Save**
 
@@ -20,7 +20,7 @@ The preset captures your complete filter state — all column filters, advanced 
 
 ## Loading a Preset
 
-1. Open **View > Filter Presets**
+1. Open **View → Filter Presets**
 2. Select a saved preset from the list
 3. The filter is applied immediately to the current tab
 

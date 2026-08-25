@@ -6,7 +6,10 @@ description: Gap and burst analysis — detect unusual inactivity periods or sus
 
 Gap and burst analysis help you identify temporal anomalies in your timeline — periods of unusual inactivity or suspicious spikes of activity.
 
-![Event Burst Detection showing 9 detected bursts with event rate over time chart and burst multipliers](/dfir-tips/Burst-Detection.png)
+![Event Burst Detection on WKS2390 — 175 bursts, 17,872 peak events / 5 min, 62× first burst](/dfir-tips/Burst-Detection.png)
+
+- **Gap Analysis:** **Tools → Analysis → Gap Analysis**
+- **Burst Detection:** **Tools → Analysis → Burst Detection**
 
 ## Gap Analysis
 
@@ -21,7 +24,7 @@ Gap analysis identifies periods where no events were recorded, which may indicat
 
 ### How to Use
 
-1. Open **Tools > Gap Analysis**
+1. Open **Tools → Analysis → Gap Analysis**
 2. Select the **timestamp column** to analyze
 3. Set the **gap threshold** — minimum duration to consider as a gap
 
@@ -93,7 +96,7 @@ Burst analysis identifies abnormal spikes in event volume that stand out from th
 
 ### How to Use
 
-1. Open **Tools > Burst Detection**
+1. Open **Tools → Analysis → Burst Detection**
 2. Select the **timestamp column** to analyze
 3. Configure the detection parameters:
 

@@ -69,6 +69,8 @@ Native binary parsing of Windows Event Log files using the `@ts-evtx` library. N
 ### Features
 
 - **Binary parsing** — reads EVTX format directly, no conversion step
+- **Bounded native reads** — validates the 4 KiB file header, then parses one 64 KiB EVTX chunk at a time instead of loading the complete log into memory
+- **Large-log support** — handles up to 65,535 declared chunks (approximately 4 GiB), including multi-gigabyte Security logs that exceed Node's 2 GiB whole-file Buffer ceiling
 - **Dynamic schema discovery** — samples the first 500 events to discover all available fields
 - **Fixed fields** extracted from every event:
 
@@ -163,7 +165,7 @@ Native binary parsing of raw NTFS Master File Table files. No need to pre-proces
 - **Timestomping detection** — compares SI and FN timestamps, flags files where `SI < FN`
 - **Zone.Identifier extraction** — parses resident ADS content to extract download origin data
 - **Parent path resolution** — two-pass architecture: first pass builds the directory tree, second pass resolves full parent paths
-- **Resident data extraction** — can extract small files stored directly inside MFT records (via Tools → NTFS Artifacts)
+- **Resident data extraction** — can extract small files stored directly inside MFT records (via **Tools → Platforms → Windows → Master File Table → Extract Resident Data**)
 
 ### Extracted Columns
 
@@ -183,7 +185,9 @@ Native binary parsing of raw NTFS Master File Table files. No need to pre-proces
 
 ### NTFS Artifact Analysis Tools
 
-When a raw `$MFT` is loaded, additional analysis tools become available under Tools → NTFS Artifacts:
+When a raw `$MFT` is loaded, additional analysis tools become available under **Tools → Platforms → Windows → Master File Table**:
+
+![Tools menu with platform-segregated Analysis and Windows NTFS submenus](/dfir-tips/Analysis-Button-NewUI.png)
 
 - **Extract Resident Data** — extract files stored inside MFT records
 - **Ransomware Analysis** — detect encryption patterns by extension
@@ -218,6 +222,57 @@ Native binary parsing of raw NTFS USN Journal (`$UsnJrnl:$J`) files. Provides a 
 | `UpdateReasons` | Decoded reason flags (e.g., `DataOverwrite\|Close`) |
 | `FileAttributes` | Decoded file attributes |
 
+## RDP Bitmap Cache Artifacts
+
+**Filenames:** `bcache*.bmc`, `cache????.bin`
+
+RDP Bitmap Cache files are handled through **Tools → Platforms → Windows → RDP Bitmap Cache** rather than the normal timeline importer. The analyzer recovers bitmap tiles and collages with `bmc-tools`, records source/output hashes, keeps previous extraction history, and can export an evidence package for reporting.
+
+Use this workflow for Windows profile artifacts under paths such as:
+
+```text
+Users\<user>\AppData\Local\Microsoft\Terminal Server Client\Cache
+```
+
+## AI App Artifacts
+
+**Inputs:** app-data folders, KAPE / triage collection roots, `.jsonl`, `.json`, `.db`, `.sqlite`, `.sqlite3`, `.ldb`, and `.log` files from supported AI apps.
+
+AI app evidence is handled through **Tools → Analysis → AI Artifacts → Collect AI Artifacts** or by opening a supported app-data folder directly (**AI Apps** submenu for single-tool imports). IRFlow Timeline parses local AI history into a normal timeline tab so prompts, responses, tool calls, session IDs, workspace paths, source evidence, and possible secret exposure can be searched, tagged, and exported.
+
+![Tools → Analysis → AI Artifacts with Collect AI Artifacts, nested OpenAI Codex / ChatGPT Computer History, and Grok Build](/dfir-tips/Tools-Menu-AI-Artifacts.png)
+
+Supported AI app families include:
+
+| App | Common artifacts |
+|-----|------------------|
+| **Claude Code / Desktop** | `~/.claude/history.jsonl`, `~/.claude/projects/**/*.jsonl`, Desktop `claude-code-sessions/`, Cowork `local-agent-mode-sessions/**/{.claude/projects,audit*.jsonl}`, plus `deleted_<uuid>` tombstones, `pending-uploads/`, `plan-usage-history.json`, `git-worktrees.json` |
+| **OpenAI Codex** | `$CODEX_HOME` or `~/.codex/`, `sessions/**/rollout-*.jsonl`, `history.jsonl`, versioned `state*.sqlite` metadata with WAL/SHM |
+| **Grok Build** | `$GROK_HOME` or `~/.grok/`, workspace `prompt_history.jsonl`, session `summary.json`, `updates.jsonl`, `chat_history.jsonl`, `hunk_records.jsonl`, plus `sessions/session_search.sqlite`, `logs/unified.jsonl`, and `active_sessions.json` |
+| **ChatGPT Desktop** | Local LevelDB / SQLite stores plus inventory of `conversations-v2-*` and `conversations-v3-*/*.data` bundles |
+| **Gemini CLI** | `~/.gemini/tmp/<project_hash>/chats/**/*.jsonl`, `~/.gemini/shell_history`, plus legacy session/checkpoint/log JSON |
+| **Cursor** | `~/.cursor/projects/**/agent-transcripts/`, composer `store.db`, VS Code-family `state.vscdb`, and Cursor `User/globalStorage/conversation-search.db` |
+| **GitHub Copilot** | `$COPILOT_HOME` / `~/.copilot` CLI sessions, commands, plans/checkpoints, safe session-store metadata, plus VS Code-family `workspaceStorage/*/chatSessions/` and `emptyWindowChatSessions/` |
+| **Windsurf** | `Windsurf/User/globalStorage/state.vscdb`, `workspaceStorage/*/state.vscdb` |
+| **Continue** | `~/.continue/sessions/*.json` |
+
+Use this workflow when AI-assisted activity may be relevant evidence: pasted secrets, suspicious prompts, generated commands, workspace-specific development activity, or AI tool output tied to an incident.
+
+## ChatGPT Computer History (Skysight)
+
+**Inputs:** a `segments/` directory of `<YYYY-MM-DDTHH-MM-SSZ>/events.jsonl` + `metadata.json` buckets, and/or a `skysight/resources/` directory of `*-(10min|6h)-*.md` activity summaries. A `.codex` folder, a CUAService group container, or a triage root containing either will also resolve.
+
+Imported through **Tools → Analysis → AI Artifacts → AI Apps → OpenAI Codex → ChatGPT Computer History**. This is **not** AI conversation history — it is macOS user-activity telemetry (app focus, clicks, keystrokes, shortcuts, selections, drags, terminal buffer changes, window and URL context), so it opens in its own tab with a dedicated 54-column schema rather than the AI Query History columns.
+
+| Path | Retention |
+|------|-----------|
+| `~/Library/Group Containers/2DC432GLL2.com.openai.sky.CUAService/Library/Caches/ComputerUse/Skysight/segments/` | ~48 hours, then purged |
+| `~/.codex/memories/extensions/skysight/resources/` | Until the user clears them (recoverable from the memories git history afterwards) |
+
+macOS only, opt-in, off by default, and unavailable in the EEA, Switzerland, and the UK — so absence of the artifact says nothing about user activity. Collect the raw segments early; on a stale image the derived summaries may be all that survives, and they are model-generated interpretation rather than primary evidence.
+
+Full artifact inventory, caveats, and investigation workflow: [ChatGPT Computer History](/dfir-tips/ai-apps/chatgpt-codex#chatgpt-computer-history-skysight).
+
 ## Format Detection
 
 IRFlow Timeline determines the file format by extension and content detection:
@@ -231,6 +286,8 @@ IRFlow Timeline determines the file format by extension and content detection:
 .sqlite, .db                →  Generic SQLite Reader (table picker for multi-table DBs)
 .mft / $MFT (FILE0 magic)  →  Raw MFT Binary Parser
 $J / $UsnJrnl (by name)    →  Raw USN Journal Parser
+AI app folders / stores      →  AI Query History parser
+Skysight segments / summaries →  Computer History parser (own tab, 54-column schema)
 ```
 
 Files without a recognized extension are auto-detected by name patterns and magic bytes, so raw `$MFT` and `$J` files extracted by forensic tools work without renaming.

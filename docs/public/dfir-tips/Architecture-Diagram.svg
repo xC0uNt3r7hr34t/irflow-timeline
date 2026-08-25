@@ -1,243 +1,263 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 680" font-family="'Inter', 'SF Pro Display', -apple-system, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1190" role="img" aria-labelledby="title desc">
+  <title id="title">IRFlow Timeline current architecture</title>
+  <desc id="desc">IRFlow Timeline v1.0.9 architecture with a semantic color system: orange = UI/output surface, violet = secure IPC bridge, blue = orchestration and network, amber = ingestion and compute, green = data and persistence, red = forensic detection. Shows the React renderer, preload bridge, Electron main services with grouped IPC, a worker-thread pool, the SQLite data engine with analyzers (including AI history parsers and AI Secret Hunt), the dual Sigma/Hayabusa detection engine, streaming parsers, and side connectors for evidence, external tools, network, state, and outputs.</desc>
   <defs>
-    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#0d1117"/>
-      <stop offset="100%" stop-color="#161b22"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0b1016"/>
+      <stop offset="100%" stop-color="#111922"/>
     </linearGradient>
     <linearGradient id="rendererGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1a1e2e"/>
-      <stop offset="100%" stop-color="#1e2333"/>
+      <stop offset="0%" stop-color="#1c1410"/>
+      <stop offset="100%" stop-color="#251813"/>
+    </linearGradient>
+    <linearGradient id="preloadGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1b1530"/>
+      <stop offset="100%" stop-color="#221a3c"/>
     </linearGradient>
     <linearGradient id="mainGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1a1e2e"/>
-      <stop offset="100%" stop-color="#1c2230"/>
+      <stop offset="0%" stop-color="#121b28"/>
+      <stop offset="100%" stop-color="#162232"/>
     </linearGradient>
-    <linearGradient id="dbGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1a1e2e"/>
-      <stop offset="100%" stop-color="#1a2420"/>
+    <linearGradient id="workerGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#221a10"/>
+      <stop offset="100%" stop-color="#2b1f14"/>
+    </linearGradient>
+    <linearGradient id="dataGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#112018"/>
+      <stop offset="100%" stop-color="#16281f"/>
     </linearGradient>
     <linearGradient id="parserGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1a1e2e"/>
-      <stop offset="100%" stop-color="#221f1a"/>
+      <stop offset="0%" stop-color="#221a10"/>
+      <stop offset="100%" stop-color="#2b1f14"/>
     </linearGradient>
-    <linearGradient id="arrowGradOrange" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#E85D2A"/>
-      <stop offset="100%" stop-color="#58a6ff"/>
-    </linearGradient>
-    <linearGradient id="arrowGradBlue" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#58a6ff"/>
-      <stop offset="100%" stop-color="#3fb950"/>
-    </linearGradient>
-    <linearGradient id="arrowGradGreen" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#3fb950"/>
-      <stop offset="100%" stop-color="#d29922"/>
-    </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="2" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#000000" flood-opacity="0.32"/>
     </filter>
-    <filter id="shadow">
-      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/>
-    </filter>
-    <marker id="arrowOrange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6 Z" fill="#E85D2A" opacity="0.9"/>
+    <marker id="aOrange" markerUnits="userSpaceOnUse" markerWidth="20" markerHeight="16" refX="17" refY="8" orient="auto">
+      <path d="M0,0 L18,8 L0,16 Z" fill="#e85d2a"/>
     </marker>
-    <marker id="arrowBlue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6 Z" fill="#58a6ff" opacity="0.9"/>
+    <marker id="aViolet" markerUnits="userSpaceOnUse" markerWidth="20" markerHeight="16" refX="17" refY="8" orient="auto">
+      <path d="M0,0 L18,8 L0,16 Z" fill="#a371f7"/>
     </marker>
-    <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6 Z" fill="#3fb950" opacity="0.9"/>
+    <marker id="aBlue" markerUnits="userSpaceOnUse" markerWidth="20" markerHeight="16" refX="17" refY="8" orient="auto">
+      <path d="M0,0 L18,8 L0,16 Z" fill="#58a6ff"/>
     </marker>
+    <marker id="aAmber" markerUnits="userSpaceOnUse" markerWidth="20" markerHeight="16" refX="17" refY="8" orient="auto">
+      <path d="M0,0 L18,8 L0,16 Z" fill="#d29922"/>
+    </marker>
+    <marker id="aGreen" markerUnits="userSpaceOnUse" markerWidth="20" markerHeight="16" refX="17" refY="8" orient="auto">
+      <path d="M0,0 L18,8 L0,16 Z" fill="#3fb950"/>
+    </marker>
+    <marker id="aRed" markerUnits="userSpaceOnUse" markerWidth="20" markerHeight="16" refX="17" refY="8" orient="auto">
+      <path d="M0,0 L18,8 L0,16 Z" fill="#f85149"/>
+    </marker>
+    <style>
+      text { font-family: Inter, "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .title { fill: #f4f7fb; font-size: 28px; font-weight: 800; }
+      .subtitle { fill: #8ea0b5; font-size: 13px; }
+      .section { font-size: 11.5px; font-weight: 700; letter-spacing: 1px; }
+      .heading { fill: #f4f8fc; font-size: 18px; font-weight: 800; }
+      .ctitle { fill: #eef3fa; font-size: 13px; font-weight: 700; }
+      .csub { fill: #8a9cb0; font-size: 10.5px; }
+      .item { fill: #dfe7ef; font-size: 12px; }
+      .tiny { fill: #8093a6; font-size: 11px; }
+      .panel { rx: 20; ry: 20; filter: url(#shadow); }
+      .card { fill: rgba(255,255,255,0.028); stroke: rgba(255,255,255,0.07); stroke-width: 1; rx: 13; ry: 13; }
+      .side { fill: rgba(255,255,255,0.022); stroke: rgba(255,255,255,0.08); stroke-width: 1; rx: 18; ry: 18; }
+      .badge { fill: rgba(255,255,255,0.05); stroke: rgba(255,255,255,0.09); stroke-width: 1; rx: 12; ry: 12; }
+      .spine { fill: none; stroke-width: 5; stroke-linecap: round; }
+      .rail { fill: none; stroke-width: 4; stroke-linecap: round; }
+      .flow { font-size: 11px; font-weight: 700; }
+    </style>
   </defs>
 
-  <!-- Background -->
-  <rect width="900" height="680" rx="12" fill="url(#bgGrad)"/>
+  <rect x="0" y="0" width="1280" height="1190" fill="url(#bg)"/>
+  <circle cx="1095" cy="70" r="200" fill="rgba(88,166,255,0.05)"/>
+  <circle cx="140" cy="1090" r="200" fill="rgba(232,93,42,0.035)"/>
 
-  <!-- ========== RENDERER LAYER ========== -->
-  <rect x="40" y="30" width="820" height="130" rx="10" fill="url(#rendererGrad)" stroke="#E85D2A" stroke-width="1.5" filter="url(#shadow)"/>
-  <!-- Layer icon -->
-  <circle cx="68" cy="52" r="11" fill="none" stroke="#E85D2A" stroke-width="1.5" opacity="0.7"/>
-  <path d="M63,52 L68,47 L73,52 L68,57 Z" fill="#E85D2A" opacity="0.5"/>
-  <!-- Layer label -->
-  <text x="86" y="57" fill="#E85D2A" font-size="13" font-weight="700" letter-spacing="0.5">REACT UI LAYER</text>
-  <text x="230" y="57" fill="#8b949e" font-size="11">src/App.jsx · detection-rules.js</text>
+  <text x="220" y="56" class="title">IRFlow Timeline Architecture</text>
+  <text x="220" y="82" class="subtitle">Modular v1.0.9 codebase — focused renderer + main-process modules.</text>
+  <rect x="220" y="96" width="190" height="24" class="badge"/>
+  <text x="315" y="112" text-anchor="middle" class="tiny">v1.0.9 workspace snapshot</text>
 
-  <!-- Renderer sub-items -->
-  <g transform="translate(60, 75)">
-    <!-- Virtual Grid -->
-    <rect x="0" y="0" width="140" height="68" rx="7" fill="rgba(232,93,42,0.08)" stroke="rgba(232,93,42,0.25)" stroke-width="1"/>
-    <svg x="12" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E85D2A" stroke-width="2" stroke-linecap="round" opacity="0.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-    <text x="34" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">Virtual Grid</text>
-    <text x="12" y="48" fill="#8b949e" font-size="9.5">10K-row scrolling</text>
-    <text x="12" y="60" fill="#8b949e" font-size="9.5">window</text>
+  <!-- ============ LEFT SIDE BOXES ============ -->
+  <rect x="40" y="150" width="152" height="212" class="side" stroke="#d29922" stroke-opacity="0.55" filter="url(#shadow)"/>
+  <circle cx="58" cy="176" r="4" fill="#d29922"/>
+  <text x="70" y="180" fill="#d29922" class="section">EVIDENCE</text>
+  <text x="60" y="208" class="item">CSV / TSV / LOG</text>
+  <text x="60" y="230" class="item">XLSX / XLS / XLSM</text>
+  <text x="60" y="252" class="item">EVTX</text>
+  <text x="60" y="274" class="item">Plaso / .timeline</text>
+  <text x="60" y="296" class="item">raw $MFT</text>
+  <text x="60" y="318" class="item">raw $UsnJrnl:$J</text>
+  <text x="60" y="340" class="item">AI app history</text>
 
-    <!-- Search & Filtering -->
-    <rect x="155" y="0" width="140" height="68" rx="7" fill="rgba(232,93,42,0.08)" stroke="rgba(232,93,42,0.25)" stroke-width="1"/>
-    <svg x="167" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E85D2A" stroke-width="2" stroke-linecap="round" opacity="0.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <text x="189" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">Search</text>
-    <text x="167" y="48" fill="#8b949e" font-size="9.5">5 modes · FTS5</text>
-    <text x="167" y="60" fill="#8b949e" font-size="9.5">Regex · Fuzzy</text>
+  <rect x="40" y="618" width="152" height="120" class="side" stroke="#f85149" stroke-opacity="0.55" filter="url(#shadow)"/>
+  <circle cx="58" cy="644" r="4" fill="#f85149"/>
+  <text x="70" y="648" fill="#f85149" class="section">EXTERNAL TOOLS</text>
+  <text x="60" y="678" class="item">Hayabusa</text>
+  <text x="60" y="694" class="csub">Sigma over EVTX</text>
+  <text x="60" y="716" class="item">bmc-tools</text>
+  <text x="60" y="732" class="csub">RDP bitmap cache</text>
 
-    <!-- Analytics -->
-    <rect x="310" y="0" width="140" height="68" rx="7" fill="rgba(232,93,42,0.08)" stroke="rgba(232,93,42,0.25)" stroke-width="1"/>
-    <svg x="322" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E85D2A" stroke-width="2" stroke-linecap="round" opacity="0.8"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg>
-    <text x="344" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">Analytics</text>
-    <text x="322" y="48" fill="#8b949e" font-size="9.5">Histogram · Burst</text>
-    <text x="322" y="60" fill="#8b949e" font-size="9.5">Gaps · Stacking</text>
+  <!-- ============ RIGHT SIDE BOXES ============ -->
+  <rect x="1088" y="160" width="152" height="140" class="side" stroke="#58a6ff" stroke-opacity="0.55" filter="url(#shadow)"/>
+  <circle cx="1106" cy="186" r="4" fill="#58a6ff"/>
+  <text x="1118" y="190" fill="#58a6ff" class="section">NETWORK</text>
+  <text x="1108" y="218" class="item">VirusTotal API</text>
+  <text x="1108" y="240" class="item">Hayabusa rules</text>
+  <text x="1108" y="262" class="item">update feed</text>
 
-    <!-- Detection Rules -->
-    <rect x="465" y="0" width="140" height="68" rx="7" fill="rgba(232,93,42,0.08)" stroke="rgba(232,93,42,0.25)" stroke-width="1"/>
-    <svg x="477" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E85D2A" stroke-width="2" stroke-linecap="round" opacity="0.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-    <text x="499" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">Detection</text>
-    <text x="477" y="48" fill="#8b949e" font-size="9.5">342 chain rules +</text>
-    <text x="477" y="60" fill="#8b949e" font-size="9.5">13 standalone patterns</text>
+  <rect x="1088" y="360" width="152" height="200" class="side" stroke="#e85d2a" stroke-opacity="0.55" filter="url(#shadow)"/>
+  <circle cx="1106" cy="386" r="4" fill="#e85d2a"/>
+  <text x="1118" y="390" fill="#e85d2a" class="section">OUTPUTS</text>
+  <text x="1108" y="418" class="item">CSV / TSV / XLSX</text>
+  <text x="1108" y="440" class="item">HTML / PDF report</text>
+  <text x="1108" y="462" class="item">.tle sessions</text>
+  <text x="1108" y="484" class="item">Sigma triage</text>
+  <text x="1108" y="506" class="item">RDP · AI history pkg</text>
 
-    <!-- State -->
-    <rect x="620" y="0" width="140" height="68" rx="7" fill="rgba(232,93,42,0.08)" stroke="rgba(232,93,42,0.25)" stroke-width="1"/>
-    <svg x="632" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E85D2A" stroke-width="2" stroke-linecap="round" opacity="0.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-    <text x="654" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">State</text>
-    <text x="632" y="48" fill="#8b949e" font-size="9.5">24 KAPE profiles</text>
-    <text x="632" y="60" fill="#8b949e" font-size="9.5">Dark / Light theme</text>
-  </g>
+  <rect x="1088" y="700" width="152" height="210" class="side" stroke="#3fb950" stroke-opacity="0.55" filter="url(#shadow)"/>
+  <circle cx="1106" cy="726" r="4" fill="#3fb950"/>
+  <text x="1118" y="730" fill="#3fb950" class="section">LOCAL STATE</text>
+  <text x="1108" y="758" class="item">temp SQLite / tab</text>
+  <text x="1108" y="780" class="item">recent + presets</text>
+  <text x="1108" y="802" class="item">sigma rules</text>
+  <text x="1108" y="824" class="item">vt cache</text>
+  <text x="1108" y="846" class="item">inspector profile</text>
 
-  <!-- ========== ARROW: Renderer → Main ========== -->
-  <line x1="450" y1="164" x2="450" y2="194" stroke="url(#arrowGradOrange)" stroke-width="2" marker-end="url(#arrowOrange)" opacity="0.8"/>
-  <rect x="370" y="168" width="160" height="22" rx="11" fill="#161b22" stroke="rgba(232,93,42,0.3)" stroke-width="1"/>
-  <text x="450" y="183" fill="#E85D2A" font-size="10" font-weight="600" text-anchor="middle">IPC · contextBridge</text>
+  <!-- ============ RENDERER ============ -->
+  <rect x="220" y="150" width="840" height="160" class="panel" fill="url(#rendererGrad)" stroke="#e85d2a" stroke-width="2"/>
+  <circle cx="248" cy="176" r="4.5" fill="#e85d2a"/>
+  <text x="262" y="180" fill="#e85d2a" class="section">RENDERER PROCESS</text>
+  <text x="248" y="212" class="heading">React UI + Zustand state</text>
+  <rect x="248" y="232" width="250" height="60" class="card"/>
+  <rect x="260" y="244" width="4" height="36" rx="2" fill="#e85d2a"/>
+  <text x="276" y="259" class="ctitle">main.jsx · App.jsx</text>
+  <text x="276" y="277" class="csub">app shell · grid wiring</text>
+  <rect x="515" y="232" width="250" height="60" class="card"/>
+  <rect x="527" y="244" width="4" height="36" rx="2" fill="#e85d2a"/>
+  <text x="543" y="259" class="ctitle">components · modals</text>
+  <text x="543" y="277" class="csub">grid, menus, 19 modals</text>
+  <rect x="782" y="232" width="250" height="60" class="card"/>
+  <rect x="794" y="244" width="4" height="36" rx="2" fill="#e85d2a"/>
+  <text x="810" y="259" class="ctitle">store · hooks · utils</text>
+  <text x="810" y="277" class="csub">state + detection-rules</text>
 
-  <!-- ========== MAIN PROCESS LAYER ========== -->
-  <rect x="40" y="198" width="820" height="130" rx="10" fill="url(#mainGrad)" stroke="#58a6ff" stroke-width="1.5" filter="url(#shadow)"/>
-  <!-- Layer icon -->
-  <rect x="56" y="216" width="22" height="16" rx="3" fill="none" stroke="#58a6ff" stroke-width="1.2" opacity="0.7"/>
-  <circle cx="67" cy="220" r="2" fill="#58a6ff" opacity="0.5"/>
-  <text x="86" y="228" fill="#58a6ff" font-size="13" font-weight="700" letter-spacing="0.5">ELECTRON MAIN PROCESS</text>
-  <text x="295" y="228" fill="#8b949e" font-size="11">main.js · preload.js · updater.js · logger.js</text>
+  <!-- renderer -> preload -->
+  <line x1="640" y1="310" x2="640" y2="345" class="spine" stroke="#e85d2a" marker-end="url(#aOrange)"/>
+  <text x="656" y="333" fill="#e85d2a" class="flow">invoke</text>
 
-  <!-- Main sub-items -->
-  <g transform="translate(60, 245)">
-    <rect x="0" y="0" width="143" height="68" rx="7" fill="rgba(88,166,255,0.08)" stroke="rgba(88,166,255,0.25)" stroke-width="1"/>
-    <svg x="12" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2" stroke-linecap="round" opacity="0.8"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M18 8l4-4-4-4"/><path d="M22 4H12"/></svg>
-    <text x="34" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">69 IPC Handlers</text>
-    <text x="12" y="48" fill="#8b949e" font-size="9.5">safeHandle() wrappers</text>
-    <text x="12" y="60" fill="#8b949e" font-size="9.5">132 window.tle methods</text>
+  <!-- ============ PRELOAD ============ -->
+  <rect x="300" y="349" width="680" height="62" class="panel" fill="url(#preloadGrad)" stroke="#a371f7" stroke-width="2"/>
+  <circle cx="328" cy="377" r="4.5" fill="#a371f7"/>
+  <text x="342" y="381" fill="#a371f7" class="section">PRELOAD BRIDGE · SECURE BOUNDARY</text>
+  <text x="328" y="401" class="csub">window.tle API · VT · Sigma · AI history / Secret Hunt IPC</text>
 
-    <rect x="153" y="0" width="143" height="68" rx="7" fill="rgba(88,166,255,0.08)" stroke="rgba(88,166,255,0.25)" stroke-width="1"/>
-    <svg x="165" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2" stroke-linecap="round" opacity="0.8"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-    <text x="187" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">File &amp; Menus</text>
-    <text x="165" y="48" fill="#8b949e" font-size="9.5">Native macOS menus</text>
-    <text x="165" y="60" fill="#8b949e" font-size="9.5">Open Recent · Sheets</text>
+  <!-- preload -> main -->
+  <line x1="640" y1="411" x2="640" y2="446" class="spine" stroke="#a371f7" marker-end="url(#aViolet)"/>
+  <text x="656" y="434" fill="#a371f7" class="flow">IPC</text>
 
-    <rect x="306" y="0" width="143" height="68" rx="7" fill="rgba(88,166,255,0.08)" stroke="rgba(88,166,255,0.25)" stroke-width="1"/>
-    <svg x="318" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2" stroke-linecap="round" opacity="0.8"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-    <text x="340" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">Session &amp; Export</text>
-    <text x="318" y="48" fill="#8b949e" font-size="9.5">Save / Load .tle files</text>
-    <text x="318" y="60" fill="#8b949e" font-size="9.5">CSV · XLSX · HTML · PDF</text>
+  <!-- ============ MAIN PROCESS ============ -->
+  <rect x="220" y="450" width="840" height="158" class="panel" fill="url(#mainGrad)" stroke="#58a6ff" stroke-width="2"/>
+  <circle cx="248" cy="476" r="4.5" fill="#58a6ff"/>
+  <text x="262" y="480" fill="#58a6ff" class="section">MAIN PROCESS SERVICES</text>
+  <text x="248" y="512" class="heading">Electron orchestration + IPC</text>
+  <rect x="248" y="532" width="250" height="58" class="card"/>
+  <rect x="260" y="544" width="4" height="34" rx="2" fill="#58a6ff"/>
+  <text x="276" y="559" class="ctitle">main.js</text>
+  <text x="276" y="577" class="csub">window · queue · safeHandle</text>
+  <rect x="515" y="532" width="250" height="58" class="card"/>
+  <rect x="527" y="544" width="4" height="34" rx="2" fill="#58a6ff"/>
+  <text x="543" y="559" class="ctitle">import · menu · updater</text>
+  <text x="543" y="577" class="csub">pipeline · menu · updates</text>
+  <rect x="782" y="532" width="250" height="58" class="card"/>
+  <rect x="794" y="544" width="4" height="34" rx="2" fill="#58a6ff"/>
+  <text x="810" y="559" class="ctitle">ipc/ · 14 modules</text>
+  <text x="810" y="577" class="csub">ai-history-handlers + domains</text>
 
-    <rect x="459" y="0" width="143" height="68" rx="7" fill="rgba(88,166,255,0.08)" stroke="rgba(88,166,255,0.25)" stroke-width="1"/>
-    <svg x="471" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2" stroke-linecap="round" opacity="0.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><circle cx="12" cy="16" r="1"/></svg>
-    <text x="493" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">VT &amp; Updater</text>
-    <text x="471" y="48" fill="#8b949e" font-size="9.5">VirusTotal cache DB</text>
-    <text x="471" y="60" fill="#8b949e" font-size="9.5">Auto-update lifecycle</text>
+  <!-- main -> workers -->
+  <line x1="640" y1="608" x2="640" y2="643" class="spine" stroke="#58a6ff" marker-end="url(#aBlue)"/>
+  <text x="656" y="631" fill="#58a6ff" class="flow">spawn</text>
 
-    <rect x="612" y="0" width="143" height="68" rx="7" fill="rgba(88,166,255,0.08)" stroke="rgba(88,166,255,0.25)" stroke-width="1"/>
-    <svg x="624" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2" stroke-linecap="round" opacity="0.8"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-    <text x="646" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">macOS Native</text>
-    <text x="624" y="48" fill="#8b949e" font-size="9.5">Vibrancy · Dark mode</text>
-    <text x="624" y="60" fill="#8b949e" font-size="9.5">Traffic lights</text>
-  </g>
+  <!-- ============ WORKER THREADS ============ -->
+  <rect x="220" y="647" width="840" height="116" class="panel" fill="url(#workerGrad)" stroke="#d29922" stroke-width="2"/>
+  <circle cx="248" cy="673" r="4.5" fill="#d29922"/>
+  <text x="262" y="677" fill="#d29922" class="section">WORKER THREADS · electron/jobs</text>
+  <rect x="248" y="691" width="192" height="56" class="card"/>
+  <rect x="260" y="703" width="4" height="32" rx="2" fill="#d29922"/>
+  <text x="276" y="712" class="ctitle">import-worker</text>
+  <text x="276" y="728" class="csub">parse + insert</text>
+  <text x="276" y="742" class="csub">ai-history decode</text>
+  <rect x="452" y="691" width="192" height="56" class="card"/>
+  <rect x="464" y="703" width="4" height="32" rx="2" fill="#3fb950"/>
+  <text x="480" y="717" class="ctitle">index-worker</text>
+  <text x="480" y="734" class="csub">index + FTS5</text>
+  <rect x="656" y="691" width="192" height="56" class="card"/>
+  <rect x="668" y="703" width="4" height="32" rx="2" fill="#f85149"/>
+  <text x="684" y="712" class="ctitle">ai-profile-worker</text>
+  <text x="684" y="728" class="csub">Collect AI Artifacts</text>
+  <text x="684" y="742" class="csub">profile-scan merge</text>
+  <rect x="860" y="691" width="172" height="56" class="card"/>
+  <rect x="872" y="703" width="4" height="32" rx="2" fill="#f85149"/>
+  <text x="888" y="717" class="ctitle">sigma-worker</text>
+  <text x="888" y="734" class="csub">Sigma · Hayabusa</text>
 
-  <!-- ========== ARROW: Main → DB ========== -->
-  <line x1="450" y1="332" x2="450" y2="362" stroke="url(#arrowGradBlue)" stroke-width="2" marker-end="url(#arrowBlue)" opacity="0.8"/>
-  <rect x="370" y="336" width="160" height="22" rx="11" fill="#161b22" stroke="rgba(88,166,255,0.3)" stroke-width="1"/>
-  <text x="450" y="351" fill="#58a6ff" font-size="10" font-weight="600" text-anchor="middle">Sync / Async API</text>
+  <!-- workers -> data -->
+  <line x1="640" y1="763" x2="640" y2="798" class="spine" stroke="#d29922" marker-end="url(#aAmber)"/>
+  <text x="656" y="786" fill="#d29922" class="flow">adopt</text>
 
-  <!-- ========== SQLITE DATA ENGINE LAYER ========== -->
-  <rect x="40" y="366" width="820" height="130" rx="10" fill="url(#dbGrad)" stroke="#3fb950" stroke-width="1.5" filter="url(#shadow)"/>
-  <!-- Layer icon -->
-  <svg x="57" y="384" width="20" height="18" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="1.5" stroke-linecap="round" opacity="0.7"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-  <text x="86" y="397" fill="#3fb950" font-size="13" font-weight="700" letter-spacing="0.5">SQLITE DATA ENGINE</text>
-  <text x="270" y="397" fill="#8b949e" font-size="11">db.js · TimelineDB class</text>
+  <!-- ============ DATA ENGINE ============ -->
+  <rect x="220" y="802" width="840" height="158" class="panel" fill="url(#dataGrad)" stroke="#3fb950" stroke-width="2"/>
+  <circle cx="248" cy="828" r="4.5" fill="#3fb950"/>
+  <text x="262" y="832" fill="#3fb950" class="section">SQLITE DATA ENGINE</text>
+  <text x="248" y="864" class="heading">TimelineDB + forensic analyzers</text>
+  <rect x="248" y="884" width="250" height="58" class="card"/>
+  <rect x="260" y="896" width="4" height="34" rx="2" fill="#3fb950"/>
+  <text x="276" y="911" class="ctitle">db.js + db/</text>
+  <text x="276" y="929" class="csub">query · tag · analytics · UDFs</text>
+  <rect x="515" y="884" width="250" height="58" class="card"/>
+  <rect x="527" y="896" width="4" height="34" rx="2" fill="#f85149"/>
+  <text x="543" y="911" class="ctitle">analyzers/ · 11 domains</text>
+  <text x="543" y="929" class="csub">LM · Sigma · ai-history secrets</text>
+  <rect x="782" y="884" width="250" height="58" class="card"/>
+  <rect x="794" y="896" width="4" height="34" rx="2" fill="#f85149"/>
+  <text x="810" y="911" class="ctitle">AI Secret Hunt</text>
+  <text x="810" y="929" class="csub">analyze-ai-history · regex+entropy</text>
 
-  <!-- DB sub-items -->
-  <g transform="translate(60, 413)">
-    <rect x="0" y="0" width="140" height="68" rx="7" fill="rgba(63,185,80,0.08)" stroke="rgba(63,185,80,0.25)" stroke-width="1"/>
-    <svg x="12" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2" stroke-linecap="round" opacity="0.8"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-    <text x="34" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">TimelineDB</text>
-    <text x="12" y="48" fill="#8b949e" font-size="9.5">FTS5 · 5 SQL funcs</text>
-    <text x="12" y="60" fill="#8b949e" font-size="9.5">REGEXP · FUZZY</text>
+  <!-- data -> parser -->
+  <line x1="640" y1="960" x2="640" y2="995" class="spine" stroke="#3fb950" marker-end="url(#aGreen)"/>
+  <text x="656" y="983" fill="#3fb950" class="flow">parse</text>
 
-    <rect x="150" y="0" width="140" height="68" rx="7" fill="rgba(63,185,80,0.08)" stroke="rgba(63,185,80,0.25)" stroke-width="1"/>
-    <svg x="162" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2" stroke-linecap="round" opacity="0.8"><path d="M12 3v6"/><circle cx="12" cy="12" r="3"/><path d="M12 15v3"/><path d="M8 15l-3 3"/><path d="M16 15l3 3"/></svg>
-    <text x="184" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">Process Inspector</text>
-    <text x="162" y="48" fill="#8b949e" font-size="9.5">GUID linking · PID</text>
-    <text x="162" y="60" fill="#8b949e" font-size="9.5">re-linking · 4688</text>
+  <!-- ============ PARSER ============ -->
+  <rect x="220" y="999" width="840" height="100" class="panel" fill="url(#parserGrad)" stroke="#d29922" stroke-width="2"/>
+  <circle cx="248" cy="1025" r="4.5" fill="#d29922"/>
+  <text x="262" y="1029" fill="#d29922" class="section">PARSER + IMPORT LAYER</text>
+  <text x="248" y="1058" class="heading">Format dispatch · streaming + binary parsers</text>
+  <rect x="248" y="1069" width="178" height="28" class="card"/>
+  <text x="337" y="1087" text-anchor="middle" class="csub">parsers/index.js</text>
+  <rect x="440" y="1069" width="178" height="28" class="card"/>
+  <text x="529" y="1087" text-anchor="middle" class="csub">csv · xlsx</text>
+  <rect x="632" y="1069" width="178" height="28" class="card"/>
+  <text x="721" y="1087" text-anchor="middle" class="csub">evtx · plaso</text>
+  <rect x="824" y="1069" width="100" height="28" class="card"/>
+  <text x="874" y="1087" text-anchor="middle" class="csub">mft · usn</text>
+  <rect x="932" y="1069" width="100" height="28" class="card"/>
+  <text x="982" y="1087" text-anchor="middle" class="csub">ai-history/</text>
 
-    <rect x="300" y="0" width="140" height="68" rx="7" fill="rgba(63,185,80,0.08)" stroke="rgba(63,185,80,0.25)" stroke-width="1"/>
-    <svg x="312" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2" stroke-linecap="round" opacity="0.8"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="16.5"/><line x1="6" y1="9" x2="6" y2="15"/></svg>
-    <text x="334" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">Lateral Movement</text>
-    <text x="312" y="48" fill="#8b949e" font-size="9.5">RDP · Chains</text>
-    <text x="312" y="60" fill="#8b949e" font-size="9.5">Impacket · Attacks</text>
+  <!-- ============ SIDE CONNECTORS ============ -->
+  <line x1="192" y1="250" x2="220" y2="250" class="rail" stroke="#d29922" marker-end="url(#aAmber)"/>
+  <line x1="192" y1="690" x2="220" y2="690" class="rail" stroke="#f85149" marker-end="url(#aRed)"/>
+  <line x1="1060" y1="230" x2="1088" y2="230" class="rail" stroke="#58a6ff" marker-end="url(#aBlue)"/>
+  <line x1="1060" y1="460" x2="1088" y2="460" class="rail" stroke="#e85d2a" marker-end="url(#aOrange)"/>
+  <line x1="1060" y1="805" x2="1088" y2="805" class="rail" stroke="#3fb950" marker-end="url(#aGreen)"/>
 
-    <rect x="450" y="0" width="140" height="68" rx="7" fill="rgba(63,185,80,0.08)" stroke="rgba(63,185,80,0.25)" stroke-width="1"/>
-    <svg x="462" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2" stroke-linecap="round" opacity="0.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-    <text x="484" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">NTFS Analysis</text>
-    <text x="462" y="48" fill="#8b949e" font-size="9.5">MFT · USN Journal</text>
-    <text x="462" y="60" fill="#8b949e" font-size="9.5">Ransomware · ADS</text>
-
-    <rect x="600" y="0" width="160" height="68" rx="7" fill="rgba(63,185,80,0.08)" stroke="rgba(63,185,80,0.25)" stroke-width="1"/>
-    <svg x="612" y="14" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2" stroke-linecap="round" opacity="0.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-    <text x="634" y="26" fill="#e6edf3" font-size="11.5" font-weight="600">Persistence</text>
-    <text x="612" y="48" fill="#8b949e" font-size="9.5">30+ techniques</text>
-    <text x="612" y="60" fill="#8b949e" font-size="9.5">Risk scoring 0–10</text>
-  </g>
-
-  <!-- ========== ARROW: DB → Parser ========== -->
-  <line x1="450" y1="500" x2="450" y2="530" stroke="url(#arrowGradGreen)" stroke-width="2" marker-end="url(#arrowGreen)" opacity="0.8"/>
-  <rect x="370" y="504" width="160" height="22" rx="11" fill="#161b22" stroke="rgba(63,185,80,0.3)" stroke-width="1"/>
-  <text x="450" y="519" fill="#3fb950" font-size="10" font-weight="600" text-anchor="middle">Streaming I/O</text>
-
-  <!-- ========== PARSER LAYER ========== -->
-  <rect x="40" y="534" width="820" height="120" rx="10" fill="url(#parserGrad)" stroke="#d29922" stroke-width="1.5" filter="url(#shadow)"/>
-  <!-- Layer icon -->
-  <svg x="57" y="552" width="20" height="18" viewBox="0 0 24 24" fill="none" stroke="#d29922" stroke-width="1.5" stroke-linecap="round" opacity="0.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-  <text x="86" y="566" fill="#d29922" font-size="13" font-weight="700" letter-spacing="0.5">PARSER LAYER</text>
-  <text x="215" y="566" fill="#8b949e" font-size="11">parser.js · 7 format parsers</text>
-
-  <!-- Parser sub-items (7 boxes) -->
-  <g transform="translate(60, 580)">
-    <rect x="0" y="0" width="100" height="58" rx="7" fill="rgba(210,153,34,0.08)" stroke="rgba(210,153,34,0.25)" stroke-width="1"/>
-    <text x="12" y="22" fill="#e6edf3" font-size="11.5" font-weight="600">CSV / TSV</text>
-    <text x="12" y="42" fill="#8b949e" font-size="9.5">128MB chunks</text>
-    <text x="12" y="52" fill="#8b949e" font-size="9.5">RFC 4180</text>
-
-    <rect x="110" y="0" width="100" height="58" rx="7" fill="rgba(210,153,34,0.08)" stroke="rgba(210,153,34,0.25)" stroke-width="1"/>
-    <text x="122" y="22" fill="#e6edf3" font-size="11.5" font-weight="600">XLSX</text>
-    <text x="122" y="42" fill="#8b949e" font-size="9.5">ExcelJS</text>
-    <text x="122" y="52" fill="#8b949e" font-size="9.5">streaming</text>
-
-    <rect x="220" y="0" width="100" height="58" rx="7" fill="rgba(210,153,34,0.08)" stroke="rgba(210,153,34,0.25)" stroke-width="1"/>
-    <text x="232" y="22" fill="#e6edf3" font-size="11.5" font-weight="600">XLS</text>
-    <text x="232" y="42" fill="#8b949e" font-size="9.5">SheetJS</text>
-    <text x="232" y="52" fill="#8b949e" font-size="9.5">legacy</text>
-
-    <rect x="330" y="0" width="100" height="58" rx="7" fill="rgba(210,153,34,0.08)" stroke="rgba(210,153,34,0.25)" stroke-width="1"/>
-    <text x="342" y="22" fill="#e6edf3" font-size="11.5" font-weight="600">EVTX</text>
-    <text x="342" y="42" fill="#8b949e" font-size="9.5">@ts-evtx</text>
-    <text x="342" y="52" fill="#8b949e" font-size="9.5">binary</text>
-
-    <rect x="440" y="0" width="100" height="58" rx="7" fill="rgba(210,153,34,0.08)" stroke="rgba(210,153,34,0.25)" stroke-width="1"/>
-    <text x="452" y="22" fill="#e6edf3" font-size="11.5" font-weight="600">Plaso</text>
-    <text x="452" y="42" fill="#8b949e" font-size="9.5">SQLite direct</text>
-    <text x="452" y="52" fill="#8b949e" font-size="9.5">query</text>
-
-    <rect x="550" y="0" width="100" height="58" rx="7" fill="rgba(210,153,34,0.08)" stroke="rgba(210,153,34,0.3)" stroke-width="1.5"/>
-    <text x="562" y="22" fill="#e6edf3" font-size="11.5" font-weight="600">$MFT</text>
-    <text x="562" y="42" fill="#8b949e" font-size="9.5">2-pass binary</text>
-    <text x="562" y="52" fill="#8b949e" font-size="9.5">22 columns</text>
-
-    <rect x="660" y="0" width="100" height="58" rx="7" fill="rgba(210,153,34,0.08)" stroke="rgba(210,153,34,0.3)" stroke-width="1.5"/>
-    <text x="672" y="22" fill="#e6edf3" font-size="11.5" font-weight="600">$J (USN)</text>
-    <text x="672" y="42" fill="#8b949e" font-size="9.5">USN Journal</text>
-    <text x="672" y="52" fill="#8b949e" font-size="9.5">binary parser</text>
-  </g>
+  <!-- ============ COLOR LEGEND ============ -->
+  <rect x="220" y="1126" width="840" height="40" rx="12" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.07)"/>
+  <circle cx="244" cy="1146" r="5" fill="#e85d2a"/><text x="256" y="1150" class="tiny">UI / output</text>
+  <circle cx="356" cy="1146" r="5" fill="#a371f7"/><text x="368" y="1150" class="tiny">secure bridge</text>
+  <circle cx="486" cy="1146" r="5" fill="#58a6ff"/><text x="498" y="1150" class="tiny">orchestration · network</text>
+  <circle cx="682" cy="1146" r="5" fill="#d29922"/><text x="694" y="1150" class="tiny">ingestion · compute</text>
+  <circle cx="858" cy="1146" r="5" fill="#3fb950"/><text x="870" y="1150" class="tiny">data · persistence</text>
+  <circle cx="992" cy="1146" r="5" fill="#f85149"/><text x="1004" y="1150" class="tiny">forensic detection</text>
 </svg>

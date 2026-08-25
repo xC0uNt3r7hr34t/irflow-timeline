@@ -1,103 +1,47 @@
 {
   "name": "irflow-timeline",
-  "version": "1.0.5",
-  "description": "IRFlow Timeline — High-performance DFIR timeline viewer for Windows",
+  "version": "1.0.12",
+  "description": "IRFlow Timeline — High-performance DFIR timeline viewer for Windows with AI Artifacts, Sigma detection, and native EVTX, MFT, USN Journal, and SQLite support.",
   "main": "electron/main.js",
   "author": "DFIR Community",
   "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22.14.0"
+  },
   "scripts": {
-    "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "dev": "concurrently \"vite\" \"TLE_DEV_SERVER=1 wait-on http://localhost:5173 && TLE_DEV_SERVER=1 electron .\"",
     "build:renderer": "vite build",
     "start": "npm run build:renderer && electron .",
-
-    "dist:win": "npm run build:renderer && electron-builder --win",
-    "dist:win:nsis": "npm run build:renderer && electron-builder --win nsis",
-    "dist:win:portable": "npm run build:renderer && electron-builder --win portable",
-
+    "bundle:hayabusa": "bash scripts/bundle-hayabusa.sh",
+    "bundle:bmc-tools": "bash scripts/bundle-bmc-tools.sh",
+    "bundle:tools": "npm run bundle:hayabusa && npm run bundle:bmc-tools",
+    "fix:scripts": "node scripts/fix-line-endings.cjs",
+    "dist": "npm run bundle:tools && npm run build:renderer && electron-builder --config electron-builder.config.cjs --mac",
+    "dist:release": "npm run dist",
+    "dist:smoke": "npm run bundle:tools && npm run build:renderer && SKIP_NOTARIZE=1 CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --config electron-builder.config.cjs --mac",
+    "dist:dmg": "npm run bundle:tools && npm run build:renderer && electron-builder --config electron-builder.config.cjs --mac dmg",
+    "dist:universal": "npm run bundle:tools && npm run build:renderer && electron-builder --config electron-builder.config.cjs --mac --universal",
+    "dist:win": "npm run build:renderer && electron-builder --config electron-builder.config.cjs --win",
+    "dist:win:full": "npm run bundle:tools && npm run build:renderer && electron-builder --config electron-builder.config.cjs --win",
+    "dist:win:nsis": "npm run build:renderer && electron-builder --config electron-builder.config.cjs --win nsis",
+    "dist:win:portable": "npm run build:renderer && electron-builder --config electron-builder.config.cjs --win portable",
+    "dist:win:ci": "npm run bundle:tools && npm run build:renderer && electron-builder --config electron-builder.config.cjs --win",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
-    "postinstall": "patch-package",
-
+    "postinstall": "patch-package && electron-rebuild -f -w better-sqlite3",
+    "smoke:electron": "electron scripts/smoke-electron-runtime.js",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
-  },
-  "build": {
-    "appId": "com.irflow.timeline",
-    "productName": "IRFlow Timeline",
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-      "dist/**/*",
-      "electron/**/*",
-      "node_modules/**/*",
-      "package.json"
-    ],
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": ["x64"]
-        },
-        {
-          "target": "portable",
-          "arch": ["x64"]
-        }
-      ],
-      "icon": "assets/icon.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "IRFlow Timeline"
-    },
-    "fileAssociations": [
-      {
-        "ext": "tle",
-        "name": "IRFlow Timeline Session",
-        "description": "IRFlow Timeline Session File",
-        "role": "Editor"
-      },
-      {
-        "ext": "csv",
-        "name": "CSV File",
-        "role": "Viewer"
-      },
-      {
-        "ext": "tsv",
-        "name": "TSV File",
-        "role": "Viewer"
-      },
-      {
-        "ext": "evtx",
-        "name": "Windows Event Log",
-        "role": "Viewer"
-      },
-      {
-        "ext": "xlsx",
-        "name": "Excel Workbook",
-        "role": "Viewer"
-      },
-      {
-        "ext": "sqlite",
-        "name": "SQLite Database",
-        "role": "Viewer"
-      },
-      {
-        "ext": "db",
-        "name": "SQLite Database",
-        "role": "Viewer"
-      }
-    ]
+    "docs:preview": "vitepress preview docs",
+    "build": "vite build",
+    "test": "node --test tests/*.test.js"
   },
   "devDependencies": {
-    "@electron/rebuild": "^3.6.0",
+    "@electron/notarize": "^3.1.1",
+    "@electron/rebuild": "^4.2.0",
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.0",
-    "electron": "^33.2.1",
-    "electron-builder": "^25.1.8",
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.3",
     "patch-package": "^8.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -108,11 +52,17 @@
   "dependencies": {
     "@ts-evtx/core": "^1.1.1",
     "@ts-evtx/messages": "^1.1.1",
-    "better-sqlite3": "^11.7.0",
+    "better-sqlite3": "^13.0.3",
     "csv-parser": "^3.0.0",
-    "electron-updater": "^6.6.7",
-    "unzipper": "^0.10.14",
+    "electron-updater": "^6.8.9",
     "exceljs": "^4.4.0",
-    "xlsx": "^0.18.5"
+    "js-yaml": "^4.3.1",
+    "xlsx": "file:vendor/xlsx-0.20.3.tgz",
+    "zustand": "^5.0.12"
+  },
+  "overrides": {
+    "@ts-evtx/messages": {
+      "better-sqlite3": "$better-sqlite3"
+    }
   }
 }

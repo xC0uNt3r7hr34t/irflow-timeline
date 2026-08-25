@@ -6,11 +6,11 @@ description: Log source coverage map — Gantt-style visualization of evidence c
 
 Log Source Coverage provides a Gantt-style visualization of which log sources are present across your timeline, their time spans, and event counts — helping you identify collection gaps and verify evidence completeness.
 
-![Log Source Coverage Map showing coverage timeline across 138 log sources with event counts and time spans](/dfir-tips/Log-Source-Coverage.png)
+![Log Source Coverage Map on WKS2390 — 177 sources, 214,098 events, Sysmon / Security / TaskScheduler bars](/dfir-tips/Log-Source-Coverage.png)
 
 ## Opening Log Source Coverage
 
-- **Menu:** Tools > Log Sources
+- **Menu:** **Tools → Analysis → Log Sources**
 
 ## Configuration
 

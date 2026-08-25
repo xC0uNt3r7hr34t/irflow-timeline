@@ -1,0 +1,3 @@
+{"kind":0,"v":{"sessionId":"jsonl-s1","creationDate":1704067200000,"requests":[]}}
+{"kind":2,"v":{"requestId":"r-jsonl","timestamp":1704067201000,"modelId":"copilot/gpt-4","message":{"text":"JSONL question?"}}}
+{"kind":1,"v":{"requests":[{"requestId":"r-jsonl","timestamp":1704067201000,"modelId":"copilot/gpt-4","message":{"text":"JSONL question?"},"response":[{"kind":"markdownContent","content":{"value":"JSONL answer."}}]}]}}

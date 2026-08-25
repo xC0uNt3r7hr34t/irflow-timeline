@@ -5,7 +5,7 @@ description: Try IRFlow Timeline's search, filter, and sort capabilities directl
 
 # Interactive Demo
 
-Experience IRFlow Timeline's core analysis workflow on a realistic 50-event attack scenario — directly in your browser.
+Experience IRFlow Timeline's core EVTX timeline workflow on a realistic 50-event attack scenario — directly in your browser. AI Artifacts and AI Secret Hunt are app-only features (not shown in this browser demo).
 
 <InteractiveDemo />
 

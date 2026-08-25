@@ -20,7 +20,7 @@
       </div>
       <div class="title-right">
         <span class="brand-name">IRFlow</span>
-        <span class="brand-version">v1.0.3-beta</span>
+        <span class="brand-version">v1.0.11</span>
       </div>
     </div>
 
@@ -33,8 +33,8 @@
     </div>
 
     <!-- Filter tags -->
-    <div class="filter-tags" :class="{ 'tour-focus': tourStep === 1 }">
-      <span v-for="(tag, i) in filterTags" :key="i" class="filter-tag" :style="{
+    <div class="filter-tags" :class="{ 'tour-focus': tourStep === 1 || tourStep === 4 }">
+      <span v-for="(tag, i) in displayedFilterTags" :key="i" class="filter-tag" :style="{
         color: tag.color,
         background: `${tag.color}15`,
         borderColor: `${tag.color}33`,
@@ -64,19 +64,20 @@
     <!-- Main content -->
     <div class="main-content">
       <!-- Timeline table -->
-      <div class="timeline-table" :class="{ 'tour-focus': tourStep === 0 || tourStep === 1 }">
+      <div class="timeline-table" :class="{ 'tour-focus': tourStep === 0 || tourStep === 1 || tourStep === 4 }">
         <div class="table-header">
           <span v-for="h in ['TIMESTAMP', 'SOURCE', 'ID', 'DETAIL']" :key="h" class="header-cell">{{ h }}</span>
         </div>
-        <div v-for="(evt, i) in timelineEvents" :key="i" class="table-row" :class="{ 'row-critical': evt.severity === 'critical' }" :style="{
-          opacity: i < visibleRows ? 1 : 0,
-          transform: i < visibleRows ? 'translateX(0)' : 'translateX(-20px)',
+        <div v-for="(evt, i) in displayedEvents" :key="i" class="table-row" :class="{ 'row-critical': evt.severity === 'critical', 'row-ai': evt.source.includes('AI') }" :style="{
+          opacity: i < Math.min(visibleRows, displayedRowCount) ? 1 : 0,
+          transform: i < Math.min(visibleRows, displayedRowCount) ? 'translateX(0)' : 'translateX(-20px)',
           transitionDelay: `${i * 40}ms`,
         }">
           <span class="cell-time">{{ evt.time.split(' ')[1] }}</span>
           <span class="cell-source" :class="{
             'source-sysmon': evt.source.includes('Sysmon'),
             'source-hayabusa': evt.source.includes('Hayabusa'),
+            'source-ai': evt.source.includes('AI'),
           }">{{ evt.source }}</span>
           <span class="cell-id">{{ evt.event }}</span>
           <div class="cell-detail">
@@ -104,6 +105,42 @@
             <span class="tree-pid">:{{ proc.pid }}</span>
             <span v-if="proc.suspicious && proc.name === 'mimikatz.exe'" class="tree-lolbin">CREDENTIAL DUMP</span>
           </div>
+        </div>
+
+        <!-- AI Apps scan -->
+        <div class="panel ai-apps-panel" :class="{ 'tour-focus': tourStep === 4 }" :style="{ opacity: sectionOpacity(4, showAiApps), transform: showAiApps ? 'translateY(0)' : 'translateY(10px)' }">
+          <div class="panel-header">
+            <span class="panel-title">AI APPS SCAN</span>
+            <span class="panel-badge badge-orange">{{ aiApps.length }} APPS</span>
+          </div>
+          <svg viewBox="0 0 380 140" class="ai-apps-svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="aiHubGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#E8613A" stop-opacity="0.35" />
+                <stop offset="100%" stop-color="#E8613A" stop-opacity="0.08" />
+              </linearGradient>
+            </defs>
+            <!-- Scan rays from apps to hub -->
+            <g v-for="(app, i) in aiApps" :key="'ray' + i">
+              <line :x1="app.x" :y1="app.y" x2="190" y2="70"
+                stroke="#E8613A" stroke-width="0.8" stroke-opacity="0.22"
+                :stroke-dasharray="tourStep === 4 ? '3 2' : '0'"
+              />
+            </g>
+            <!-- Central merge target -->
+            <rect x="148" y="52" width="84" height="36" rx="4" fill="url(#aiHubGrad)" stroke="#E8613A" stroke-width="1" stroke-opacity="0.7" />
+            <text x="190" y="67" fill="#F0845A" font-size="5.5" text-anchor="middle" font-family="monospace" font-weight="700">AI QUERY</text>
+            <text x="190" y="78" fill="#CCC" font-size="5" text-anchor="middle" font-family="monospace">HISTORY TAB</text>
+            <!-- App nodes -->
+            <g v-for="(app, i) in aiApps" :key="'app' + i">
+              <circle :cx="app.x" :cy="app.y" r="13" :fill="app.color + '18'" :stroke="app.color" stroke-width="0.9" stroke-opacity="0.75" />
+              <text :x="app.x" :y="app.y + 1" :fill="app.color" font-size="4.5" text-anchor="middle" font-family="monospace" font-weight="700">{{ app.abbr }}</text>
+              <text :x="app.x" :y="app.y + 22" fill="#AAA" font-size="4.5" text-anchor="middle" font-family="monospace">{{ app.label }}</text>
+            </g>
+            <!-- Collect badge -->
+            <rect x="262" y="10" width="108" height="18" rx="3" fill="#E8613A12" stroke="#E8613A" stroke-width="0.7" stroke-opacity="0.5" />
+            <text x="316" y="21" fill="#E8613A" font-size="5" text-anchor="middle" font-family="monospace" font-weight="600">COLLECT AI ARTIFACTS</text>
+          </svg>
         </div>
 
         <!-- Lateral Movement -->
@@ -164,7 +201,7 @@
       </div>
       <div class="status-right">
         <span class="status-accent">⚡ 12ms query time</span>
-        <span class="status-item">CSV • EVTX • XLSX • Plaso</span>
+        <span class="status-item">CSV • EVTX • XLSX • Plaso • $MFT • <span class="status-ai">AI Apps</span> • AI history</span>
       </div>
     </div>
 
@@ -191,13 +228,76 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 
 const scanLine = ref(0)
 const visibleRows = ref(0)
 const histogramAnim = ref(false)
 const showTree = ref(false)
 const showNetwork = ref(false)
+const showAiApps = ref(false)
+
+// Tour state
+const tourActive = ref(false)
+const tourStep = ref(-1)
+const tourPaused = ref(false)
+const isMobile = ref(false)
+const TOUR_INTERVAL = 5000
+const TOUR_START_DELAY = 2400
+
+const tourSteps = [
+  { index: 0, shortLabel: 'Import', icon: '\u26A1', caption: 'Stream 30GB+ forensic timelines without loading into memory' },
+  { index: 1, shortLabel: 'Search', icon: '\uD83D\uDD0D', caption: '5 search modes: text, regex, fuzzy, FTS, mixed' },
+  { index: 2, shortLabel: 'Processes', icon: '\uD83C\uDF33', caption: 'Reconstruct attack chains with MITRE ATT&CK mapping', desktopOnly: true },
+  { index: 3, shortLabel: 'Network', icon: '\uD83D\uDD17', caption: 'Track multi-hop lateral movement across your network', desktopOnly: true },
+  { index: 4, shortLabel: 'AI Apps', icon: '\uD83E\uDD16', caption: 'Collect AI history from Grok Build, Claude, Codex, ChatGPT, Copilot, Gemini, Cursor, and more' },
+]
+
+const visibleTourSteps = computed(() => {
+  if (isMobile.value) {
+    return tourSteps.filter(s => !s.desktopOnly)
+  }
+  return tourSteps
+})
+
+function sectionOpacity(stepN, baseVisible) {
+  if (!baseVisible) return 0
+  if (!tourActive.value || tourStep.value < 0) return 1
+  return tourStep.value === stepN ? 1 : 0.2
+}
+
+let tourIv = null
+
+function advanceTour() {
+  const visible = visibleTourSteps.value
+  const currentIdx = visible.findIndex(s => s.index === tourStep.value)
+  const nextIdx = (currentIdx + 1) % visible.length
+  tourStep.value = visible[nextIdx].index
+}
+
+function startTourCycle() {
+  if (tourIv) clearInterval(tourIv)
+  tourIv = setInterval(() => {
+    if (!tourPaused.value) advanceTour()
+  }, TOUR_INTERVAL)
+}
+
+function goToStep(n) {
+  tourStep.value = n
+  startTourCycle()
+}
+
+function pauseTour() {
+  tourPaused.value = true
+}
+
+function resumeTour() {
+  tourPaused.value = false
+}
+
+function checkMobile() {
+  isMobile.value = window.innerWidth <= 960
+}
 
 // Tour state
 const tourActive = ref(false)
@@ -270,6 +370,18 @@ const stats = [
 
 const histogramData = [2,5,3,8,15,28,42,38,55,72,48,35,62,45,30,22,18,12,8,5,15,25,38,52,68,45,32,20,14,8,4,2,6,12,18,25,35,28,20,15]
 const maxHist = Math.max(...histogramData)
+
+const aiTimelineEvents = [
+  { time: '2025-02-14 03:11:02', source: 'AI: Cursor', event: 'USER', detail: 'paste AWS key into agent prompt', severity: 'critical' },
+  { time: '2025-02-14 03:11:18', source: 'AI: Codex', event: 'TOOL', detail: 'shell: whoami /priv', severity: 'high' },
+  { time: '2025-02-14 03:11:31', source: 'AI: Grok', event: 'TOOL', detail: 'run_terminal_command: systeminfo', severity: 'high' },
+  { time: '2025-02-14 03:11:44', source: 'AI: Claude', event: 'ASST', detail: 'powershell lateral movement steps', severity: 'high' },
+  { time: '2025-02-14 03:12:05', source: 'AI: Copilot', event: 'USER', detail: 'decrypt mimikatz output', severity: 'critical' },
+  { time: '2025-02-14 03:12:22', source: 'AI: ChatGPT', event: 'USER', detail: 'ransomware recovery script', severity: 'medium' },
+  { time: '2025-02-14 03:12:41', source: 'AI: Gemini', event: 'ASST', detail: 'exfil via DNS tunneling', severity: 'high' },
+  { time: '2025-02-14 03:12:58', source: 'AI: Windsurf', event: 'USER', detail: 'workspace: C:\\Prod\\finance-api', severity: 'medium' },
+  { time: '2025-02-14 03:13:12', source: 'AI: Continue', event: 'USER', detail: 'review .env for secrets', severity: 'critical' },
+]
 
 const timelineEvents = [
   { time: '2025-02-14 03:12:41', source: 'Security.evtx', event: '4624', detail: 'Logon Type 10 - RDP', severity: 'high' },
@@ -348,6 +460,32 @@ const filterTags = [
   { label: 'Bookmarked', color: '#FFB020' },
 ]
 
+const aiFilterTags = [
+  { label: 'AI Apps: 9 sources merged', color: '#E8613A' },
+  { label: 'Tag: Secret Hunt', color: '#FF3B3B' },
+  { label: 'Workspace: finance-api', color: '#9B59B6' },
+]
+
+const displayedEvents = computed(() => tourStep.value === 4 ? aiTimelineEvents : timelineEvents)
+const displayedFilterTags = computed(() => tourStep.value === 4 ? aiFilterTags : filterTags)
+const displayedRowCount = computed(() => displayedEvents.value.length)
+
+watch(tourStep, (step) => {
+  visibleRows.value = step === 4 ? aiTimelineEvents.length : timelineEvents.length
+})
+
+const aiApps = [
+  { label: 'Claude', abbr: 'CL', color: '#D4A574', x: 42, y: 28 },
+  { label: 'Codex', abbr: 'CX', color: '#10A37F', x: 42, y: 112 },
+  { label: 'Grok', abbr: 'GK', color: '#F5F5F5', x: 190, y: 16 },
+  { label: 'Cursor', abbr: 'CU', color: '#6BA3E8', x: 108, y: 18 },
+  { label: 'Copilot', abbr: 'CP', color: '#4A90D9', x: 108, y: 122 },
+  { label: 'ChatGPT', abbr: 'GPT', color: '#74AA9C', x: 272, y: 28 },
+  { label: 'Gemini', abbr: 'GM', color: '#4285F4', x: 338, y: 70 },
+  { label: 'Windsurf', abbr: 'WS', color: '#00C2B2', x: 272, y: 112 },
+  { label: 'Continue', abbr: 'CT', color: '#9B59B6', x: 338, y: 122 },
+]
+
 const prefersReducedMotion = typeof window !== 'undefined'
   && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -363,6 +501,7 @@ onMounted(() => {
     histogramAnim.value = true
     showTree.value = true
     showNetwork.value = true
+    showAiApps.value = true
     visibleRows.value = timelineEvents.length
     // Still start tour (cycles content without transitions)
     tourActive.value = true
@@ -374,6 +513,7 @@ onMounted(() => {
   timers.push(setTimeout(() => { histogramAnim.value = true }, 300))
   timers.push(setTimeout(() => { showTree.value = true }, 600))
   timers.push(setTimeout(() => { showNetwork.value = true }, 900))
+  timers.push(setTimeout(() => { showAiApps.value = true }, 1050))
 
   timelineEvents.forEach((_, i) => {
     timers.push(setTimeout(() => { visibleRows.value = i + 1 }, 400 + i * 120))
@@ -514,7 +654,7 @@ onUnmounted(() => {
 /* Main content */
 .main-content {
   display: flex;
-  min-height: 380px;
+  min-height: 420px;
 }
 
 /* Timeline table */
@@ -557,6 +697,8 @@ onUnmounted(() => {
 .cell-source { font-size: 10px; color: #888; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .source-sysmon { color: #6BA3E8; }
 .source-hayabusa { color: #E8613A; }
+.source-ai { color: #F0845A; }
+.row-ai { background: #E8613A06; }
 .cell-id { font-size: 10px; color: #888; line-height: 1.2; }
 .cell-detail { display: flex; align-items: center; }
 .cell-detail span:last-child { font-size: 11px; color: #CCC; line-height: 1.2; }
@@ -591,8 +733,9 @@ onUnmounted(() => {
   padding: 16px !important;
   transition: all 0.5s ease;
 }
-.process-tree { border-bottom: 1px solid #222; }
-.lateral-panel { transition-delay: 0.2s; }
+.process-tree { border-bottom: 1px solid #222; flex: 1.1; }
+.ai-apps-panel { border-bottom: 1px solid #222; flex: 0 0 148px; }
+.lateral-panel { transition-delay: 0.2s; flex: 1; }
 
 .panel-header {
   display: flex;
@@ -628,8 +771,10 @@ onUnmounted(() => {
   line-height: 1;
 }
 
-/* Network graph */
-.network-svg { width: 100%; }
+/* Network + AI Apps graphs */
+.network-svg,
+.ai-apps-svg { width: 100%; }
+.status-ai { color: #F0845A; }
 
 /* Filter tags */
 .filter-tags {
@@ -668,7 +813,8 @@ onUnmounted(() => {
 .hero-graphic.tour-active .stats-bar,
 .hero-graphic.tour-active .histogram-section,
 .hero-graphic.tour-active .filter-tags,
-.hero-graphic.tour-active .timeline-table {
+.hero-graphic.tour-active .timeline-table,
+.hero-graphic.tour-active .ai-apps-panel {
   opacity: 0.2;
   transition: opacity 0.5s ease;
 }

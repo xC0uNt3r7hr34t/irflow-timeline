@@ -3539,7 +3539,7 @@ export default function App() {
         icon: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><rect x="10" y="11" width="4" height="4" rx="1"/><path d="M10.5 11V9.5a1.5 1.5 0 0 1 3 0V11"/></> },
       { title: "USN Journal", desc: "Renames, deletions, exfil staging & self-deletion from the $J journal", color: th.accent, capability: "usn", chip: "$J / USN", outcome: "Open → journal triage", onClick: () => launchCapabilityFromHome("usn"),
         icon: <><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></> },
-      { title: "Open & Explore", desc: "Just browse a large CSV / TSV / XLSX in a fast grid — filter, search & sort. No analyzer needed.", color: th.accent, chip: "Any file", outcome: "Open any file →", onClick: () => runOpenFileDialog(),
+      { title: "Open & Explore", desc: "Browse a large CSV / TSV / XLSX / SQLite DB in a fast grid — filter, search & sort. No analyzer needed.", color: th.accent, chip: "Any file", outcome: "Open any file →", onClick: () => runOpenFileDialog(),
         icon: <><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></> },
     ];
     return (
@@ -3670,7 +3670,7 @@ export default function App() {
           <div style={{ position: "relative", zIndex: 1, flex: 1, overflowY: "auto", padding: "52px 52px 40px" }}>
             <div style={{ WebkitAppRegion: "no-drag", maxWidth: 980 }}>
               <h1 style={{ fontSize: 27, fontWeight: 700, color: th.text, margin: 0, fontFamily: "-apple-system, 'SF Pro Display', sans-serif", letterSpacing: "-0.015em" }}>Start an investigation</h1>
-              <p style={{ fontSize: 13, color: th.textDim, margin: "9px 0 0", fontFamily: "-apple-system, sans-serif", maxWidth: 620, lineHeight: 1.55 }}>Drop a timeline anywhere in this window, or launch a capability below. SQLite-backed · built for 30–50GB+ files · CSV / TSV / XLSX / EVTX / Plaso / $MFT / $J.</p>
+              <p style={{ fontSize: 13, color: th.textDim, margin: "9px 0 0", fontFamily: "-apple-system, sans-serif", maxWidth: 620, lineHeight: 1.55 }}>Drop a timeline anywhere in this window, or launch a capability below. SQLite-backed · built for 30–50GB+ files · CSV / TSV / XLSX / EVTX / Plaso / SQLite / $MFT / $J.</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 14, marginTop: 26 }}>
                 {homeTiles.map((t, i) => (
                   <button key={i} onClick={t.onClick}
@@ -3701,7 +3701,7 @@ export default function App() {
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, padding: "36px 60px", border: `2px dashed ${th.borderAccent}`, borderRadius: 16, background: th.selection }}>
               <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={th.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               <div style={{ color: th.accent, fontSize: 18, fontWeight: 700, fontFamily: "-apple-system, sans-serif" }}>Drop files to import</div>
-              <div style={{ color: th.textDim, fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>CSV · TSV · XLSX · EVTX · Plaso · $MFT · $J</div>
+              <div style={{ color: th.textDim, fontSize: 12, fontFamily: "-apple-system, sans-serif" }}>CSV · TSV · XLSX · EVTX · Plaso · SQLite · $MFT · $J</div>
             </div>
           </div>
         )}
@@ -3854,7 +3854,7 @@ export default function App() {
           <div style={{ padding: "40px 60px", border: `3px dashed ${th.accent}`, borderRadius: 14, background: `${th.bg}DD`, textAlign: "center" }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>+</div>
             <div style={{ color: th.accent, fontSize: 16, fontWeight: 600, fontFamily: "-apple-system, sans-serif" }}>Drop files to import</div>
-            <div style={{ color: th.textMuted, fontSize: 11, marginTop: 4, fontFamily: "-apple-system, sans-serif" }}>CSV · TSV · XLSX · EVTX · Plaso · Raw $MFT · $J</div>
+            <div style={{ color: th.textMuted, fontSize: 11, marginTop: 4, fontFamily: "-apple-system, sans-serif" }}>CSV · TSV · XLSX · EVTX · Plaso · SQLite · Raw $MFT · $J</div>
             <div style={{ color: th.textMuted, fontSize: 10, marginTop: 2, fontFamily: "-apple-system, sans-serif", opacity: 0.7 }}>Extensionless files auto-detected by content</div>
           </div>
         </div>
@@ -4189,7 +4189,7 @@ export default function App() {
                 {APP_DESCRIPTION}
               </p>
               <p style={{ margin: "0 0 8px", fontSize: 12, color: th.text, lineHeight: 1.6, fontFamily: "-apple-system, sans-serif" }}>
-                Ingest CSV, TSV, XLSX, Plaso, $MFT, USN Journal, and EVTX (chunked, to ~4 GiB). Collect AI prompts, responses, tool calls, and shell output — plus ChatGPT Computer History: interaction events, activity summaries, and consolidated memory.
+                Ingest CSV, TSV, XLSX, Plaso, generic SQLite databases (.sqlite / .db), $MFT, USN Journal, and EVTX (chunked, to ~4 GiB). Collect AI prompts, responses, tool calls, and shell output — plus ChatGPT Computer History: interaction events, activity summaries, and consolidated memory.
               </p>
               <p style={{ margin: 0, fontSize: 12, color: th.text, lineHeight: 1.6, fontFamily: "-apple-system, sans-serif" }}>
                 Investigate with Sigma and Hayabusa, process trees, lateral movement, persistence, ransomware and NTFS analytics, secret hunting, IOC and VirusTotal, RDP bitmap cache, tags, and reports. Computer History adds fidelity tiers, credential-entry timing, deletion recovery, and host attribution.

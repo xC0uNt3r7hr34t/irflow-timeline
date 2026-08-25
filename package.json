@@ -1,7 +1,7 @@
 {
   "name": "irflow-timeline",
   "version": "1.0.12",
-  "description": "IRFlow Timeline — High-performance DFIR timeline viewer for Windows with AI Artifacts, Sigma detection, and native EVTX, MFT, USN Journal, and SQLite support.",
+  "description": "IRFlow Timeline — High-performance DFIR timeline viewer for Windows with AI Artifacts, Sigma detection, and native EVTX, MFT, USN Journal, Plaso, and generic SQLite database import.",
   "main": "electron/main.js",
   "author": "DFIR Community",
   "license": "Apache-2.0",

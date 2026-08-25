@@ -500,38 +500,6 @@ class TagStoreMethods {
    * Bulk Actions modal, and any caller that forgets to pass its scope) silently
    * tags every row in the file.
    */
-  bulkRemoveTagFiltered(tabId, tag, options = {}) {
-    const meta = this.databases.get(tabId);
-    if (!meta || !tag) return { removed: 0 };
-
-    try {
-      const db = meta.db;
-      const params = [tag];
-      const whereConditions = [];
-      this._applyStandardFilters(options, meta, whereConditions, params);
-
-      if (whereConditions.length === 0) {
-        const RECOGNIZED = new Set(["columnFilters", "checkboxFilters", "bookmarkedOnly", "tagFilter", "dateRangeFilters", "advancedFilters", "searchTerm", "searchMode", "searchCondition", "rowIdFilter", "excludedRowIds"]);
-        const unknown = Object.keys(options || {}).filter((k) => !RECOGNIZED.has(k));
-        if (unknown.length > 0) {
-          return { removed: 0, error: `Refused to remove tag: unrecognized filter option(s) [${unknown.join(", ")}] matched no rows (would have removed the tag from the entire tab).` };
-        }
-      }
-
-      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
-      const result = db.prepare(`
-        DELETE FROM tags
-        WHERE tag = ?
-          AND rowid IN (SELECT data.rowid FROM data ${whereClause})
-      `).run(...params);
-      this._invalidateCountCache(tabId);
-      return { removed: result.changes };
-    } catch (e) {
-      dbg("DB", `bulkRemoveTagFiltered error`, { tabId, error: e.message });
-      return { removed: 0, error: e.message };
-    }
-  }
-
   bulkTagFiltered(tabId, tag, options = {}) {
     const meta = this.databases.get(tabId);
     if (!meta) return { tagged: 0, error: "Unknown tab" };

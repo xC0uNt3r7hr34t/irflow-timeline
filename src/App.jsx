@@ -1621,6 +1621,10 @@ export default function App() {
     // Load saved filter presets
     tle.loadFilterPresets().then((p) => setFilterPresets(p || [])).catch(() => {});
 
+    // Every listener above is now attached, so the main process can release the work it
+    // buffered during startup (a .tle restore or a file opened by double-click).
+    tle.rendererReady?.();
+
     return () => {
       for (const unsub of unsubs.splice(0)) {
         try { unsub(); } catch {}

@@ -190,15 +190,44 @@ function _cleanupDbFiles(dbPath) {
 }
 
 let _pendingSessionRestore = null;
+let _pendingStartupImport = null;
+// A live webContents is not the same as a renderer that can receive events: listeners are
+// registered by a React effect well after the window object exists. Anything pushed before
+// then is delivered to no one and silently lost, which is how a .tle or a file opened at
+// launch used to leave the app sitting on the home screen. The renderer announces itself
+// once its listeners are attached; until then, startup work waits here.
+let _rendererReady = false;
 
 function deliverSessionRestore(session) {
-  if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
+  if (_rendererReady && mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
     safeSend("restore-session", session);
     return true;
   }
   _pendingSessionRestore = session;
   return false;
 }
+
+function flushPendingStartupWork() {
+  if (_pendingSessionRestore) {
+    const session = _pendingSessionRestore;
+    _pendingSessionRestore = null;
+    dbg("SESSION", "Delivering buffered session restore after renderer ready");
+    deliverSessionRestore(session);
+    return;
+  }
+  if (_pendingStartupImport) {
+    const filePath = _pendingStartupImport;
+    _pendingStartupImport = null;
+    dbg("QUEUE", "Enqueuing buffered startup import after renderer ready", { filePath });
+    enqueueImport(filePath);
+  }
+}
+
+safeHandle("renderer-ready", () => {
+  _rendererReady = true;
+  flushPendingStartupWork();
+  return true;
+});
 
 function enqueueSessionRestore(filePath) {
   const session = loadSessionFromPath(filePath);
@@ -546,6 +575,7 @@ function createWindow() {
     openExternalSafe(url);
   });
 
+  _rendererReady = false;
   if (isDev) {
     mainWindow.loadURL("http://localhost:5173");
   } else {
@@ -553,6 +583,9 @@ function createWindow() {
   }
 
   const wc = mainWindow.webContents;
+  // A reload tears down the renderer's listeners; re-arm the gate so anything queued
+  // mid-reload waits for the fresh mount instead of being sent into a dead tree.
+  wc.on("did-start-loading", () => { _rendererReady = false; });
   wc.on("render-process-gone", (_event, details) => {
     dbg("CRASH", "Renderer process gone", { reason: details?.reason, exitCode: details?.exitCode });
     if (isQuitting && ["clean-exit", "killed"].includes(details?.reason)) return;
@@ -570,18 +603,18 @@ function createWindow() {
     mainWindow.show();
     fatalRecovery.markStableStartup();
 
-    if (_pendingSessionRestore) {
-      deliverSessionRestore(_pendingSessionRestore);
-      _pendingSessionRestore = null;
-    } else if (app.pendingFilePath) {
-      enqueueImport(app.pendingFilePath);
-      app.pendingFilePath = null;
-    } else if (process.platform === "win32") {
-      const fileArg = _extractFileArgFromArgv(process.argv);
-      if (fileArg && fs.existsSync(fileArg)) {
-        enqueueImport(fileArg);
+    // Only stage the work here — flushPendingStartupWork() releases it once the renderer
+    // reports its IPC listeners are attached, so the resulting modal/progress is seen.
+    if (!_pendingSessionRestore) {
+      if (app.pendingFilePath) {
+        _pendingStartupImport = app.pendingFilePath;
+        app.pendingFilePath = null;
+      } else if (process.platform === "win32") {
+        const fileArg = _extractFileArgFromArgv(process.argv);
+        if (fileArg && fs.existsSync(fileArg)) _pendingStartupImport = fileArg;
       }
     }
+    if (_rendererReady) flushPendingStartupWork();
     updateController.scheduleStartupCheck();
   });
 
@@ -591,7 +624,7 @@ function createWindow() {
     mainWindow.hide();
   });
 
-  mainWindow.on("closed", () => { mainWindow = null; });
+  mainWindow.on("closed", () => { mainWindow = null; _rendererReady = false; });
 
   buildMenu();
 }

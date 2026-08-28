@@ -3499,6 +3499,22 @@ export default function App() {
     return ai % 2 === 0 ? th.rowEven : th.rowOdd;
   }, [th]);
 
+  // Overlays the main process can trigger before any tab exists. The sheet/table
+  // pickers arrive on their own IPC channels without an import-start, so nothing is
+  // added to `tabs` while they wait for an answer — rendering them only in the main
+  // view left a workbook or multi-table database silently parked on the home screen
+  // until an unrelated import created a tab. Toasts and confirms are grouped here for
+  // the same reason: import and session-restore failures raised from an empty
+  // workspace had nowhere to render. Each uses fixed positioning with its own
+  // z-index, so this single mount point is valid in both render paths.
+  const globalOverlays = (
+    <>
+      {modal?.type === "sheets" && <SheetModal th={th} ms={ms} tle={tle} />}
+      {modal?.type === "tables" && <TableModal th={th} ms={ms} tle={tle} />}
+      <ConfirmDialog />
+      <ToastContainer />
+    </>
+  );
 
   // ── Empty state ──────────────────────────────────────────────────
   if (tabs.length === 0) {
@@ -3715,6 +3731,7 @@ export default function App() {
           {modal?.type === "aiHistoryScope" && <AiHistoryScopeModal />}
           {modal?.type === "aiSecrets" && <AiSecretsModal th={th} />}
         </Suspense>
+        {globalOverlays}
 	      </div>
     );
   }
@@ -4211,8 +4228,6 @@ export default function App() {
           </div>
         </Overlay>
       )}
-      {modal?.type === "sheets" && <SheetModal th={th} ms={ms} tle={tle} />}
-      {modal?.type === "tables" && <TableModal th={th} ms={ms} tle={tle} />}
       {/* Manage Tags — backed by live SQLite tag counts (see TagManagerModal). */}
       {modal?.type === "tags" && ct && (
         <Suspense fallback={<ModalChunkFallback th={th} />}>
@@ -4787,11 +4802,8 @@ export default function App() {
       {/* Process Analyzer (provider + modal) */}
       <ProcessAnalyzerRoot activeFilters={activeFilters} />
 
-      {/* Themed confirm dialog (replaces window.confirm) */}
-      <ConfirmDialog />
-
-      {/* Themed toast notifications (replaces alert() and inline message flashes) */}
-      <ToastContainer />
+      {/* Sheet/table pickers, themed confirm dialog, and toast notifications */}
+      {globalOverlays}
 
       <Suspense fallback={<ModalChunkFallback th={th} />}>
         {/* Lateral Movement Modal */}

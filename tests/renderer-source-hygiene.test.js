@@ -100,3 +100,39 @@ test("a modal type is rendered either inline or as a component, never both", () 
   const both = [...inline].filter((type) => component.has(type)).sort();
   assert.deepEqual(both, [], `these modals render twice — drop the stale inline copy: ${both.join(", ")}`);
 });
+
+/**
+ * App.jsx returns early for the empty workspace, so it has two render paths. The sheet and
+ * table pickers are opened by main-process IPC that adds nothing to `tabs` while it waits
+ * for an answer, and import/session failures raise toasts from the same state — mounting
+ * any of them only in the main view means opening a multi-sheet workbook, a multi-table
+ * database, or a session from the home screen does nothing visible, and the import stays
+ * parked until an unrelated file creates a tab and drags the pending modal on screen.
+ */
+test("IPC-driven overlays mount in the empty state as well as the main view", () => {
+  const app = fs.readFileSync(APP_JSX, "utf8");
+
+  const overlayDef = app.indexOf("const globalOverlays = (");
+  const emptyState = app.indexOf("if (tabs.length === 0) {");
+  const mainRender = app.indexOf("// ── Main render");
+
+  assert.ok(overlayDef !== -1, "globalOverlays is gone — the shared overlay mount was removed");
+  assert.ok(emptyState !== -1, "empty-state guard not found");
+  assert.ok(mainRender !== -1, "main render marker not found");
+  assert.ok(
+    overlayDef < emptyState,
+    "globalOverlays must be defined before the empty-state early return so both paths can mount it",
+  );
+
+  const emptyStateBranch = app.slice(emptyState, mainRender);
+  const mainRenderBranch = app.slice(mainRender);
+  assert.match(emptyStateBranch, /\{globalOverlays\}/, "empty state does not mount globalOverlays");
+  assert.match(mainRenderBranch, /\{globalOverlays\}/, "main render does not mount globalOverlays");
+
+  // Each overlay belongs to the shared mount only; a second copy in one branch would put it
+  // back on a single render path (and double-mount it on the other).
+  for (const overlay of ["SheetModal", "TableModal", "ConfirmDialog", "ToastContainer"]) {
+    const mounts = [...app.matchAll(new RegExp(`<${overlay}[\\s/>]`, "g"))].length;
+    assert.equal(mounts, 1, `${overlay} should be mounted once, inside globalOverlays (found ${mounts})`);
+  }
+});

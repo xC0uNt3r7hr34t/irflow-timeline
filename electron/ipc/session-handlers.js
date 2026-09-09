@@ -533,10 +533,11 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
       title: "Save Session",
       defaultPath: defaultSessionSavePath(),
       filters: [{ name: "TLE Session", extensions: ["tle"] }],
-      // Existing .tle files are selectable and get replaced. Windows and macOS prompt
-      // before overwriting on their own; showOverwriteConfirmation adds the same prompt
-      // on Linux. createDirectory lets a new case folder be made from the dialog.
-      properties: ["showOverwriteConfirmation", "createDirectory"],
+      // Existing .tle files are selectable and get replaced either way. Windows prompts
+      // before overwriting on its own and documents neither of these properties, so it is
+      // sent nothing extra; showOverwriteConfirmation is Linux-only and createDirectory
+      // is macOS-only.
+      ...(process.platform === "win32" ? {} : { properties: ["showOverwriteConfirmation", "createDirectory"] }),
     });
     if (result.canceled || !result.filePath) return { canceled: true };
 
@@ -548,9 +549,14 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
     try {
       const written = await writeSessionAtomic(target, sessionData, { pretty: true });
       rememberLastSessionPath(written.path);
-      // flushed=false means the destination refused fsync (common on removable media and
-      // network shares). The file is written; only power-loss durability is reduced.
-      dbg("SESSION", "Session saved", { path: written.path, bytes: written.bytes, replaced, flushed: written.flushed });
+      // flushed=false means the destination refused fsync (common on removable media,
+      // mounted images and network shares); the file is written, only power-loss
+      // durability is reduced. strategy="in-place" means it also refused the
+      // temp-and-rename write. Both are recorded to make an odd destination diagnosable.
+      dbg("SESSION", "Session saved", {
+        path: written.path, bytes: written.bytes, replaced,
+        flushed: written.flushed, strategy: written.strategy,
+      });
       return { path: written.path, bytes: written.bytes, tabCount: sessionData.tabs.length, replaced };
     } catch (err) {
       dbg("SESSION", "Session save failed", { path: target, code: err?.code, message: err?.message });

@@ -216,14 +216,19 @@ test("save-session replaces an existing file that was picked in the dialog", asy
   assert.deepEqual(fs.readdirSync(dir), ["case.tle"]);
 });
 
-test("save-session asks the dialog to confirm before overwriting", async () => {
-  const dir = tmpdir("tle-save-confirm-");
+test("save-session asks for overwrite confirmation only where it is documented", async () => {
   const { channels, calls } = loadHandlers({ saveResult: { canceled: true } });
 
   await channels["save-session"](null, { sessionData: sessionPayload() });
 
-  // Windows and macOS prompt on their own; Linux only does when asked.
-  assert.ok(calls.showSaveDialog[0].properties.includes("showOverwriteConfirmation"));
+  const { properties } = calls.showSaveDialog[0];
+  if (process.platform === "win32") {
+    // Windows prompts natively and documents neither property; passing options a platform
+    // does not recognise to a native dialog is not worth the risk.
+    assert.equal(properties, undefined);
+  } else {
+    assert.ok(properties.includes("showOverwriteConfirmation"));
+  }
 });
 
 test("save-session defaults to the file it last wrote, so re-saving overwrites it", async () => {

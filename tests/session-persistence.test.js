@@ -139,13 +139,38 @@ test("a session save survives a transient lock on the new file", async (t) => {
   assert.deepEqual(JSON.parse(fs.readFileSync(target, "utf8")), payload);
 });
 
-test("a rename that never succeeds is reported, not swallowed", async (t) => {
+test("a destination that refuses the temp-and-rename dance still gets written", async (t) => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-session-norename-"));
+  t.after(() => { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* ignore */ } });
+  const target = path.join(tmp, "case.tle");
+  const payload = session("2026-09-09T00:00:00.000Z", "On A Mounted Image");
+
+  // Mounted images and volumes behind a filter driver can refuse the rename outright.
+  // Atomicity is a technique, not the goal — the save must still land.
+  const restore = patchFsp({
+    rename: () => async () => { throw Object.assign(new Error("EPERM: operation not permitted, rename"), { code: "EPERM" }); },
+  });
+  let result;
+  try {
+    result = await writeSessionAtomic(target, payload, { pretty: true });
+  } finally { restore(); }
+
+  assert.equal(result.strategy, "in-place");
+  assert.deepEqual(JSON.parse(fs.readFileSync(target, "utf8")), payload);
+  assert.deepEqual(fs.readdirSync(tmp), ["case.tle"], "no temp file should be left behind");
+});
+
+test("a destination that refuses both write strategies reports the original failure", async (t) => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-session-stuck-"));
   t.after(() => { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* ignore */ } });
   const target = path.join(tmp, "case.tle");
 
   const restore = patchFsp({
     rename: () => async () => { throw Object.assign(new Error("EBUSY: resource busy"), { code: "EBUSY" }); },
+    open: (realOpen) => async (p, flags, ...rest) => {
+      if (flags === "w") throw Object.assign(new Error("EACCES: permission denied, open"), { code: "EACCES" });
+      return realOpen(p, flags, ...rest);
+    },
   });
   try {
     await assert.rejects(
@@ -158,17 +183,24 @@ test("a rename that never succeeds is reported, not swallowed", async (t) => {
   assert.deepEqual(fs.readdirSync(tmp), [], "the temp file must not be left behind");
 });
 
-test("a filesystem that reports a rename without producing the file is caught", async (t) => {
+test("a filesystem that reports a write without producing the file is caught", async (t) => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-session-phantom-"));
   t.after(() => { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* ignore */ } });
   const target = path.join(tmp, "case.tle");
 
-  // "Saved" must never be returned for a file that is not on disk.
-  const restore = patchFsp({ rename: () => async () => {} });
+  // "Saved" must never be returned for a file that is not on disk. Both the rename and
+  // the in-place fallback are made to claim success without writing anything.
+  const restore = patchFsp({
+    rename: () => async () => {},
+    open: (realOpen) => async (p, flags, ...rest) => {
+      if (flags === "w") return { writeFile: async () => {}, sync: async () => {}, close: async () => {} };
+      return realOpen(p, flags, ...rest);
+    },
+  });
   try {
     await assert.rejects(
       writeSessionAtomic(target, session("2026-09-09T00:00:00.000Z"), { pretty: true }),
-      /was not created/,
+      /could not be read back/,
     );
   } finally { restore(); }
 });
@@ -187,9 +219,34 @@ test("a truncated write is reported rather than passed off as a saved session", 
   try {
     await assert.rejects(
       writeSessionAtomic(target, session("2026-09-09T00:00:00.000Z"), { pretty: true }),
-      /did not complete/,
+      /could not be read back/,
     );
   } finally { restore(); }
+});
+
+test("a stale size reported straight after the write is not mistaken for a failure", async (t) => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-session-stale-"));
+  t.after(() => { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* ignore */ } });
+  const target = path.join(tmp, "case.tle");
+  const payload = session("2026-09-09T00:00:00.000Z", "Stale Metadata");
+
+  // A volume that refused the flush can still report stale metadata for the new file.
+  // Verification reads the content back precisely so that cannot fail a good save.
+  const restore = patchFsp({
+    stat: () => async () => ({ size: 0 }),
+    open: (realOpen) => async (...args) => {
+      const handle = await realOpen(...args);
+      handle.sync = async () => { throw Object.assign(new Error("EINVAL"), { code: "EINVAL" }); };
+      return handle;
+    },
+  });
+  let result;
+  try {
+    result = await writeSessionAtomic(target, payload, { pretty: true });
+  } finally { restore(); }
+
+  assert.equal(result.flushed, false);
+  assert.deepEqual(JSON.parse(fs.readFileSync(target, "utf8")), payload);
 });
 
 test("session recovery reports corruption when neither snapshot is valid", async (t) => {

@@ -96,16 +96,14 @@ async function _renameWithRetry(from, to) {
   throw lastErr;
 }
 
-async function writeSessionAtomic(filePath, session, { backupPath = null, pretty = false } = {}) {
-  assertValidSessionPayload(session);
-  const json = JSON.stringify(session, null, pretty ? 2 : 0);
-  const dirPath = path.dirname(filePath);
+/**
+ * Write through a temp file and rename it into place, so a reader never sees a half
+ * written session. Rotates the previous copy to `backupPath` first when one is asked for.
+ */
+async function _writeViaTempAndRename(filePath, json, backupPath) {
   const tempPath = _tempPathFor(filePath);
   let handle;
   let primaryMovedToBackup = false;
-
-  const expectedBytes = Buffer.byteLength(json, "utf8");
-  await fsp.mkdir(dirPath, { recursive: true });
   try {
     handle = await fsp.open(tempPath, "wx", 0o600);
     await handle.writeFile(json, "utf8");
@@ -127,27 +125,75 @@ async function writeSessionAtomic(filePath, session, { backupPath = null, pretty
       }
       throw err;
     }
-
-    await _syncDirectory(dirPath);
-
-    // Confirm the bytes are actually there. A filesystem that reported a successful
-    // rename without producing a readable file would otherwise be indistinguishable from
-    // a real save, which is the one outcome this function must never return.
-    let stat;
-    try {
-      stat = await fsp.stat(filePath);
-    } catch (err) {
-      throw new Error(`The session file was not created at ${filePath} (${err?.code || err?.message || "unknown error"}).`);
-    }
-    if (stat.size !== expectedBytes) {
-      throw new Error(`The session file at ${filePath} is ${stat.size} bytes but should be ${expectedBytes} — the write did not complete.`);
-    }
-
-    return { path: filePath, bytes: expectedBytes, flushed };
+    return flushed;
   } finally {
     try { await handle?.close(); } catch {}
     try { await fsp.rm(tempPath, { force: true }); } catch {}
   }
+}
+
+/** Last resort: write the destination in place. Not crash-atomic, but it is a saved file. */
+async function _writeInPlace(filePath, json) {
+  let handle;
+  try {
+    handle = await fsp.open(filePath, "w", 0o600);
+    await handle.writeFile(json, "utf8");
+    return await _bestEffortSync(handle);
+  } finally {
+    try { await handle?.close(); } catch {}
+  }
+}
+
+/**
+ * Prove the session is on disk and usable by reading it back.
+ *
+ * Checking the size reported by stat() is not good enough: fsync is best-effort, and on a
+ * volume that refused the flush the metadata can still be stale straight after the
+ * rename, so a perfectly good save looks truncated. Reading the file goes through the
+ * same cache the write went into, and parsing it is a stronger guarantee than a byte
+ * count — it also catches a partial write or a filesystem that reported a rename without
+ * producing a usable file.
+ */
+async function _verifyWritten(filePath) {
+  const raw = await fsp.readFile(filePath, "utf8");
+  assertValidSessionPayload(JSON.parse(raw));
+}
+
+async function writeSessionAtomic(filePath, session, { backupPath = null, pretty = false } = {}) {
+  assertValidSessionPayload(session);
+  const json = JSON.stringify(session, null, pretty ? 2 : 0);
+  const expectedBytes = Buffer.byteLength(json, "utf8");
+  const dirPath = path.dirname(filePath);
+
+  await fsp.mkdir(dirPath, { recursive: true });
+
+  let flushed = false;
+  let strategy = "atomic";
+  try {
+    flushed = await _writeViaTempAndRename(filePath, json, backupPath);
+  } catch (atomicErr) {
+    // Creating a sibling temp file and renaming over the target is refused on some
+    // destinations — mounted images, restrictive mounts, volumes behind a filter driver.
+    // Giving up there would lose the save over a durability technique, so fall back to
+    // writing the file directly and report the original, more specific error only if
+    // that fails too.
+    try {
+      flushed = await _writeInPlace(filePath, json);
+      strategy = "in-place";
+    } catch {
+      throw atomicErr;
+    }
+  }
+
+  await _syncDirectory(dirPath);
+
+  try {
+    await _verifyWritten(filePath);
+  } catch (err) {
+    throw new Error(`The session at ${filePath} could not be read back after writing (${err?.code || err?.message || "unknown error"}).`);
+  }
+
+  return { path: filePath, bytes: expectedBytes, flushed, strategy };
 }
 
 async function readSessionWithBackup(filePath, backupPath = null) {

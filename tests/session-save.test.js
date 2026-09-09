@@ -78,9 +78,10 @@ function sessionPayload(over = {}) {
   };
 }
 
-test("save-session writes the file and reports where it went", async () => {
+test("save-session creates the file for a session that has never been saved", async () => {
   const dir = tmpdir("tle-save-ok-");
   const target = path.join(dir, "case.tle");
+  assert.equal(fs.existsSync(target), false, "precondition: this session has no file yet");
   const { channels } = loadHandlers({ saveResult: { canceled: false, filePath: target }, userData: dir });
 
   const result = await channels["save-session"](null, { sessionData: sessionPayload() });
@@ -94,6 +95,31 @@ test("save-session writes the file and reports where it went", async () => {
   const written = JSON.parse(fs.readFileSync(target, "utf8"));
   assert.equal(written.version, 1);
   assert.deepEqual(written.tabs[0].bookmarkedRowIds, [4, 9]);
+});
+
+test("save-session creates a first save into a directory that does not exist yet", async () => {
+  const dir = tmpdir("tle-save-newdir-");
+  // writeSessionAtomic mkdirs recursively; the temp file and the rename both have to land
+  // in a directory it just created, which only happens on a genuine first save.
+  const target = path.join(dir, "Case 2026-09", "evidence", "case.tle");
+  const { channels } = loadHandlers({ saveResult: { canceled: false, filePath: target }, userData: dir });
+
+  const result = await channels["save-session"](null, { sessionData: sessionPayload() });
+
+  assert.equal(result.error, undefined);
+  assert.equal(fs.existsSync(target), true);
+  assert.equal(JSON.parse(fs.readFileSync(target, "utf8")).version, 1);
+});
+
+test("save-session leaves no temp artefact next to a first save", async () => {
+  const dir = tmpdir("tle-save-clean-");
+  const target = path.join(dir, "case.tle");
+  const { channels } = loadHandlers({ saveResult: { canceled: false, filePath: target }, userData: dir });
+
+  await channels["save-session"](null, { sessionData: sessionPayload() });
+
+  // A leftover .tmp beside the session would look like a half-written save to an examiner.
+  assert.deepEqual(fs.readdirSync(dir), ["case.tle"]);
 });
 
 test("save-session appends .tle when the chosen name lacks it", async () => {

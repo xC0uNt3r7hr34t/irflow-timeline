@@ -444,6 +444,8 @@ export default function App() {
   const pendingSessionRestoreRef = useRef(null);
   const autoSaveInFlightRef = useRef(false);
   const autoSaveQueuedRef = useRef(false);
+  // Surfaced in the status bar so the examiner can see crash protection is alive.
+  const [autoSaveState, setAutoSaveState] = useState({ phase: "idle", at: null, tabCount: 0, path: null, error: null });
   // Home-screen capability intent: set when the user clicks an analyzer tile, consumed
   // at import-complete to auto-open that analyzer. A ref (not state) so the import-complete
   // listener always reads the current value without re-registering.
@@ -2163,6 +2165,11 @@ export default function App() {
 
   // ── Auto-save: every 30s, snapshot the in-flight investigation to userData/autosave.tle ──
   // Survives crashes; protects against losing tags/bookmarks/filters during a long forensic run.
+  //
+  // An autosave must never interrupt analysis, but it must not fail invisibly either: a
+  // silently broken autosave means crash protection is off for the rest of the run and the
+  // examiner has no way to know. Outcomes are published to the status bar, and a failure
+  // raises one deduplicated toast rather than one every 30 seconds.
   useEffect(() => {
     if (!tle?.autoSaveSession || tabs.length === 0) return;
     const dataReadyTabs = tabs.filter((t) => t.dataReady);
@@ -2174,10 +2181,28 @@ export default function App() {
         return;
       }
       autoSaveInFlightRef.current = true;
+      if (!disposed) setAutoSaveState((prev) => ({ ...prev, phase: "saving" }));
       try {
         const payload = await buildSessionPayload();
-        if (payload.tabs.length > 0) await tle.autoSaveSession(payload);
-      } catch { /* swallow — autosave failures must never disrupt analysis */ }
+        if (payload.tabs.length > 0) {
+          const r = await tle.autoSaveSession(payload);
+          const failure = r?.error || (r?.__ipcError ? r.message : null) || (r && r.ok === false ? "Auto-save failed" : null);
+          if (failure) throw new Error(failure);
+          if (!disposed) {
+            setAutoSaveState({ phase: "saved", at: Date.now(), tabCount: payload.tabs.length, path: r?.path || null, error: null });
+          }
+        } else if (!disposed) {
+          setAutoSaveState((prev) => ({ ...prev, phase: prev.at ? "saved" : "idle" }));
+        }
+      } catch (err) {
+        const detail = err?.message || String(err);
+        if (!disposed) setAutoSaveState((prev) => ({ ...prev, phase: "failed", error: detail }));
+        toast.warning("Auto-save failed", {
+          detail: `${detail}\n\nYour work is not being snapshotted. Save the session manually (File ▸ Save Session).`,
+          dedupeKey: "autosave-failed",
+          ttl: 10000,
+        });
+      }
       finally {
         autoSaveInFlightRef.current = false;
         const runQueuedSave = autoSaveQueuedRef.current;
@@ -4070,7 +4095,7 @@ export default function App() {
 
       {/* ── StatusBar ─────────────────────────────────────────── */}
       <StatusBar
-        th={th} ct={ct} isGrouped={isGrouped}
+        th={th} ct={ct} isGrouped={isGrouped} autoSaveState={autoSaveState}
         selectionCount={selectionCount}
         copiedMsg={copiedMsg} setCopiedMsg={setCopiedMsg}
         pinnedH={pinnedH} allVisH={allVisH}

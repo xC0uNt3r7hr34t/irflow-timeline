@@ -548,7 +548,9 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
     try {
       const written = await writeSessionAtomic(target, sessionData, { pretty: true });
       rememberLastSessionPath(written.path);
-      dbg("SESSION", "Session saved", { path: written.path, bytes: written.bytes, replaced });
+      // flushed=false means the destination refused fsync (common on removable media and
+      // network shares). The file is written; only power-loss durability is reduced.
+      dbg("SESSION", "Session saved", { path: written.path, bytes: written.bytes, replaced, flushed: written.flushed });
       return { path: written.path, bytes: written.bytes, tabCount: sessionData.tabs.length, replaced };
     } catch (err) {
       dbg("SESSION", "Session save failed", { path: target, code: err?.code, message: err?.message });

@@ -76,6 +76,122 @@ test("session validation rejects malformed recovery data before it is written", 
   assert.throws(() => assertValidSessionPayload({ version: 1 }), /tabs array/);
 });
 
+/**
+ * Patch the shared fs/promises singleton the module under test holds a reference to.
+ * These behaviours belong to the destination filesystem — an attached exFAT drive, an SMB
+ * share, a volume being scanned by antivirus — and cannot be provoked from a temp dir.
+ */
+function patchFsp(overrides) {
+  const originals = {};
+  for (const [name, make] of Object.entries(overrides)) {
+    originals[name] = fsp[name];
+    fsp[name] = make(originals[name]);
+  }
+  return () => { for (const [name, fn] of Object.entries(originals)) fsp[name] = fn; };
+}
+
+test("a session still saves when the destination filesystem refuses fsync", async (t) => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-session-nofsync-"));
+  t.after(() => { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* ignore */ } });
+  const target = path.join(tmp, "case.tle");
+  const payload = session("2026-09-09T00:00:00.000Z", "On A USB Drive");
+
+  // exFAT/SD-card and SMB/NFS targets can reject fsync outright. The bytes are already
+  // written by then, so this must cost durability, not the save.
+  const restore = patchFsp({
+    open: (realOpen) => async (...args) => {
+      const handle = await realOpen(...args);
+      handle.sync = async () => { throw Object.assign(new Error("EINVAL: invalid argument, fsync"), { code: "EINVAL" }); };
+      return handle;
+    },
+  });
+  let result;
+  try {
+    result = await writeSessionAtomic(target, payload, { pretty: true });
+  } finally { restore(); }
+
+  assert.equal(result.flushed, false, "the write should report that it could not flush");
+  assert.equal(result.bytes > 0, true);
+  assert.deepEqual(JSON.parse(fs.readFileSync(target, "utf8")), payload);
+});
+
+test("a session save survives a transient lock on the new file", async (t) => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-session-locked-"));
+  t.after(() => { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* ignore */ } });
+  const target = path.join(tmp, "case.tle");
+  const payload = session("2026-09-09T00:00:00.000Z");
+
+  // Antivirus holding a just-created file is the usual cause on Windows, and it clears.
+  let attempts = 0;
+  const restore = patchFsp({
+    rename: (realRename) => async (from, to) => {
+      if (to === target && ++attempts < 3) {
+        throw Object.assign(new Error("EPERM: operation not permitted, rename"), { code: "EPERM" });
+      }
+      return realRename(from, to);
+    },
+  });
+  try {
+    await writeSessionAtomic(target, payload, { pretty: true });
+  } finally { restore(); }
+
+  assert.equal(attempts, 3, "the rename should have been retried");
+  assert.deepEqual(JSON.parse(fs.readFileSync(target, "utf8")), payload);
+});
+
+test("a rename that never succeeds is reported, not swallowed", async (t) => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-session-stuck-"));
+  t.after(() => { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* ignore */ } });
+  const target = path.join(tmp, "case.tle");
+
+  const restore = patchFsp({
+    rename: () => async () => { throw Object.assign(new Error("EBUSY: resource busy"), { code: "EBUSY" }); },
+  });
+  try {
+    await assert.rejects(
+      writeSessionAtomic(target, session("2026-09-09T00:00:00.000Z"), { pretty: true }),
+      /EBUSY/,
+    );
+  } finally { restore(); }
+
+  assert.equal(fs.existsSync(target), false);
+  assert.deepEqual(fs.readdirSync(tmp), [], "the temp file must not be left behind");
+});
+
+test("a filesystem that reports a rename without producing the file is caught", async (t) => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-session-phantom-"));
+  t.after(() => { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* ignore */ } });
+  const target = path.join(tmp, "case.tle");
+
+  // "Saved" must never be returned for a file that is not on disk.
+  const restore = patchFsp({ rename: () => async () => {} });
+  try {
+    await assert.rejects(
+      writeSessionAtomic(target, session("2026-09-09T00:00:00.000Z"), { pretty: true }),
+      /was not created/,
+    );
+  } finally { restore(); }
+});
+
+test("a truncated write is reported rather than passed off as a saved session", async (t) => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-session-short-"));
+  t.after(() => { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* ignore */ } });
+  const target = path.join(tmp, "case.tle");
+
+  const restore = patchFsp({
+    rename: (realRename) => async (from, to) => {
+      await realRename(from, to);
+      await fsp.truncate(to, 10); // a full volume that accepted only part of the write
+    },
+  });
+  try {
+    await assert.rejects(
+      writeSessionAtomic(target, session("2026-09-09T00:00:00.000Z"), { pretty: true }),
+      /did not complete/,
+    );
+  } finally { restore(); }
+});
+
 test("session recovery reports corruption when neither snapshot is valid", async (t) => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-session-both-corrupt-"));
   t.after(() => { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* ignore */ } });

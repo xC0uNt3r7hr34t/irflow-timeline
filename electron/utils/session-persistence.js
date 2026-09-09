@@ -57,6 +57,45 @@ async function _syncDirectory(dirPath) {
   }
 }
 
+/**
+ * Flush the file, but never fail the write over it.
+ *
+ * fsync is not available everywhere: it is rejected on some removable media (exFAT, SD
+ * cards) and on SMB/NFS shares, which is why saving to an attached drive could fail while
+ * the same save to a local profile folder succeeded. The bytes have already been handed to
+ * the filesystem by this point, so a refused flush costs durability if the machine loses
+ * power — losing the examiner's session instead is far worse.
+ */
+async function _bestEffortSync(handle) {
+  try {
+    await handle.sync();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// A newly created file on Windows is routinely held for a moment by antivirus or the
+// indexer, and removable volumes are scanned more aggressively than local ones. Those
+// locks surface as EPERM/EACCES/EBUSY on the rename and clear on their own.
+const RENAME_RETRY_DELAYS_MS = [0, 25, 75, 200];
+const TRANSIENT_RENAME_CODES = new Set(["EPERM", "EACCES", "EBUSY", "ETXTBSY"]);
+
+async function _renameWithRetry(from, to) {
+  let lastErr;
+  for (const delay of RENAME_RETRY_DELAYS_MS) {
+    if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+    try {
+      await fsp.rename(from, to);
+      return;
+    } catch (err) {
+      lastErr = err;
+      if (!TRANSIENT_RENAME_CODES.has(err?.code)) throw err;
+    }
+  }
+  throw lastErr;
+}
+
 async function writeSessionAtomic(filePath, session, { backupPath = null, pretty = false } = {}) {
   assertValidSessionPayload(session);
   const json = JSON.stringify(session, null, pretty ? 2 : 0);
@@ -65,11 +104,12 @@ async function writeSessionAtomic(filePath, session, { backupPath = null, pretty
   let handle;
   let primaryMovedToBackup = false;
 
+  const expectedBytes = Buffer.byteLength(json, "utf8");
   await fsp.mkdir(dirPath, { recursive: true });
   try {
     handle = await fsp.open(tempPath, "wx", 0o600);
     await handle.writeFile(json, "utf8");
-    await handle.sync();
+    const flushed = await _bestEffortSync(handle);
     await handle.close();
     handle = null;
 
@@ -80,7 +120,7 @@ async function writeSessionAtomic(filePath, session, { backupPath = null, pretty
     }
 
     try {
-      await fsp.rename(tempPath, filePath);
+      await _renameWithRetry(tempPath, filePath);
     } catch (err) {
       if (primaryMovedToBackup && !fs.existsSync(filePath) && fs.existsSync(backupPath)) {
         try { await fsp.rename(backupPath, filePath); } catch {}
@@ -89,7 +129,21 @@ async function writeSessionAtomic(filePath, session, { backupPath = null, pretty
     }
 
     await _syncDirectory(dirPath);
-    return { path: filePath, bytes: Buffer.byteLength(json, "utf8") };
+
+    // Confirm the bytes are actually there. A filesystem that reported a successful
+    // rename without producing a readable file would otherwise be indistinguishable from
+    // a real save, which is the one outcome this function must never return.
+    let stat;
+    try {
+      stat = await fsp.stat(filePath);
+    } catch (err) {
+      throw new Error(`The session file was not created at ${filePath} (${err?.code || err?.message || "unknown error"}).`);
+    }
+    if (stat.size !== expectedBytes) {
+      throw new Error(`The session file at ${filePath} is ${stat.size} bytes but should be ${expectedBytes} — the write did not complete.`);
+    }
+
+    return { path: filePath, bytes: expectedBytes, flushed };
   } finally {
     try { await handle?.close(); } catch {}
     try { await fsp.rm(tempPath, { force: true }); } catch {}

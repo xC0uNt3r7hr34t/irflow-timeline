@@ -35,7 +35,7 @@ export default function QuickHelpModal() {
       bodyPadding="20px 24px"
     >
       <div style={{ fontSize: 13, color: th.text, lineHeight: 1.7 }}>
-        <P>IRFlow Timeline can open CSV, TSV, TXT, LOG, XLSX, XLS, EVTX, Plaso, raw $MFT, and $J ($UsnJrnl) files and display them in a high-performance SQLite-backed grid. Files stream into a temporary SQLite database rather than loading fully into memory, so there is no row limit — tested with 30GB+ files and 150M+ rows.</P>
+        <P>IRFlow Timeline can open CSV, TSV, TXT, LOG, XLSX, XLS, EVTX, Plaso, generic SQLite databases (.sqlite / .db / .sqlite3), raw $MFT, and $J ($UsnJrnl) files and display them in a high-performance SQLite-backed grid. Files stream into a temporary SQLite database rather than loading fully into memory, so there is no row limit — tested with 30GB+ files and 150M+ rows.</P>
 
         <S>Supported Formats</S>
         <Li><b>CSV / TSV / TXT / LOG</b> — Auto-delimiter detection, streaming import. Handles multi-GB files.</Li>
@@ -44,6 +44,7 @@ export default function QuickHelpModal() {
         <Li><b>$MFT</b> — Raw NTFS Master File Table. Full file path reconstruction from parent references, dual SI/FN timestamp extraction, and attribute flag parsing.</Li>
         <Li><b>$J / $UsnJrnl</b> — Raw NTFS USN Change Journal. Change reason mapping (rename, delete, data extend, security change, close), MFT parent correlation, and full path resolution.</Li>
         <Li><b>Plaso</b> — log2timeline/Plaso SQLite output files. All event sources and timestamps preserved.</Li>
+        <Li><b>SQLite / .db</b> — Generic SQLite databases with multi-table picker (non-Plaso). Streams large forensic DBs without loading into memory.</Li>
 
         <S>Search Controls</S>
         {SEARCH_BEHAVIORS.map((behavior) => <Li key={behavior.value}><b>{behavior.label}</b> — {behavior.description}</Li>)}

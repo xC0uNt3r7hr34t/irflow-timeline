@@ -25,6 +25,9 @@ function onIpcNoArgs(channel, cb) {
 }
 
 contextBridge.exposeInMainWorld("tle", {
+  // Announce that the renderer's IPC listeners are attached. The main process holds
+  // startup work (a .tle restore, a file opened by double-click) until this lands.
+  rendererReady: () => ipcRenderer.invoke("renderer-ready"),
   // File operations
   openFileDialog: () => ipcRenderer.invoke("open-file-dialog"),
   openAiSource: (filePath, lineNumber) => ipcRenderer.invoke("open-ai-source", { filePath, lineNumber }),

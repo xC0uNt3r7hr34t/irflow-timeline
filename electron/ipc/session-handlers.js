@@ -18,6 +18,81 @@ const {
 } = require("../utils/session-persistence");
 const { diffTabTitle } = require("../db/diff-tabs");
 
+/** Session files are only recognised by their extension, so never save without it. */
+function withTleExtension(filePath) {
+  return isTleSessionPath(filePath) ? filePath : `${filePath}.tle`;
+}
+
+function sessionStatePath() {
+  try { return path.join(app.getPath("userData"), "session-state.json"); } catch { return null; }
+}
+
+/** The .tle this workspace was last saved to or opened from, if it is still reachable. */
+function loadLastSessionPath() {
+  const statePath = sessionStatePath();
+  if (!statePath) return null;
+  try {
+    const { lastSessionPath } = JSON.parse(fs.readFileSync(statePath, "utf8"));
+    if (typeof lastSessionPath !== "string" || !lastSessionPath) return null;
+    // A case folder that has been moved or unmounted would send the dialog somewhere
+    // that no longer exists, so fall back to the generated default instead.
+    return fs.existsSync(path.dirname(lastSessionPath)) ? lastSessionPath : null;
+  } catch { return null; }
+}
+
+function rememberLastSessionPath(filePath) {
+  const statePath = sessionStatePath();
+  if (!statePath || !filePath) return;
+  try { fs.writeFileSync(statePath, JSON.stringify({ lastSessionPath: filePath }), "utf8"); } catch {
+    /* remembering the path is a convenience — never fail a save over it */
+  }
+}
+
+/**
+ * Absolute default target for the save dialog. Prefer the file this workspace was last
+ * saved to or opened from so Save Session re-saves over it, which is what an examiner
+ * working one case file expects; only fall back to a fresh timestamped name when there is
+ * nothing to overwrite. A bare filename would leave the starting directory up to the
+ * platform, which can land in the install folder for a packaged app.
+ */
+function defaultSessionSavePath() {
+  const remembered = loadLastSessionPath();
+  if (remembered) return remembered;
+  const stamp = new Date().toISOString().replace(/\.\d+Z$/, "").replace(/:/g, "-");
+  const fileName = `irflow-session-${stamp}.tle`;
+  for (const location of ["documents", "home"]) {
+    try {
+      return path.join(app.getPath(location), fileName);
+    } catch { /* not every platform defines every well-known location */ }
+  }
+  return fileName;
+}
+
+/**
+ * Turn a filesystem error into something an examiner can act on. The raw message names
+ * the internal temp file the atomic write was using, which reads like a bug report.
+ */
+function describeWriteFailure(err, target) {
+  const dir = path.dirname(target);
+  switch (err?.code) {
+    case "EACCES":
+    case "EPERM":
+      return `Permission denied writing to ${dir}. Pick a folder you can write to, or reopen IRFlow with the rights to write there.`;
+    case "EROFS":
+      return `${dir} is on a read-only volume.`;
+    case "ENOSPC":
+      return `The volume holding ${dir} is full.`;
+    case "EBUSY":
+    case "ETXTBSY":
+      return `${path.basename(target)} is in use by another program. Close it and save again.`;
+    case "ENAMETOOLONG":
+      return "That file name is too long for this filesystem.";
+    default:
+      return (err?.message || "Failed to write the session file")
+        .replace(/'[^']*\.tmp'/g, `'${target}'`);
+  }
+}
+
 function enqueuePlannedImports(planned, enqueueImport) {
   const scopePending = [];
   let enqueued = 0;
@@ -440,14 +515,53 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
   });
 
   // Session save
+  //
+  // Every outcome is reported back to the renderer. safeHandle turns a throw into a
+  // resolved {__ipcError} value, so a handler that threw here — or returned a bare path
+  // the caller ignored — was indistinguishable from a successful save: the examiner chose
+  // a location, no file appeared, and nothing said why. Validation also runs before the
+  // dialog so an unsaveable session is refused up front instead of after picking a path.
   safeHandle("save-session", async (event, { sessionData }) => {
+    try {
+      assertValidSessionPayload(sessionData);
+    } catch (err) {
+      dbg("SESSION", "Refusing to save an invalid session payload", { message: err?.message });
+      return { error: `This session cannot be saved: ${err?.message || "invalid session payload"}` };
+    }
+
     const result = await dialog.showSaveDialog(_activeWindow(), {
-      defaultPath: "session.tle",
+      title: "Save Session",
+      defaultPath: defaultSessionSavePath(),
       filters: [{ name: "TLE Session", extensions: ["tle"] }],
+      // Existing .tle files are selectable and get replaced either way. Windows prompts
+      // before overwriting on its own and documents neither of these properties, so it is
+      // sent nothing extra; showOverwriteConfirmation is Linux-only and createDirectory
+      // is macOS-only.
+      ...(process.platform === "win32" ? {} : { properties: ["showOverwriteConfirmation", "createDirectory"] }),
     });
-    if (result.canceled) return null;
-    await writeSessionAtomic(result.filePath, sessionData, { pretty: true });
-    return result.filePath;
+    if (result.canceled || !result.filePath) return { canceled: true };
+
+    // Resolve before writing: a relative path would be written against the process
+    // working directory (inside the install folder for a packaged app), which either
+    // fails on a protected location or lands somewhere the examiner will never look.
+    const target = withTleExtension(path.resolve(result.filePath));
+    const replaced = fs.existsSync(target);
+    try {
+      const written = await writeSessionAtomic(target, sessionData, { pretty: true });
+      rememberLastSessionPath(written.path);
+      // flushed=false means the destination refused fsync (common on removable media,
+      // mounted images and network shares); the file is written, only power-loss
+      // durability is reduced. strategy="in-place" means it also refused the
+      // temp-and-rename write. Both are recorded to make an odd destination diagnosable.
+      dbg("SESSION", "Session saved", {
+        path: written.path, bytes: written.bytes, replaced,
+        flushed: written.flushed, strategy: written.strategy,
+      });
+      return { path: written.path, bytes: written.bytes, tabCount: sessionData.tabs.length, replaced };
+    } catch (err) {
+      dbg("SESSION", "Session save failed", { path: target, code: err?.code, message: err?.message });
+      return { error: describeWriteFailure(err, target), path: target };
+    }
   });
 
   // Session load
@@ -459,7 +573,10 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
     if (result.canceled || !result.filePaths.length) return null;
     try {
       const raw = fs.readFileSync(result.filePaths[0], "utf-8");
-      return assertValidSessionPayload(JSON.parse(raw));
+      const session = assertValidSessionPayload(JSON.parse(raw));
+      // Saving after opening a case file should offer to write back to it.
+      rememberLastSessionPath(result.filePaths[0]);
+      return session;
     } catch (e) {
       return { error: e.message };
     }
@@ -471,7 +588,9 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
     }
     try {
       const raw = fs.readFileSync(filePath, "utf-8");
-      return assertValidSessionPayload(JSON.parse(raw));
+      const session = assertValidSessionPayload(JSON.parse(raw));
+      rememberLastSessionPath(filePath);
+      return session;
     } catch (e) {
       return { error: e.message };
     }

@@ -18,6 +18,27 @@ const {
 } = require("../utils/session-persistence");
 const { diffTabTitle } = require("../db/diff-tabs");
 
+/** Session files are only recognised by their extension, so never save without it. */
+function withTleExtension(filePath) {
+  return isTleSessionPath(filePath) ? filePath : `${filePath}.tle`;
+}
+
+/**
+ * Absolute default target for the save dialog. A bare filename leaves the starting
+ * directory up to the platform, and the timestamp keeps successive saves in one case
+ * folder from silently overwriting each other.
+ */
+function defaultSessionSavePath() {
+  const stamp = new Date().toISOString().replace(/\.\d+Z$/, "").replace(/:/g, "-");
+  const fileName = `irflow-session-${stamp}.tle`;
+  for (const location of ["documents", "home"]) {
+    try {
+      return path.join(app.getPath(location), fileName);
+    } catch { /* not every platform defines every well-known location */ }
+  }
+  return fileName;
+}
+
 function enqueuePlannedImports(planned, enqueueImport) {
   const scopePending = [];
   let enqueued = 0;
@@ -440,14 +461,39 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
   });
 
   // Session save
+  //
+  // Every outcome is reported back to the renderer. safeHandle turns a throw into a
+  // resolved {__ipcError} value, so a handler that threw here — or returned a bare path
+  // the caller ignored — was indistinguishable from a successful save: the examiner chose
+  // a location, no file appeared, and nothing said why. Validation also runs before the
+  // dialog so an unsaveable session is refused up front instead of after picking a path.
   safeHandle("save-session", async (event, { sessionData }) => {
+    try {
+      assertValidSessionPayload(sessionData);
+    } catch (err) {
+      dbg("SESSION", "Refusing to save an invalid session payload", { message: err?.message });
+      return { error: `This session cannot be saved: ${err?.message || "invalid session payload"}` };
+    }
+
     const result = await dialog.showSaveDialog(_activeWindow(), {
-      defaultPath: "session.tle",
+      title: "Save Session",
+      defaultPath: defaultSessionSavePath(),
       filters: [{ name: "TLE Session", extensions: ["tle"] }],
     });
-    if (result.canceled) return null;
-    await writeSessionAtomic(result.filePath, sessionData, { pretty: true });
-    return result.filePath;
+    if (result.canceled || !result.filePath) return { canceled: true };
+
+    // Resolve before writing: a relative path would be written against the process
+    // working directory (inside the install folder for a packaged app), which either
+    // fails on a protected location or lands somewhere the examiner will never look.
+    const target = withTleExtension(path.resolve(result.filePath));
+    try {
+      const written = await writeSessionAtomic(target, sessionData, { pretty: true });
+      dbg("SESSION", "Session saved", { path: written.path, bytes: written.bytes });
+      return { path: written.path, bytes: written.bytes, tabCount: sessionData.tabs.length };
+    } catch (err) {
+      dbg("SESSION", "Session save failed", { path: target, message: err?.message });
+      return { error: err?.message || "Failed to write the session file", path: target };
+    }
   });
 
   // Session load

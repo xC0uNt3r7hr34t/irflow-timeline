@@ -113,12 +113,15 @@ test("IPC-driven overlays mount in the empty state as well as the main view", ()
   const app = fs.readFileSync(APP_JSX, "utf8");
 
   const overlayDef = app.indexOf("const globalOverlays = (");
-  const emptyState = app.indexOf("if (tabs.length === 0) {");
+  // Anchor on the section markers, not on `tabs.length === 0` — that condition is a
+  // normal guard clause elsewhere in the component and would match the wrong place.
+  const emptyState = app.indexOf("// ── Empty state");
   const mainRender = app.indexOf("// ── Main render");
 
   assert.ok(overlayDef !== -1, "globalOverlays is gone — the shared overlay mount was removed");
-  assert.ok(emptyState !== -1, "empty-state guard not found");
+  assert.ok(emptyState !== -1, "empty-state marker not found");
   assert.ok(mainRender !== -1, "main render marker not found");
+  assert.ok(emptyState < mainRender, "expected the empty-state branch to precede the main render");
   assert.ok(
     overlayDef < emptyState,
     "globalOverlays must be defined before the empty-state early return so both paths can mount it",

@@ -18,11 +18,6 @@ const {
 } = require("../utils/session-persistence");
 const { diffTabTitle } = require("../db/diff-tabs");
 
-/** Session files are only recognised by their extension, so never save without it. */
-function withTleExtension(filePath) {
-  return isTleSessionPath(filePath) ? filePath : `${filePath}.tle`;
-}
-
 function sessionStatePath() {
   try { return path.join(app.getPath("userData"), "session-state.json"); } catch { return null; }
 }
@@ -48,24 +43,32 @@ function rememberLastSessionPath(filePath) {
   }
 }
 
+/** Directory the save dialog should open in. Always a directory, never a file path. */
+function asDialogDirectory(dirPath) {
+  if (!dirPath) return null;
+  return dirPath.endsWith(path.sep) ? dirPath : dirPath + path.sep;
+}
+
 /**
- * Absolute default target for the save dialog. Prefer the file this workspace was last
- * saved to or opened from so Save Session re-saves over it, which is what an examiner
- * working one case file expects; only fall back to a fresh timestamped name when there is
- * nothing to overwrite. A bare filename would leave the starting directory up to the
- * platform, which can land in the install folder for a packaged app.
+ * Where the save dialog opens. A full file path here is what broke saving onto a VHD or
+ * other drive letter: on Windows, showSaveDialog seeded with an absolute file under
+ * Documents returns a bad path once the examiner changes drives, so the write never lands
+ * on the volume they picked. A directory (trailing separator) opens in a useful place and
+ * still lets them change drives. The last-used case folder wins over Documents.
  */
 function defaultSessionSavePath() {
   const remembered = loadLastSessionPath();
-  if (remembered) return remembered;
-  const stamp = new Date().toISOString().replace(/\.\d+Z$/, "").replace(/:/g, "-");
-  const fileName = `irflow-session-${stamp}.tle`;
+  if (remembered) {
+    const dir = asDialogDirectory(path.dirname(remembered));
+    if (dir) return dir;
+  }
   for (const location of ["documents", "home"]) {
     try {
-      return path.join(app.getPath(location), fileName);
+      const dir = asDialogDirectory(app.getPath(location));
+      if (dir) return dir;
     } catch { /* not every platform defines every well-known location */ }
   }
-  return fileName;
+  return "session.tle";
 }
 
 /**
@@ -533,30 +536,18 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
       title: "Save Session",
       defaultPath: defaultSessionSavePath(),
       filters: [{ name: "TLE Session", extensions: ["tle"] }],
-      // Existing .tle files are selectable and get replaced either way. Windows prompts
-      // before overwriting on its own and documents neither of these properties, so it is
-      // sent nothing extra; showOverwriteConfirmation is Linux-only and createDirectory
-      // is macOS-only.
-      ...(process.platform === "win32" ? {} : { properties: ["showOverwriteConfirmation", "createDirectory"] }),
     });
     if (result.canceled || !result.filePath) return { canceled: true };
 
-    // Resolve before writing: a relative path would be written against the process
-    // working directory (inside the install folder for a packaged app), which either
-    // fails on a protected location or lands somewhere the examiner will never look.
-    const target = withTleExtension(path.resolve(result.filePath));
+    // Write exactly the path the dialog returned. Resolving or rewriting it is what sent
+    // a drive-letter VHD save somewhere else (or nowhere): Windows already returns an
+    // absolute path, and the native dialog is what adds .tle and confirms an overwrite.
+    const target = result.filePath;
     const replaced = fs.existsSync(target);
     try {
       const written = await writeSessionAtomic(target, sessionData, { pretty: true });
       rememberLastSessionPath(written.path);
-      // flushed=false means the destination refused fsync (common on removable media,
-      // mounted images and network shares); the file is written, only power-loss
-      // durability is reduced. strategy="in-place" means it also refused the
-      // temp-and-rename write. Both are recorded to make an odd destination diagnosable.
-      dbg("SESSION", "Session saved", {
-        path: written.path, bytes: written.bytes, replaced,
-        flushed: written.flushed, strategy: written.strategy,
-      });
+      dbg("SESSION", "Session saved", { path: written.path, bytes: written.bytes, replaced });
       return { path: written.path, bytes: written.bytes, tabCount: sessionData.tabs.length, replaced };
     } catch (err) {
       dbg("SESSION", "Session save failed", { path: target, code: err?.code, message: err?.message });

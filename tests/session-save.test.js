@@ -127,17 +127,20 @@ test("save-session leaves no temp artefact next to a first save", async () => {
   assert.deepEqual(fs.readdirSync(dir), ["case.tle"]);
 });
 
-test("save-session appends .tle when the chosen name lacks it", async () => {
-  const dir = tmpdir("tle-save-ext-");
+test("save-session writes the dialog path exactly and does not rewrite it", async () => {
+  const dir = tmpdir("tle-save-exact-");
+  const target = path.join(dir, "case-notes.tle");
   const { channels } = loadHandlers({
-    saveResult: { canceled: false, filePath: path.join(dir, "case-notes") },
+    saveResult: { canceled: false, filePath: target },
   });
 
   const result = await channels["save-session"](null, { sessionData: sessionPayload() });
 
-  // Without the extension the file cannot be reopened — isTleSessionPath gates the loader.
-  assert.equal(result.path, path.join(dir, "case-notes.tle"));
-  assert.equal(fs.existsSync(result.path), true);
+  // The Windows dialog already returns the absolute path the examiner picked, including a
+  // drive-letter VHD. Resolving or appending an extension here is what sent that save
+  // somewhere else.
+  assert.equal(result.path, target);
+  assert.equal(fs.existsSync(target), true);
 });
 
 test("save-session keeps an extension it already has, whatever the case", async () => {
@@ -150,28 +153,20 @@ test("save-session keeps an extension it already has, whatever the case", async 
   assert.equal(result.path, path.join(dir, "CASE.TLE"));
 });
 
-test("save-session resolves a relative path instead of writing beside the executable", async () => {
-  const dir = tmpdir("tle-save-rel-");
-  const { channels } = loadHandlers({ saveResult: { canceled: false, filePath: "case.tle" } });
-
-  const result = await channels["save-session"](null, { sessionData: sessionPayload() });
-
-  assert.equal(result.error, undefined);
-  assert.equal(path.isAbsolute(result.path), true, "a relative dialog result must be resolved");
-  fs.rmSync(result.path, { force: true });
-});
-
-test("save-session offers an absolute, .tle-suffixed default path", async () => {
-  const dir = tmpdir("tle-save-default-");
+test("save-session opens the dialog in a directory, not on a file path", async () => {
   const { channels, calls } = loadHandlers({ saveResult: { canceled: true } });
 
   await channels["save-session"](null, { sessionData: sessionPayload() });
 
-  const [options] = calls.showSaveDialog;
-  assert.equal(path.isAbsolute(options.defaultPath), true);
-  assert.match(options.defaultPath, /\.tle$/);
-  // A colon is not a legal filename character on Windows, so the ISO stamp must be cleaned.
-  assert.equal(path.basename(options.defaultPath).includes(":"), false);
+  const { defaultPath, properties } = calls.showSaveDialog[0];
+  // An absolute *file* as defaultPath is the Windows bug: changing to another drive letter
+  // makes showSaveDialog return a path that is not on that drive. A directory does not.
+  assert.equal(properties, undefined);
+  assert.ok(
+    defaultPath === "session.tle" || defaultPath.endsWith(path.sep),
+    `defaultPath must be a directory, got ${defaultPath}`,
+  );
+  assert.equal(defaultPath.endsWith(".tle"), false);
 });
 
 test("save-session reports cancellation distinctly from failure", async () => {
@@ -216,22 +211,7 @@ test("save-session replaces an existing file that was picked in the dialog", asy
   assert.deepEqual(fs.readdirSync(dir), ["case.tle"]);
 });
 
-test("save-session asks for overwrite confirmation only where it is documented", async () => {
-  const { channels, calls } = loadHandlers({ saveResult: { canceled: true } });
-
-  await channels["save-session"](null, { sessionData: sessionPayload() });
-
-  const { properties } = calls.showSaveDialog[0];
-  if (process.platform === "win32") {
-    // Windows prompts natively and documents neither property; passing options a platform
-    // does not recognise to a native dialog is not worth the risk.
-    assert.equal(properties, undefined);
-  } else {
-    assert.ok(properties.includes("showOverwriteConfirmation"));
-  }
-});
-
-test("save-session defaults to the file it last wrote, so re-saving overwrites it", async () => {
+test("save-session reopens the dialog in the folder last saved to", async () => {
   const dir = tmpdir("tle-save-remember-");
   const userData = tmpdir("tle-save-remember-ud-"); // shared, as one install would be
   const target = path.join(dir, "operation-badger.tle");
@@ -241,7 +221,9 @@ test("save-session defaults to the file it last wrote, so re-saving overwrites i
   const second = loadHandlers({ saveResult: { canceled: true }, userData });
   await second.channels["save-session"](null, { sessionData: sessionPayload() });
 
-  assert.equal(second.calls.showSaveDialog[0].defaultPath, target);
+  // The folder, not the file. The examiner picks (or overwrites) the file from there,
+  // including when that folder is on another drive letter.
+  assert.equal(second.calls.showSaveDialog[0].defaultPath, dir + path.sep);
 });
 
 test("save-session defaults to the session that was opened", async () => {
@@ -254,7 +236,7 @@ test("save-session defaults to the session that was opened", async () => {
   assert.equal(loaded.error, undefined);
   await channels["save-session"](null, { sessionData: sessionPayload() });
 
-  assert.equal(calls.showSaveDialog[0].defaultPath, opened);
+  assert.equal(calls.showSaveDialog[0].defaultPath, dir + path.sep);
 });
 
 test("save-session ignores a remembered path whose folder has gone away", async () => {
@@ -272,8 +254,8 @@ test("save-session ignores a remembered path whose folder has gone away", async 
   await second.channels["save-session"](null, { sessionData: sessionPayload() });
 
   const { defaultPath } = second.calls.showSaveDialog[0];
-  assert.notEqual(defaultPath, target);
-  assert.match(defaultPath, /\.tle$/);
+  assert.ok(!defaultPath.startsWith(gone), "a removed case folder must not be the dialog start");
+  assert.ok(defaultPath === "session.tle" || defaultPath.endsWith(path.sep));
 });
 
 test("save-session surfaces a write failure instead of looking like a success", async () => {

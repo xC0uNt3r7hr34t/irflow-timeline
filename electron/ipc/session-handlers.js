@@ -545,10 +545,16 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
     const target = result.filePath;
     const replaced = fs.existsSync(target);
     try {
-      const written = await writeSessionAtomic(target, sessionData, { pretty: true });
-      rememberLastSessionPath(written.path);
-      dbg("SESSION", "Session saved", { path: written.path, bytes: written.bytes, replaced });
-      return { path: written.path, bytes: written.bytes, tabCount: sessionData.tabs.length, replaced };
+      // A plain write to the chosen path, as the Windows build did before the v1.0.12
+      // merge. writeSessionAtomic (sibling temp file + fsync + rename) fails on mounted
+      // VHDs and similar drive-letter volumes that accept an ordinary write; it stays for
+      // autosave, which only ever targets userData on the system drive.
+      const json = JSON.stringify(sessionData, null, 2);
+      await fsp.writeFile(target, json, "utf-8");
+      const bytes = Buffer.byteLength(json, "utf8");
+      rememberLastSessionPath(target);
+      dbg("SESSION", "Session saved", { path: target, bytes, replaced });
+      return { path: target, bytes, tabCount: sessionData.tabs.length, replaced };
     } catch (err) {
       dbg("SESSION", "Session save failed", { path: target, code: err?.code, message: err?.message });
       return { error: describeWriteFailure(err, target), path: target };

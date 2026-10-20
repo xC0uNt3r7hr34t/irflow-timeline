@@ -102,18 +102,28 @@ test("save-session creates the file for a session that has never been saved", as
   assert.deepEqual(written.tabs[0].bookmarkedRowIds, [4, 9]);
 });
 
-test("save-session creates a first save into a directory that does not exist yet", async () => {
-  const dir = tmpdir("tle-save-newdir-");
-  // writeSessionAtomic mkdirs recursively; the temp file and the rename both have to land
-  // in a directory it just created, which only happens on a genuine first save.
-  const target = path.join(dir, "Case 2026-09", "evidence", "case.tle");
+test("save-session needs only a plain write: no mkdir, temp file, or rename", async () => {
+  const dir = tmpdir("tle-save-plain-");
+  const target = path.join(dir, "case.tle");
   const { channels } = loadHandlers({ saveResult: { canceled: false, filePath: target } });
 
-  const result = await channels["save-session"](null, { sessionData: sessionPayload() });
+  // A mounted VHD on a drive letter accepted the pre-v1.0.12 plain write but not the
+  // atomic one. Make every step the atomic path depends on fail, as such a volume can.
+  const fsp = require("node:fs/promises");
+  const refuse = (op) => async () => { throw Object.assign(new Error(`EPERM: operation not permitted, ${op}`), { code: "EPERM" }); };
+  const original = { mkdir: fsp.mkdir, rename: fsp.rename };
+  fsp.mkdir = refuse("mkdir");
+  fsp.rename = refuse("rename");
+  let result;
+  try {
+    result = await channels["save-session"](null, { sessionData: sessionPayload() });
+  } finally {
+    Object.assign(fsp, original);
+  }
 
   assert.equal(result.error, undefined);
-  assert.equal(fs.existsSync(target), true);
   assert.equal(JSON.parse(fs.readFileSync(target, "utf8")).version, 1);
+  assert.deepEqual(fs.readdirSync(dir), ["case.tle"]);
 });
 
 test("save-session leaves no temp artefact next to a first save", async () => {

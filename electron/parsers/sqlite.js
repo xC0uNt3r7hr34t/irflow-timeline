@@ -11,7 +11,10 @@ const { dbg } = require("../logger");
 
 const SQLITE_MAGIC = Buffer.from("SQLite format 3\0");
 const BATCH_SIZE_DEFAULT = 50000;
+const BATCH_SIZE_LARGE = 100000;
 const BATCH_SIZE_MAX_BYTES = 80 * 1024 * 1024;
+const LARGE_DB_BYTES = 100 * 1024 * 1024; // skip exact COUNT(*) above this
+const LARGE_FILE_BYTES = 5 * 1024 * 1024 * 1024;
 
 function isSqliteFile(filePath) {
   try {
@@ -48,8 +51,41 @@ function coerceSqliteValue(val) {
   return String(val);
 }
 
-function listSqliteTables(filePath) {
-  dbg("SQLITE", "listSqliteTables start", { filePath });
+/**
+ * Fast row-count estimate for large tables. COUNT(*) on multi-GB tables can take
+ * minutes; MAX(rowid) is usually instant when rowid is the primary key.
+ */
+function estimateTableRowCount(sqliteDb, tableName, useFastEstimate) {
+  const quoted = quoteSqliteIdent(tableName);
+  if (!useFastEstimate) {
+    try {
+      return sqliteDb.prepare(`SELECT COUNT(*) AS cnt FROM ${quoted}`).get()?.cnt || 0;
+    } catch (e) {
+      dbg("SQLITE", "estimateTableRowCount exact failed", { table: tableName, error: e.message });
+      return null;
+    }
+  }
+  try {
+    const maxRow = sqliteDb.prepare(`SELECT MAX(rowid) AS mx FROM ${quoted}`).get()?.mx;
+    if (Number.isFinite(maxRow) && maxRow > 0) return maxRow;
+  } catch {}
+  try {
+    return sqliteDb.prepare(`SELECT COUNT(*) AS cnt FROM ${quoted}`).get()?.cnt || 0;
+  } catch (e) {
+    dbg("SQLITE", "estimateTableRowCount failed", { table: tableName, error: e.message });
+    return null;
+  }
+}
+
+function listSqliteTables(filePath, fileSizeHint = 0, options = {}) {
+  const { rowCounts = true } = options;
+  dbg("SQLITE", "listSqliteTables start", { filePath, rowCounts });
+  let fileSize = fileSizeHint;
+  if (!fileSize) {
+    try { fileSize = fs.statSync(filePath).size; } catch {}
+  }
+  const useFastEstimate = fileSize > LARGE_DB_BYTES;
+
   let sqliteDb;
   try {
     sqliteDb = openSqliteReadonly(filePath);
@@ -62,30 +98,35 @@ function listSqliteTables(filePath) {
     const tables = [];
     for (const row of rows) {
       if (row.sql && /VIRTUAL/i.test(row.sql)) continue;
-      const quoted = quoteSqliteIdent(row.name);
-      let rowCount = 0;
-      try {
-        rowCount = sqliteDb.prepare(`SELECT COUNT(*) AS cnt FROM ${quoted}`).get()?.cnt || 0;
-      } catch (e) {
-        dbg("SQLITE", "listSqliteTables count failed", { table: row.name, error: e.message });
+      if (!rowCounts) {
+        tables.push({ name: row.name, rowCount: 0, rowCountEstimate: false });
         continue;
       }
-      tables.push({ name: row.name, rowCount });
+      const rowCount = estimateTableRowCount(sqliteDb, row.name, useFastEstimate);
+      if (rowCount == null) continue;
+      tables.push({
+        name: row.name,
+        rowCount,
+        rowCountEstimate: useFastEstimate,
+      });
     }
-    dbg("SQLITE", "listSqliteTables done", { tableCount: tables.length });
+    dbg("SQLITE", "listSqliteTables done", { tableCount: tables.length, rowCounts, useFastEstimate });
     return tables;
   } finally {
     try { sqliteDb?.close(); } catch {}
   }
 }
 
-async function parseSqliteTable(filePath, tabId, db, onProgress, tableName) {
+async function parseSqliteTable(filePath, tabId, db, onProgress, tableName, fileSizeHint = 0) {
   dbg("SQLITE", "parseSqliteTable start", { filePath, tabId, tableName });
   if (!tableName) throw new Error("SQLite table name required");
 
-  const tables = listSqliteTables(filePath);
-  const tableInfo = tables.find((t) => t.name === tableName);
-  if (!tableInfo) throw new Error(`Table not found: ${tableName}`);
+  let fileSize = fileSizeHint;
+  if (!fileSize) {
+    try { fileSize = fs.statSync(filePath).size; } catch {}
+  }
+  const isLargeFile = fileSize > LARGE_FILE_BYTES;
+  const useFastEstimate = fileSize > LARGE_DB_BYTES;
 
   let sqliteDb;
   try {
@@ -96,17 +137,50 @@ async function parseSqliteTable(filePath, tabId, db, onProgress, tableName) {
 
     const headers = colInfo.map((c) => c.name);
     const colCount = headers.length;
-    const totalRows = tableInfo.rowCount;
+    // On large DBs, skip COUNT/MAX(rowid) — it can block for minutes before the first row.
+    let totalRows = 0;
+    if (!useFastEstimate) {
+      totalRows = estimateTableRowCount(sqliteDb, tableName, false) ?? 0;
+    }
     db.createTab(tabId, headers);
 
+    if (onProgress) {
+      onProgress(0, 0, fileSize || 0, {
+        phase: "parsing",
+        statusDetail: useFastEstimate
+          ? "Importing SQLite rows (row total unknown for large databases)…"
+          : "Importing SQLite rows…",
+      });
+    }
+
+    const defaultBatch = isLargeFile ? BATCH_SIZE_LARGE : BATCH_SIZE_DEFAULT;
     const batchSize = Math.max(
       2000,
-      Math.min(BATCH_SIZE_DEFAULT, Math.floor(BATCH_SIZE_MAX_BYTES / Math.max(colCount * 64, 64)))
+      Math.min(defaultBatch, Math.floor(BATCH_SIZE_MAX_BYTES / Math.max(colCount * 64, 64)))
     );
     let batch = [];
     let rowCount = 0;
     let lastProgress = 0;
     const stmt = sqliteDb.prepare(`SELECT * FROM ${quoted}`);
+
+    const reportProgress = (force = false) => {
+      if (!onProgress) return;
+      if (!force && rowCount - lastProgress < 10000) return;
+      lastProgress = rowCount;
+      const bytesRead = totalRows > 0 && fileSize > 0
+        ? Math.min(fileSize, Math.round((rowCount / totalRows) * fileSize))
+        : 0;
+      const percent = totalRows > 0 && fileSize > 0
+        ? Math.min(99, Math.round((rowCount / totalRows) * 100))
+        : 0;
+      onProgress(rowCount, bytesRead, fileSize || totalRows, {
+        phase: "parsing",
+        percentHint: percent,
+        statusDetail: totalRows > 0
+          ? `Importing SQLite table (${rowCount.toLocaleString()} / ${totalRows.toLocaleString()} rows)…`
+          : `Importing SQLite table (${rowCount.toLocaleString()} rows)…`,
+      });
+    };
 
     for (const row of stmt.iterate()) {
       const values = new Array(colCount);
@@ -118,14 +192,11 @@ async function parseSqliteTable(filePath, tabId, db, onProgress, tableName) {
       if (batch.length >= batchSize) {
         db.insertBatchArrays(tabId, batch);
         batch = [];
-        if (rowCount - lastProgress >= 10000) {
-          lastProgress = rowCount;
-          if (onProgress) onProgress(rowCount, rowCount, totalRows);
-        }
+        reportProgress();
       }
     }
     if (batch.length) db.insertBatchArrays(tabId, batch);
-    if (onProgress) onProgress(rowCount, totalRows, totalRows);
+    reportProgress(true);
     const result = db.finalizeImport(tabId);
     dbg("SQLITE", "parseSqliteTable done", { tableName, rowCount: result.rowCount });
     return {
@@ -134,6 +205,7 @@ async function parseSqliteTable(filePath, tabId, db, onProgress, tableName) {
       tsColumns: result.tsColumns,
       numericColumns: result.numericColumns,
       sourceFormat: "sqlite",
+      isLargeFile,
     };
   } finally {
     try { sqliteDb?.close(); } catch {}
@@ -144,4 +216,6 @@ module.exports = {
   isSqliteFile,
   listSqliteTables,
   parseSqliteTable,
+  LARGE_DB_BYTES,
+  LARGE_FILE_BYTES,
 };

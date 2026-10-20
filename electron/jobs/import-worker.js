@@ -32,7 +32,7 @@ function cleanupAndExit(db, tabId) {
   try {
     if (cancelled) throw Object.assign(new Error("Import cancelled"), { cancelled: true });
     db._dbPathHint = dbPath;
-    progress({ phase: "parsing", rowsImported: 0, bytesRead: 0, totalBytes: fileSize || 0, percent: 0 });
+    progress({ phase: "preparing", rowsImported: 0, bytesRead: 0, totalBytes: fileSize || 0, percent: 0, statusDetail: "Starting import worker…" });
 
     const parsed = await parseFile(filePath, tabId, db, (rows, bytesRead, totalBytes, meta = {}) => {
       if (cancelled) throw Object.assign(new Error("Import cancelled"), { cancelled: true });

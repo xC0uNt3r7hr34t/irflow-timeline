@@ -18,6 +18,84 @@ const {
 } = require("../utils/session-persistence");
 const { diffTabTitle } = require("../db/diff-tabs");
 
+function sessionStatePath() {
+  try { return path.join(app.getPath("userData"), "session-state.json"); } catch { return null; }
+}
+
+/** The .tle this workspace was last saved to or opened from, if it is still reachable. */
+function loadLastSessionPath() {
+  const statePath = sessionStatePath();
+  if (!statePath) return null;
+  try {
+    const { lastSessionPath } = JSON.parse(fs.readFileSync(statePath, "utf8"));
+    if (typeof lastSessionPath !== "string" || !lastSessionPath) return null;
+    // A case folder that has been moved or unmounted would send the dialog somewhere
+    // that no longer exists, so fall back to the generated default instead.
+    return fs.existsSync(path.dirname(lastSessionPath)) ? lastSessionPath : null;
+  } catch { return null; }
+}
+
+function rememberLastSessionPath(filePath) {
+  const statePath = sessionStatePath();
+  if (!statePath || !filePath) return;
+  try { fs.writeFileSync(statePath, JSON.stringify({ lastSessionPath: filePath }), "utf8"); } catch {
+    /* remembering the path is a convenience — never fail a save over it */
+  }
+}
+
+/** Directory the save dialog should open in. Always a directory, never a file path. */
+function asDialogDirectory(dirPath) {
+  if (!dirPath) return null;
+  return dirPath.endsWith(path.sep) ? dirPath : dirPath + path.sep;
+}
+
+/**
+ * Where the save dialog opens. A full file path here is what broke saving onto a VHD or
+ * other drive letter: on Windows, showSaveDialog seeded with an absolute file under
+ * Documents returns a bad path once the examiner changes drives, so the write never lands
+ * on the volume they picked. A directory (trailing separator) opens in a useful place and
+ * still lets them change drives. The last-used case folder wins over Documents.
+ */
+function defaultSessionSavePath() {
+  const remembered = loadLastSessionPath();
+  if (remembered) {
+    const dir = asDialogDirectory(path.dirname(remembered));
+    if (dir) return dir;
+  }
+  for (const location of ["documents", "home"]) {
+    try {
+      const dir = asDialogDirectory(app.getPath(location));
+      if (dir) return dir;
+    } catch { /* not every platform defines every well-known location */ }
+  }
+  return "session.tle";
+}
+
+/**
+ * Turn a filesystem error into something an examiner can act on. The raw message names
+ * the internal temp file the atomic write was using, which reads like a bug report.
+ */
+function describeWriteFailure(err, target) {
+  const dir = path.dirname(target);
+  switch (err?.code) {
+    case "EACCES":
+    case "EPERM":
+      return `Permission denied writing to ${dir}. Pick a folder you can write to, or reopen IRFlow with the rights to write there.`;
+    case "EROFS":
+      return `${dir} is on a read-only volume.`;
+    case "ENOSPC":
+      return `The volume holding ${dir} is full.`;
+    case "EBUSY":
+    case "ETXTBSY":
+      return `${path.basename(target)} is in use by another program. Close it and save again.`;
+    case "ENAMETOOLONG":
+      return "That file name is too long for this filesystem.";
+    default:
+      return (err?.message || "Failed to write the session file")
+        .replace(/'[^']*\.tmp'/g, `'${target}'`);
+  }
+}
+
 function enqueuePlannedImports(planned, enqueueImport) {
   const scopePending = [];
   let enqueued = 0;
@@ -440,14 +518,47 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
   });
 
   // Session save
+  //
+  // Every outcome is reported back to the renderer. safeHandle turns a throw into a
+  // resolved {__ipcError} value, so a handler that threw here — or returned a bare path
+  // the caller ignored — was indistinguishable from a successful save: the examiner chose
+  // a location, no file appeared, and nothing said why. Validation also runs before the
+  // dialog so an unsaveable session is refused up front instead of after picking a path.
   safeHandle("save-session", async (event, { sessionData }) => {
+    try {
+      assertValidSessionPayload(sessionData);
+    } catch (err) {
+      dbg("SESSION", "Refusing to save an invalid session payload", { message: err?.message });
+      return { error: `This session cannot be saved: ${err?.message || "invalid session payload"}` };
+    }
+
     const result = await dialog.showSaveDialog(_activeWindow(), {
-      defaultPath: "session.tle",
+      title: "Save Session",
+      defaultPath: defaultSessionSavePath(),
       filters: [{ name: "TLE Session", extensions: ["tle"] }],
     });
-    if (result.canceled) return null;
-    await writeSessionAtomic(result.filePath, sessionData, { pretty: true });
-    return result.filePath;
+    if (result.canceled || !result.filePath) return { canceled: true };
+
+    // Write exactly the path the dialog returned. Resolving or rewriting it is what sent
+    // a drive-letter VHD save somewhere else (or nowhere): Windows already returns an
+    // absolute path, and the native dialog is what adds .tle and confirms an overwrite.
+    const target = result.filePath;
+    const replaced = fs.existsSync(target);
+    try {
+      // A plain write to the chosen path, as the Windows build did before the v1.0.12
+      // merge. writeSessionAtomic (sibling temp file + fsync + rename) fails on mounted
+      // VHDs and similar drive-letter volumes that accept an ordinary write; it stays for
+      // autosave, which only ever targets userData on the system drive.
+      const json = JSON.stringify(sessionData, null, 2);
+      await fsp.writeFile(target, json, "utf-8");
+      const bytes = Buffer.byteLength(json, "utf8");
+      rememberLastSessionPath(target);
+      dbg("SESSION", "Session saved", { path: target, bytes, replaced });
+      return { path: target, bytes, tabCount: sessionData.tabs.length, replaced };
+    } catch (err) {
+      dbg("SESSION", "Session save failed", { path: target, code: err?.code, message: err?.message });
+      return { error: describeWriteFailure(err, target), path: target };
+    }
   });
 
   // Session load
@@ -459,7 +570,10 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
     if (result.canceled || !result.filePaths.length) return null;
     try {
       const raw = fs.readFileSync(result.filePaths[0], "utf-8");
-      return assertValidSessionPayload(JSON.parse(raw));
+      const session = assertValidSessionPayload(JSON.parse(raw));
+      // Saving after opening a case file should offer to write back to it.
+      rememberLastSessionPath(result.filePaths[0]);
+      return session;
     } catch (e) {
       return { error: e.message };
     }
@@ -471,7 +585,9 @@ function registerSessionHandlers(safeHandle, safeSend, ctx) {
     }
     try {
       const raw = fs.readFileSync(filePath, "utf-8");
-      return assertValidSessionPayload(JSON.parse(raw));
+      const session = assertValidSessionPayload(JSON.parse(raw));
+      rememberLastSessionPath(filePath);
+      return session;
     } catch (e) {
       return { error: e.message };
     }

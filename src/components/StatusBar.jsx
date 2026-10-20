@@ -21,9 +21,44 @@ import { Tooltip } from "./primitives/index.js";
  *   clearAllFilters     – function to clear all filters
  *   up                  – function to update current tab field
  */
+/**
+ * Autosave state, shown where the examiner can glance at it. A crash-protection snapshot
+ * that has quietly stopped working is worth seeing, so a failure is coloured and carries
+ * the reason; a healthy autosave stays muted so it does not compete with filter state.
+ */
+function AutoSaveIndicator({ th, state }) {
+  if (!state || state.phase === "idle") return null;
+
+  const clock = state.at ? new Date(state.at).toLocaleTimeString() : null;
+  if (state.phase === "failed") {
+    return (
+      <Tooltip content={`Auto-save failed: ${state.error || "unknown error"}${clock ? `\nLast good snapshot: ${clock}` : "\nNo snapshot has been written this session."}`}>
+        <span style={{ color: th.warning, cursor: "help" }}>⚠ Auto-save failed</span>
+      </Tooltip>
+    );
+  }
+  if (state.phase === "saving" && !clock) {
+    return <span style={{ color: th.textMuted }}>Auto-saving…</span>;
+  }
+
+  const label = state.phase === "saving" ? "Auto-saving…" : `Auto-saved ${clock}`;
+  const detail = [
+    `${formatNumber(state.tabCount || 0)} tab${state.tabCount === 1 ? "" : "s"} snapshotted at ${clock}`,
+    "Recovered automatically if IRFlow exits unexpectedly.",
+    state.path ? `\n${state.path}` : "",
+  ].filter(Boolean).join("\n");
+
+  return (
+    <Tooltip content={detail}>
+      <span style={{ color: th.textMuted, cursor: "help" }}>{label}</span>
+    </Tooltip>
+  );
+}
+
 export default function StatusBar({
   th,
   ct,
+  autoSaveState,
   isGrouped,
   selectionCount,
   copiedMsg,
@@ -135,6 +170,7 @@ export default function StatusBar({
         {ct._detectedProfile && <span style={{ color: th.success }}>{ct._detectedProfile}</span>}
         <button type="button" disabled={!ct?.dataReady} onClick={() => setModal({ type: "editFilter" })}
           style={{ ...actionStyle, cursor: ct?.dataReady ? "pointer" : "default", color: ct?.advancedFilters?.length > 0 ? th.accent : th.textMuted, textDecoration: ct?.dataReady ? "underline" : "none" }}>Edit Filter</button>
+        <AutoSaveIndicator th={th} state={autoSaveState} />
         <span style={{ color: th.textMuted }}>SQLite-backed</span>
       </div>
     </div>

@@ -77,7 +77,7 @@ async function parseFile(filePath, tabId, db, onProgress, sheetName, fileSize, t
     const check = validatePlasoFile(filePath);
     if (check.valid) return parsePlasoFile(filePath, tabId, db, onProgress);
     if (!tableName) throw new Error("SQLite table name required");
-    return parseSqliteTable(filePath, tabId, db, onProgress, tableName);
+    return parseSqliteTable(filePath, tabId, db, onProgress, tableName, fileSize);
   }
 
   if (ext === ".jsonl" || ext === ".json") {

@@ -8,6 +8,7 @@ const {
   isSqliteFile,
   listSqliteTables,
   parseSqliteTable,
+  LARGE_DB_BYTES,
 } = require("../electron/parsers/sqlite");
 const { makeImportQueueKey } = require("../electron/utils/import-queue");
 
@@ -56,13 +57,14 @@ test("generic SQLite import lists tables and streams one table", async (t) => {
     assert.equal(isSqliteFile(dbPath), true);
     const tables = listSqliteTables(dbPath);
     assert.deepEqual(
-      tables.map((row) => ({ name: row.name, rowCount: row.rowCount })),
+      tables.map((row) => ({ name: row.name, rowCount: row.rowCount, rowCountEstimate: !!row.rowCountEstimate })),
       [
-        { name: "events", rowCount: 3 },
-        { name: "users", rowCount: 2 },
+        { name: "events", rowCount: 3, rowCountEstimate: false },
+        { name: "users", rowCount: 2, rowCountEstimate: false },
       ],
     );
 
+    const progressCalls = [];
     const created = [];
     const batches = [];
     const fakeDb = {
@@ -70,12 +72,75 @@ test("generic SQLite import lists tables and streams one table", async (t) => {
       insertBatchArrays(_tabId, rows) { batches.push(rows); },
       finalizeImport() { return { rowCount: 2, tsColumns: ["created_at"], numericColumns: ["id"] }; },
     };
-    const result = await parseSqliteTable(dbPath, "tab-1", fakeDb, null, "users");
+    const result = await parseSqliteTable(dbPath, "tab-1", fakeDb, (rows, bytesRead, totalBytes) => {
+      progressCalls.push({ rows, bytesRead, totalBytes });
+    }, "users");
     assert.deepEqual(created[0].headers, ["id", "name", "created_at"]);
     assert.equal(result.rowCount, 2);
     assert.equal(result.sourceFormat, "sqlite");
     assert.equal(batches.flat().length, 2);
     assert.equal(batches.flat()[0][1], "alice");
+    assert.ok(progressCalls.length >= 1);
+    assert.equal(progressCalls[progressCalls.length - 1].rows, 2);
+  } catch (err) {
+    if (skipSqlite(t, err)) return;
+    throw err;
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("listSqliteTables can skip row counts for fast single-table routing", async (t) => {
+  let Database;
+  try {
+    Database = require("better-sqlite3");
+  } catch (err) {
+    if (skipSqlite(t, err)) return;
+    throw err;
+  }
+
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-sqlite-fast-"));
+  const dbPath = path.join(dir, "single.sqlite");
+  try {
+    const sqlite = new Database(dbPath);
+    sqlite.exec(`
+      CREATE TABLE events (id INTEGER PRIMARY KEY, action TEXT);
+      INSERT INTO events (action) VALUES ('login');
+    `);
+    sqlite.close();
+    const tables = listSqliteTables(dbPath, 0, { rowCounts: false });
+    assert.deepEqual(tables, [{ name: "events", rowCount: 0, rowCountEstimate: false }]);
+  } catch (err) {
+    if (skipSqlite(t, err)) return;
+    throw err;
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("listSqliteTables uses fast row estimates for large databases", async (t) => {
+  let Database;
+  try {
+    Database = require("better-sqlite3");
+  } catch (err) {
+    if (skipSqlite(t, err)) return;
+    throw err;
+  }
+
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "irflow-sqlite-large-"));
+  const dbPath = path.join(dir, "large.sqlite");
+  try {
+    const sqlite = new Database(dbPath);
+    sqlite.exec(`
+      CREATE TABLE events (id INTEGER PRIMARY KEY, action TEXT);
+      INSERT INTO events (action) VALUES ('login'), ('logout'), ('export');
+    `);
+    sqlite.close();
+    const tables = listSqliteTables(dbPath, LARGE_DB_BYTES + 1);
+    assert.equal(tables.length, 1);
+    assert.equal(tables[0].name, "events");
+    assert.equal(tables[0].rowCount, 3);
+    assert.equal(tables[0].rowCountEstimate, true);
   } catch (err) {
     if (skipSqlite(t, err)) return;
     throw err;

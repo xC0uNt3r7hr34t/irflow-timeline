@@ -19,6 +19,60 @@ const LARGE_FILE_BLOCK_XLSX_BYTES = 10 * 1024 * 1024 * 1024;
 const MEMORY_PRESSURE_RSS_BYTES = 3.5 * 1024 * 1024 * 1024;
 const MEMORY_PRESSURE_MIN_FILE_BYTES = 2 * 1024 * 1024 * 1024;
 
+function gb(n) {
+  return (n / (1024 ** 3)).toFixed(0);
+}
+
+function checkTempDiskSpace(fileSize, tempDir) {
+  if (!(fileSize > 0) || typeof fs.statfsSync !== "function") return null;
+  const FTS_GATE = 5 * 1024 * 1024 * 1024;
+  const ftsWillRun = fileSize <= FTS_GATE;
+  const requiredBytes = Math.round(fileSize * (ftsWillRun ? 5 : 2.5));
+  let freeBytes = Infinity;
+  try { const st = fs.statfsSync(tempDir); freeBytes = st.bavail * st.bsize; } catch {}
+  if (freeBytes >= requiredBytes) return null;
+  return {
+    requiredBytes,
+    freeBytes,
+    tempDir,
+    message: `Not enough free disk space to import this file. IRFlow needs roughly ${gb(requiredBytes)} GB free on the temp volume (${tempDir}) for the database and indexes, but only ${gb(freeBytes)} GB is available. Free up space, or choose a folder on a larger volume via Tools ▸ Set Temp Storage Folder…, and try again.`,
+  };
+}
+
+function reportImportPreparing(safeSend, { tabId, fileName, filePath, fileSize, statusDetail }) {
+  safeSend("import-start", {
+    tabId,
+    fileName,
+    filePath,
+    fileSize,
+    sheetName: null,
+    tableName: null,
+  });
+  safeSend("import-progress", {
+    tabId,
+    fileName,
+    rowsImported: 0,
+    percent: 0,
+    phase: "preparing",
+    statusDetail: statusDetail || "Preparing import…",
+    bytesRead: 0,
+    totalBytes: fileSize || 0,
+  });
+}
+
+async function showImportFailure(activeWindow, mainWindow, safeSend, { tabId, fileName, error }) {
+  safeSend("import-error", { tabId, fileName, error });
+  if (mainWindow) {
+    await dialog.showMessageBox(activeWindow(), {
+      type: "error",
+      title: "Import Failed",
+      message: fileName ? `Could not import ${fileName}` : "Import failed",
+      detail: error,
+      buttons: ["OK"],
+    }).catch(() => {});
+  }
+}
+
 /**
  * Import a file into the application.
  *
@@ -88,7 +142,7 @@ async function importFile(filePath, preTabId, preSheetName, deps, queueItem = {}
       type: "warning",
       title: "Large File Warning",
       message: `This file is ${sizeGB} GB`,
-      detail: `Importing very large files needs significant disk space (roughly 2–3× the file size on your temp volume) and memory. The UI may stay busy for several minutes after import finishes.\n\nSystem RAM: ${ramGB} GB\n\nTips: quit and restart IRFlow before importing, close other large tabs, and wait for "indexes ready" before opening column filters. For Plaso files, consider exporting a filtered CSV with psort first.`,
+      detail: `Importing very large files needs significant disk space (roughly 2–3× the file size on your temp volume) and memory. The UI may stay busy for several minutes after import finishes.\n\nSystem RAM: ${ramGB} GB\n\nTips: quit and restart IRFlow before importing, close other large tabs, and wait for "indexes ready" before opening column filters. For Plaso or large SQLite databases, consider exporting a filtered CSV with psort first.`,
       buttons: ["Import Anyway", "Cancel"],
       defaultId: 1,
       cancelId: 1,
@@ -121,6 +175,24 @@ async function importFile(filePath, preTabId, preSheetName, deps, queueItem = {}
       }
       dbg("IMPORT", `User proceeding despite memory pressure`, { filePath, rssMB, sizeGB });
     }
+  }
+
+  // Show the import tab immediately after preflight dialogs — large SQLite discovery and
+  // worker startup can otherwise leave the UI blank for minutes with no feedback.
+  const sqliteCandidateEarly = !aiHistory && (
+    ext === ".sqlite" || ext === ".sqlite3" || ext === ".db" || (typeof isSqliteFile === "function" && isSqliteFile(filePath))
+  );
+  if (fileSize > LARGE_FILE_WARN_BYTES || sqliteCandidateEarly) {
+    reportImportPreparing(safeSend, { tabId, fileName, filePath, fileSize, statusDetail: "Preparing import…" });
+  }
+
+  const diskError = checkTempDiskSpace(fileSize, resolveTempDir());
+  if (diskError) {
+    dbg("IMPORT", `Refusing import — insufficient temp disk`, { filePath, ...diskError });
+    await showImportFailure(activeWindow(), mainWindow, safeSend, {
+      tabId, fileName, error: diskError.message,
+    });
+    return;
   }
 
   // If sheetName is pre-assigned (from select-sheet or session restore), skip sheet detection
@@ -162,13 +234,28 @@ async function importFile(filePath, preTabId, preSheetName, deps, queueItem = {}
       const plasoCheck = typeof validatePlasoFile === "function" ? validatePlasoFile(filePath) : { valid: false };
       if (!plasoCheck.valid) {
         dbg("IMPORT", `listSqliteTables calling...`, { filePath });
-        const tables = await listSqliteTables(filePath);
+        reportImportPreparing(safeSend, {
+          tabId, fileName, filePath, fileSize,
+          statusDetail: "Reading SQLite table list…",
+        });
+        // Name-only pass — row counts can take minutes on multi-GB DBs.
+        const tables = await listSqliteTables(filePath, fileSize, { rowCounts: false });
         dbg("IMPORT", `listSqliteTables returned`, { tableCount: tables.length, tables: tables.map((t) => t.name) });
         if (!tables.length) {
           safeSend("import-error", { tabId, fileName, error: "No importable tables found in SQLite database" });
           return;
         }
         if (tables.length > 1) {
+          safeSend("import-progress", {
+            tabId,
+            fileName,
+            rowsImported: 0,
+            percent: 0,
+            phase: "preparing",
+            statusDetail: "Multiple tables found — choose which table to import",
+            bytesRead: 0,
+            totalBytes: fileSize || 0,
+          });
           safeSend("table-selection", { tabId, fileName, filePath, tables });
           return;
         }
@@ -186,38 +273,26 @@ async function importFile(filePath, preTabId, preSheetName, deps, queueItem = {}
 }
 
 async function startImport(filePath, tabId, fileName, sheetName, preFileSize, deps, tableName = null) {
-  const { safeSend, db, runImportJob, scheduleIndexBuild, importQueue, pendingIndexTabs, tabMeta } = deps;
+  const {
+    safeSend, db, runImportJob, scheduleIndexBuild, importQueue, pendingIndexTabs, tabMeta,
+    mainWindow, activeWindow,
+  } = deps;
 
   dbg("IMPORT", `startImport begin`, { filePath, tabId, fileName, sheetName, tableName });
   let fileSize = preFileSize || 0;
   if (!fileSize) { try { fileSize = fs.statSync(filePath).size; } catch {} }
   dbg("IMPORT", `fileSize`, { fileSize });
 
-  // ── Free-disk guardrail ──────────────────────────────────────────
-  // The temp SQLite DB + per-column indexes (and, for files ≤5GB, the trigram FTS index)
-  // live on the os.tmpdir() volume and can total several times the source size. Refuse up
-  // front if the volume clearly lacks headroom, rather than failing with SQLITE_FULL
-  // mid-build — which silently leaves a half-indexed DB and a stuffed system disk.
-  if (fileSize > 0 && typeof fs.statfsSync === "function") {
-    const tempDir = resolveTempDir(); // the volume the temp DB + indexes will be written to
-    const FTS_GATE = 5 * 1024 * 1024 * 1024; // matches db.js isLargeFile (FTS is skipped above this)
-    const ftsWillRun = fileSize <= FTS_GATE;
-    // db (~1.2x) + all-column indexes (~1.5x) + WAL/temp slack, plus trigram FTS (~2.5x) when it runs.
-    const requiredBytes = Math.round(fileSize * (ftsWillRun ? 5 : 2.5));
-    let freeBytes = Infinity;
-    try { const st = fs.statfsSync(tempDir); freeBytes = st.bavail * st.bsize; } catch {}
-    if (freeBytes < requiredBytes) {
-      const gb = (n) => (n / (1024 ** 3)).toFixed(0);
-      dbg("IMPORT", `Refusing import — insufficient temp disk`, { fileSize, requiredBytes, freeBytes, tempDir });
-      safeSend("import-error", {
-        tabId, fileName,
-        error: `Not enough free disk space to import this file. IRFlow needs roughly ${gb(requiredBytes)} GB free on the temp volume (${tempDir}) for the database and indexes, but only ${gb(freeBytes)} GB is available. Free up space, or choose a folder on a larger volume via Tools ▸ Set Temp Storage Folder…, and try again.`,
-      });
-      return;
-    }
+  const diskError = checkTempDiskSpace(fileSize, resolveTempDir());
+  if (diskError) {
+    dbg("IMPORT", `Refusing import — insufficient temp disk`, { fileSize, ...diskError });
+    await showImportFailure(activeWindow, mainWindow, safeSend, {
+      tabId, fileName, error: diskError.message,
+    });
+    return;
   }
 
-  // Notify renderer that import has started
+  // Notify renderer that import has started (idempotent if preparing UI was already shown).
   safeSend("import-start", {
     tabId,
     fileName,
@@ -336,7 +411,7 @@ async function startImport(filePath, tabId, fileName, sheetName, preFileSize, de
     dbg("IMPORT", `startImport FAILED`, { error: err.message, stack: err.stack });
     // Clean up partially-imported tab on failure
     try { db.closeTab(tabId); } catch (_) {}
-    safeSend("import-error", {
+    await showImportFailure(activeWindow, mainWindow, safeSend, {
       tabId,
       fileName,
       error: err.message,

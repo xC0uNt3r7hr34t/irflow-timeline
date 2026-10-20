@@ -5,6 +5,29 @@ All notable changes to IRFlow Timeline. The macOS release workflow
 released version as the GitHub release notes — keep version headers in the form
 `## v<MAJOR.MINOR.PATCH>`.
 
+## v1.0.13
+
+Windows release. Session save works again on a VHD or other volume mounted as a drive letter, and large SQLite imports show progress instead of sitting on a blank screen.
+
+### Session save
+
+- **Save Session writes the file you pick.** A plain write to the dialog path, including `E:\` and other mounted VHDs. The v1.0.12 atomic temp-file write failed on those volumes while Documents on C: succeeded.
+- **Replace an existing session.** Pick the `.tle` in the save dialog and confirm the replace prompt.
+- **The dialog opens in the last case folder**, or in Documents, as a folder rather than a pre-filled file, so changing drives stays on the drive you chose.
+- **You are told whether it saved.** Success names the path. Failure names the reason.
+- **Auto-save is visible** in the status bar, including when a snapshot fails.
+
+### Import
+
+- **SQLite databases are a supported format**, listed with CSV, EVTX, Plaso, `$MFT`, and `$J`. One table imports directly. More than one asks which table to import.
+- **Large files show progress immediately** after the size warning, including while a SQLite database is still being opened.
+- **A multi-sheet workbook or multi-table database opened from the home screen shows its picker.** Previously the choice was set and nothing appeared until another file was opened.
+- **Opening a session or a file at launch waits** until the window is ready to receive it.
+
+### Windows wording
+
+- Home screen, import progress, and Collect AI Artifacts say Windows and This PC.
+
 ## v1.0.10
 
 IRFlow Timeline 1.0.10 adds **ChatGPT Computer History** as a new forensic artifact family, and hardens the app for long-running investigations.
